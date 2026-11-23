@@ -142,6 +142,51 @@
       mix-blend-mode: overlay;
     }
 
+    /* Fix Tampilan Pemindai Kamera Live Stream Html5Qrcode */
+    #qrReaderContainer {
+      position: relative;
+      width: 100%;
+      min-height: 280px;
+      max-height: 440px;
+      overflow: hidden;
+      background-color: #020617;
+    }
+
+    #qrReader {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 280px;
+      max-height: 440px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      position: relative !important;
+      border: none !important;
+      background: #020617 !important;
+    }
+
+    #qrReader video {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 280px;
+      max-height: 440px;
+      object-fit: cover !important;
+      display: block !important;
+      border-radius: 1rem;
+    }
+
+    #qrReader canvas {
+      display: none !important;
+    }
+
+    #qrReader__scan_region,
+    #qr-shaded-region {
+      border: none !important;
+      box-shadow: none !important;
+      display: none !important;
+    }
+
     /* Cetak Print Layout */
     @media print {
       @page {
@@ -1368,30 +1413,30 @@
 
             <!-- Video Scanner Container Live Canggih -->
             <div id="qrReaderContainer"
-              class="w-full bg-slate-950 rounded-2xl overflow-hidden min-h-[250px] flex items-center justify-center text-slate-400 text-xs relative border-2 border-slate-700/60 shadow-inner">
-              <div id="qrReader" class="w-full"></div>
+              class="w-full bg-slate-950 rounded-2xl overflow-hidden min-h-[300px] sm:min-h-[360px] max-h-[440px] flex items-center justify-center text-slate-400 text-xs relative border-2 border-slate-700/60 shadow-inner">
+              <div id="qrReader" class="w-full h-full min-h-[300px]"></div>
 
               <!-- Viewfinder Overlay Laser Animasi -->
               <div id="qrScanOverlay"
-                class="absolute inset-0 pointer-events-none hidden flex flex-col items-center justify-center p-4">
+                class="absolute inset-0 pointer-events-none hidden flex flex-col items-center justify-center p-4 z-10">
                 <div
-                  class="w-48 h-48 sm:w-56 sm:h-56 border border-emerald-400/50 rounded-2xl relative shadow-2xl shadow-emerald-500/20 backdrop-brightness-105">
+                  class="w-56 h-56 sm:w-64 sm:h-64 border-2 border-emerald-400/60 rounded-2xl relative shadow-2xl shadow-emerald-500/30 backdrop-brightness-105">
                   <!-- Sudut Pemindai Bersinar -->
                   <span
-                    class="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg"></span>
+                    class="absolute -top-1.5 -left-1.5 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl"></span>
                   <span
-                    class="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg"></span>
+                    class="absolute -top-1.5 -right-1.5 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl"></span>
                   <span
-                    class="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg"></span>
+                    class="absolute -bottom-1.5 -left-1.5 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl"></span>
                   <span
-                    class="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-emerald-400 rounded-br-lg"></span>
+                    class="absolute -bottom-1.5 -right-1.5 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-xl"></span>
                   <!-- Garis Laser Pemindai Animasi -->
                   <div
                     class="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent absolute top-1/2 -translate-y-1/2 animate-pulse shadow-md shadow-emerald-300">
                   </div>
                 </div>
                 <span
-                  class="mt-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-emerald-300 font-bold text-[10px] tracking-wide border border-emerald-500/30">
+                  class="mt-3 px-3.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-emerald-300 font-bold text-[10px] tracking-wide border border-emerald-500/40">
                   Arahkan Barcode / QR ID Card Siswa ke Kotak
                 </span>
               </div>
@@ -5524,8 +5569,25 @@
       const btnStop = document.getElementById('btnStopQrScan');
       const badge = document.getElementById('qrStatusBadge');
 
+      const supportedFormats = (typeof Html5QrcodeSupportedFormats !== 'undefined') ? [
+        Html5QrcodeSupportedFormats.QR_CODE,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODABAR
+      ] : undefined;
+
       if (!appState.html5QrCode) {
-        appState.html5QrCode = new Html5Qrcode('qrReader');
+        appState.html5QrCode = new Html5Qrcode('qrReader', {
+          formatsToSupport: supportedFormats,
+          verbose: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        });
       }
 
       if (qrScanningActive) return;
@@ -5536,26 +5598,15 @@
       }
 
       const launchCameraEngine = function () {
-        let cameraTarget = { facingMode: currentFacingMode };
-        if (availableCameras.length > 0 && availableCameras[currentCameraIdx]) {
-          cameraTarget = { deviceId: { exact: availableCameras[currentCameraIdx].id } };
+        let cameraTarget;
+        if (availableCameras.length > 0 && availableCameras[currentCameraIdx] && availableCameras[currentCameraIdx].id) {
+          cameraTarget = availableCameras[currentCameraIdx].id;
+        } else {
+          cameraTarget = { facingMode: currentFacingMode };
         }
 
         const scanConfig = {
-          fps: 15,
-          qrbox: function (viewfinderWidth, viewfinderHeight) {
-            const minDim = Math.min(viewfinderWidth, viewfinderHeight);
-            const boxSize = Math.floor(minDim * 0.72);
-            return { width: Math.max(boxSize, 220), height: Math.max(boxSize, 220) };
-          },
-          aspectRatio: 1.0,
-          formatsToSupport: typeof Html5QrcodeSupportedFormats !== 'undefined' ? [
-            Html5QrcodeSupportedFormats.QR_CODE,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.UPC_A
-          ] : undefined
+          fps: 20
         };
 
         appState.html5QrCode.start(
