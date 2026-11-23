@@ -3433,14 +3433,19 @@
           args: args
         });
 
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(function () { controller.abort(); }, 15000) : null;
+
         fetch(targetUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'text/plain;charset=utf-8'
           },
-          body: postPayload
+          body: postPayload,
+          signal: controller ? controller.signal : undefined
         })
           .then(function (res) {
+            if (timeoutId) clearTimeout(timeoutId);
             if (!res.ok) throw new Error('HTTP Status ' + res.status);
             return res.json();
           })
@@ -3448,6 +3453,7 @@
             if (callback) callback(response);
           })
           .catch(function (err) {
+            if (timeoutId) clearTimeout(timeoutId);
             console.warn('Gagal memanggil API GAS (' + functionName + '), beralih ke simulasi lokal:', err);
             simulateBackendLocally(functionName, args, callback);
             if (errorCallback) errorCallback(err);
@@ -3713,9 +3719,9 @@
     }
 
     /**
-     * Memuat Data Awal Pengaturan dan Metrik Dashboard (Stale-While-Revalidate)
+     * Memuat Data Awal Pengaturan dan Metrik Dashboard (True Cache-First)
      */
-    function fetchInitialData() {
+    function fetchInitialData(forceRefresh) {
       // 1. Tampilkan data dari Persistent Cache secara instan (0.05 detik)
       const cached = getLocalCache('initialData');
       if (cached && cached.data) {
@@ -3732,9 +3738,14 @@
           const timeEl = document.getElementById('dashboardServerTime');
           if (timeEl) timeEl.innerText = res.serverTime;
         }
+        // Jika data masih segar (<10 menit) dan tidak dipaksa refresh, tidak perlu panggil server!
+        if (!cached.isExpired && !forceRefresh) {
+          fetchWaliData(false);
+          return;
+        }
       }
 
-      // 2. Revalidasi data paling segar dari Google Apps Script di latar belakang
+      // 2. Ambil data paling segar dari Google Apps Script jika cache kosong, kedaluwarsa, atau dipaksa refresh
       callBackend('apiGetInitialData', undefined, function (res) {
         if (res && res.success) {
           setLocalCache('initialData', res);
@@ -3753,7 +3764,7 @@
         }
       });
       // Ambil data wali untuk pipeline dashboard & dropdown surat izin
-      fetchWaliData();
+      fetchWaliData(forceRefresh);
     }
 
     // Asset Vektor SVG DataURI Bawaan Resmi (100% Bebas CORS & Instan Offline untuk ID Card / Avatar)
@@ -3824,17 +3835,17 @@
 
     /**
      * Memformat Tautan Gambar & Mengubah URL Google Drive ke Direct CDN
-     * Dilengkapi integrasi CORS Proxy untuk menjamin kompatibilitas html2canvas saat cetak / download ID Card.
+     * Bebas dari proxy eksternal lambat sehingga pemuatan gambar instan.
      */
     function formatImageUrl(url, defaultAvatar) {
-      if (!url || typeof url !== 'string') return defaultAvatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+      if (!url || typeof url !== 'string') return defaultAvatar || DEFAULT_SRMA_LOGO;
       const trimmed = url.trim();
-      if (!trimmed) return defaultAvatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+      if (!trimmed) return defaultAvatar || DEFAULT_SRMA_LOGO;
 
       // Jika berupa DataURI Base64, kembalikan langsung
       if (trimmed.indexOf('data:') === 0) return trimmed;
 
-      // Konversi berbagai variasi link Google Drive ke CDN thumbnail langsung lewat CORS proxy
+      // Konversi berbagai variasi link Google Drive ke CDN thumbnail langsung berkecepatan tinggi
       if (trimmed.indexOf('drive.google.com') !== -1 || trimmed.indexOf('drive.usercontent.google.com') !== -1) {
         let id = '';
         const matchD = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -3845,14 +3856,8 @@
           if (matchId && matchId[1]) id = matchId[1];
         }
         if (id) {
-          const directThumb = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
-          return 'https://images.weserv.nl/?url=' + encodeURIComponent(directThumb);
+          return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w800';
         }
-      }
-
-      // Jika URL eksternal biasa (seperti flaticon), lewatkan ke weserv agar memiliki header CORS untuk html2canvas
-      if (trimmed.indexOf('http') === 0 && trimmed.indexOf('images.weserv.nl') === -1) {
-        return 'https://images.weserv.nl/?url=' + encodeURIComponent(trimmed);
       }
 
       return trimmed;
@@ -4339,12 +4344,13 @@
     function loadModuleData(menuId) {
       if (menuId === 'dashboard') {
         if (appState.metrics) renderDoughnutChart(appState.metrics);
-        refreshDashboardData();
+        if (appState.cache.shift) renderPiketHariIni(appState.cache.shift);
+        else fetchJadwalShiftData(false);
       } else if (menuId === 'wali') {
-        if (!appState.cache.wali) fetchWaliData();
+        if (!appState.cache.wali) fetchWaliData(false);
         else renderWaliList(appState.cache.wali);
         // Data shift dimuat agar banner Petugas Piket Hari Ini tetap tampil untuk umum
-        if (!appState.cache.shift) fetchJadwalShiftData();
+        if (!appState.cache.shift) fetchJadwalShiftData(false);
         else {
           renderPiketHariIni(appState.cache.shift);
           if (appState.currentUser) {
@@ -4352,29 +4358,35 @@
           }
         }
       } else if (menuId === 'siswa') {
-        if (!appState.cache.siswa) fetchSiswaData();
+        if (!appState.cache.siswa) fetchSiswaData(null, false);
         else renderSiswaTable(appState.cache.siswa);
       } else if (menuId === 'absensi') {
-        if (!appState.cache.siswa) fetchSiswaData(function () { loadAbsensiForSession(); });
+        if (!appState.cache.siswa) fetchSiswaData(function () { loadAbsensiForSession(); }, false);
         else loadAbsensiForSession();
         if (!appState.cache.riwayatAbsensi) loadRiwayatAbsensi(false);
       } else if (menuId === 'izin') {
-        if (!appState.cache.izin) fetchIzinData();
+        if (!appState.cache.izin) fetchIzinData(false);
         else renderIzinTable(appState.cache.izin);
       } else if (menuId === 'penanganan') {
-        if (!appState.cache.sakit) fetchSakitData();
-        if (!appState.cache.pelanggaran) fetchPelanggaranData();
+        if (!appState.cache.sakit) fetchSakitData(false);
+        if (!appState.cache.pelanggaran) fetchPelanggaranData(false);
       } else if (menuId === 'kebutuhan') {
-        if (!appState.cache.kebutuhan) fetchKebutuhanInventarisData();
+        if (!appState.cache.kebutuhan) fetchKebutuhanInventarisData(false);
         else renderKebutuhanDanInventarisTables();
       }
     }
 
     function refreshDashboardData() {
       invalidateLocalCache();
-      fetchInitialData();
-      if (appState.activeMenu) loadModuleData(appState.activeMenu);
-      showToast('Cache dibersihkan & data disinkronkan.', 'info');
+      showToast('Menyinkronkan data terbaru dari server...', 'info');
+      fetchInitialData(true);
+      fetchWaliData(true);
+      if (appState.activeMenu === 'wali') fetchJadwalShiftData(true);
+      else if (appState.activeMenu === 'siswa') fetchSiswaData(null, true);
+      else if (appState.activeMenu === 'absensi') { fetchSiswaData(null, true); loadRiwayatAbsensi(true); }
+      else if (appState.activeMenu === 'izin') fetchIzinData(true);
+      else if (appState.activeMenu === 'penanganan') { fetchSakitData(true); fetchPelanggaranData(true); }
+      else if (appState.activeMenu === 'kebutuhan') fetchKebutuhanInventarisData(true);
     }
 
     // =====================================================================
@@ -4539,13 +4551,16 @@
     // MODUL WALI ASUH & ASRAMA
     // =====================================================================
 
-    function fetchWaliData() {
+    function fetchWaliData(forceRefresh) {
       const cached = getLocalCache('wali');
       if (cached && cached.data) {
         appState.cache.wali = cached.data;
         renderWaliList(cached.data);
         renderWaliPipeline(cached.data);
         populateWaliPiketDropdowns();
+        if (!cached.isExpired && !forceRefresh) {
+          return;
+        }
       }
       callBackend('apiGetWaliList', undefined, function (res) {
         if (res && res.success) {
@@ -4776,13 +4791,16 @@
       }
     }
 
-    function fetchJadwalShiftData() {
+    function fetchJadwalShiftData(forceRefresh) {
       const cached = getLocalCache('shift');
       if (cached && cached.data) {
         appState.cache.shift = cached.data;
         renderPiketHariIni(cached.data);
         if (appState.currentUser) {
           renderJadwalShiftTable(cached.data);
+        }
+        if (!cached.isExpired && !forceRefresh) {
+          return;
         }
       }
       callBackend('apiGetJadwalShiftList', undefined, function (res) {
@@ -5535,7 +5553,7 @@
     // MODUL SISWA, ID CARD & PORTOFOLIO
     // =====================================================================
 
-    function fetchSiswaData(callback) {
+    function fetchSiswaData(callback, forceRefresh) {
       const cached = getLocalCache('siswa');
       let hasCallbackRun = false;
       if (cached && cached.data) {
@@ -5545,6 +5563,9 @@
         if (callback) {
           callback();
           hasCallbackRun = true;
+        }
+        if (!cached.isExpired && !forceRefresh) {
+          return;
         }
       }
       callBackend('apiGetSiswaList', undefined, function (res) {
@@ -6382,6 +6403,7 @@
         if (cached && cached.data && cached.data.length > 0) {
           appState.cache.riwayatAbsensi = cached.data;
           filterRiwayatAbsensi();
+          if (!cached.isExpired) return;
         }
       }
 
@@ -6681,11 +6703,12 @@
     // MODUL SURAT IZIN PULANG DAN KELUAR
     // =====================================================================
 
-    function fetchIzinData() {
+    function fetchIzinData(forceRefresh) {
       const cached = getLocalCache('izin');
       if (cached && cached.data) {
         appState.cache.izin = cached.data;
         renderIzinTable(cached.data);
+        if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetIzinList', undefined, function (res) {
         if (res && res.success) {
@@ -7231,11 +7254,12 @@
       }
     }
 
-    function fetchSakitData() {
+    function fetchSakitData(forceRefresh) {
       const cached = getLocalCache('sakit');
       if (cached && cached.data) {
         appState.cache.sakit = cached.data;
         renderSakitTable(cached.data);
+        if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetSakitList', undefined, function (res) {
         if (res && res.success) {
@@ -7425,11 +7449,12 @@
     }
 
     // Pelanggaran & Asesmen
-    function fetchPelanggaranData() {
+    function fetchPelanggaranData(forceRefresh) {
       const cached = getLocalCache('pelanggaran');
       if (cached && cached.data) {
         appState.cache.pelanggaran = cached.data;
         renderPelanggaranTable(cached.data);
+        if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetPelanggaranList', undefined, function (res) {
         if (res && res.success) {
@@ -7564,12 +7589,13 @@
       }
     }
 
-    function fetchKebutuhanInventarisData() {
+    function fetchKebutuhanInventarisData(forceRefresh) {
       const cached = getLocalCache('kebutuhan_inv');
       if (cached && cached.data) {
         appState.cache.kebutuhan = cached.data.kebutuhan;
         appState.cache.inventaris = cached.data.inventaris;
         renderKebutuhanDanInventarisTables();
+        if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetKebutuhanDanInventaris', undefined, function (res) {
         if (res && res.success) {
