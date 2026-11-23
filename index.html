@@ -2406,7 +2406,7 @@
           <!-- 3. Barcode QR Code Absensi di Bagian Bawah -->
           <div class="w-full pt-1 flex flex-col items-center">
             <div class="bg-white p-1 rounded-xl shadow-lg border border-amber-300/40">
-              <div id="idCardQrContainer" class="flex items-center justify-center"></div>
+              <div id="idCardQrContainer" class="flex items-center justify-center min-w-[90px] min-h-[90px]"></div>
             </div>
             <span class="text-[7px] text-slate-300 tracking-wider font-bold mt-1 uppercase">SCAN VERIFIKASI
               ABSENSI</span>
@@ -3454,7 +3454,7 @@
 
     /**
      * Memformat Tautan Gambar & Mengubah URL Google Drive ke Direct CDN
-     * Menghilangkan kendala X-Frame-Options dan gambar rusak (broken image).
+     * Dilengkapi integrasi CORS Proxy untuk menjamin kompatibilitas html2canvas saat cetak / download ID Card.
      */
     function formatImageUrl(url, defaultAvatar) {
       if (!url || typeof url !== 'string') return defaultAvatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
@@ -3464,7 +3464,7 @@
       // Jika berupa DataURI Base64, kembalikan langsung
       if (trimmed.indexOf('data:') === 0) return trimmed;
 
-      // Konversi berbagai variasi link Google Drive ke CDN thumbnail langsung
+      // Konversi berbagai variasi link Google Drive ke CDN thumbnail langsung lewat CORS proxy
       if (trimmed.indexOf('drive.google.com') !== -1 || trimmed.indexOf('drive.usercontent.google.com') !== -1) {
         let id = '';
         const matchD = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -3475,9 +3475,16 @@
           if (matchId && matchId[1]) id = matchId[1];
         }
         if (id) {
-          return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
+          const directThumb = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000';
+          return 'https://images.weserv.nl/?url=' + encodeURIComponent(directThumb);
         }
       }
+
+      // Jika URL eksternal biasa (seperti flaticon), lewatkan ke weserv agar memiliki header CORS untuk html2canvas
+      if (trimmed.indexOf('http') === 0 && trimmed.indexOf('images.weserv.nl') === -1) {
+        return 'https://images.weserv.nl/?url=' + encodeURIComponent(trimmed);
+      }
+
       return trimmed;
     }
 
@@ -3558,9 +3565,22 @@
       if (logoEl) logoEl.src = logoUrl;
       if (instansiEl) instansiEl.innerText = instansi;
       if (heroInstansi) heroInstansi.innerText = instansi;
-      if (idLogo) idLogo.src = logoUrl;
-      if (kopLogo) kopLogo.src = logoUrl;
-      if (suratLogo) suratLogo.src = logoUrl;
+      if (idLogo) {
+        idLogo.crossOrigin = 'anonymous';
+        idLogo.src = logoUrl;
+      }
+      if (kopLogo) {
+        kopLogo.crossOrigin = 'anonymous';
+        kopLogo.src = logoUrl;
+      }
+      if (suratLogo) {
+        suratLogo.crossOrigin = 'anonymous';
+        suratLogo.src = logoUrl;
+      }
+      const sideLogo = document.getElementById('sidebarLogoImg');
+      const sideInstansi = document.getElementById('sidebarInstansiName');
+      if (sideLogo) sideLogo.src = logoUrl;
+      if (sideInstansi) sideInstansi.innerText = instansi;
     }
 
     /**
@@ -5320,30 +5340,47 @@
         : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
       const idCardFotoEl = document.getElementById('idCardFoto');
       if (idCardFotoEl) {
-        idCardFotoEl.onerror = function () { this.src = defaultSiswaAvatar; };
+        idCardFotoEl.crossOrigin = 'anonymous';
+        idCardFotoEl.onerror = function () {
+          if (this.src.indexOf('images.weserv.nl') !== -1 && s.fotoUrl && s.fotoUrl.indexOf('drive.google.com') !== -1) {
+            let id = '';
+            const matchD = s.fotoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (matchD && matchD[1]) id = matchD[1];
+            else {
+              const matchId = s.fotoUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+              if (matchId && matchId[1]) id = matchId[1];
+            }
+            if (id) {
+              this.src = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w800';
+              return;
+            }
+          }
+          this.src = defaultSiswaAvatar;
+        };
         idCardFotoEl.src = formatImageUrl(s.fotoUrl, defaultSiswaAvatar);
       }
 
-      // Generate Barcode QR Code Dinamis (Menampilkan data lengkap siswa saat di-scan)
+      const idCardLogoEl = document.getElementById('idCardLogo');
+      if (idCardLogoEl) {
+        idCardLogoEl.crossOrigin = 'anonymous';
+        idCardLogoEl.onerror = function () {
+          this.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+        };
+        idCardLogoEl.src = formatImageUrl(appState.settings.LOGO_URL, 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+      }
+
+      // Generate Barcode QR Code Dinamis Bersih & Berkontras Tinggi (Khusus Absensi Cepat)
       const qrBox = document.getElementById('idCardQrContainer');
       qrBox.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
-        const qrContent = [
-          '=== KTA DIGITAL e-SIWALI ===',
-          'Nama: ' + (s.nama || '-'),
-          'NISN: ' + (s.nisn || '-'),
-          'JK: ' + (s.jenisKelamin || '-'),
-          'Kamar: ' + (s.noKamar || '-'),
-          'Wali Asuh: ' + (s.namaWaliAsuh || '-'),
-          'Status: Siswa Aktif Asrama',
-          'Instansi: SRT 1 Sidenreng Rappang'
-        ].join('\n');
+        // HANYA gunakan NISN bersih agar matriks QR berukuran Version 1 (modul besar, tajam, & instan di-scan)
+        const qrContent = 'NISN: ' + String(s.nisn || '').trim();
 
         new QRCode(qrBox, {
           text: qrContent,
-          width: 76,
-          height: 76,
-          colorDark: '#0F2537',
+          width: 90,
+          height: 90,
+          colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
@@ -5373,8 +5410,9 @@
       html2canvas(card, {
         scale: 3,
         useCORS: true,
-        allowTaint: true,
-        backgroundColor: null
+        allowTaint: false,
+        backgroundColor: null,
+        logging: false
       }).then(function (canvas) {
         const link = document.createElement('a');
         link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
