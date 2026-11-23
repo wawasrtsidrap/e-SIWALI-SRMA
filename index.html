@@ -152,39 +152,52 @@
       background-color: #020617;
     }
 
-    #qrReader {
+    #qrReader,
+    #qrReader > div,
+    #qrReader__scan_region {
       width: 100% !important;
       height: 100% !important;
-      min-height: 280px;
-      max-height: 440px;
+      min-height: 280px !important;
+      max-height: 440px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       overflow: hidden !important;
       position: relative !important;
       border: none !important;
-      background: #020617 !important;
+      background: transparent !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     #qrReader video {
       width: 100% !important;
       height: 100% !important;
-      min-height: 280px;
-      max-height: 440px;
+      min-width: 100% !important;
+      min-height: 100% !important;
+      max-height: 440px !important;
       object-fit: cover !important;
       display: block !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       border-radius: 1rem;
     }
 
+    /* Sembunyikan canvas tanpa display:none agar ZXing tetap dapat membaca frame video */
     #qrReader canvas {
-      display: none !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      z-index: -1 !important;
     }
 
-    #qrReader__scan_region,
+    /* Sembunyikan shaded region bawaan Html5Qrcode agar memakai laser overlay custom */
     #qr-shaded-region {
-      border: none !important;
-      box-shadow: none !important;
       display: none !important;
+      border: none !important;
     }
 
     /* Cetak Print Layout */
@@ -1227,6 +1240,7 @@
                 </tbody>
               </table>
             </div>
+            <div id="paginationShift"></div>
           </div>
         </div>
 
@@ -1322,6 +1336,7 @@
             </tbody>
           </table>
         </div>
+        <div id="paginationSiswa"></div>
       </div>
     </section>
 
@@ -1707,6 +1722,7 @@
               </tbody>
             </table>
           </div>
+          <div id="paginationRiwayatAbsensi"></div>
         </div>
       </div>
     </section>
@@ -1759,6 +1775,7 @@
             </tbody>
           </table>
         </div>
+        <div id="paginationIzin"></div>
       </div>
     </section>
 
@@ -1813,6 +1830,7 @@
               </tbody>
             </table>
           </div>
+          <div id="paginationSakit"></div>
         </div>
       </div>
 
@@ -1848,6 +1866,7 @@
               </tbody>
             </table>
           </div>
+          <div id="paginationAsesmen"></div>
         </div>
       </div>
     </section>
@@ -1900,6 +1919,7 @@
             </tbody>
           </table>
         </div>
+        <div id="paginationKebutuhan"></div>
       </div>
 
       <!-- Panel Inventaris Barang -->
@@ -1923,6 +1943,7 @@
             </tbody>
           </table>
         </div>
+        <div id="paginationInventaris"></div>
       </div>
     </section>
 
@@ -2368,7 +2389,7 @@
 
           <!-- 1. Header Kop Lembaga Resmi (Portrait Center) -->
           <div class="w-full pb-2 border-b border-white/20 flex flex-col items-center space-y-1">
-            <img id="idCardLogo" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png"
+            <img id="idCardLogo" src="" alt="Logo SRMA"
               class="w-9 h-9 rounded-xl bg-white p-0.5 object-contain shadow-md ring-1 ring-white/40">
             <div class="leading-tight px-1">
               <h5 class="text-[8.5px] font-black uppercase tracking-wider text-amber-300 leading-tight">SEKOLAH RAKYAT
@@ -3329,6 +3350,16 @@
         kebutuhan: null,
         inventaris: null
       },
+      pagination: {
+        shift: { page: 1, limit: 10 },
+        siswa: { page: 1, limit: 10 },
+        riwayatAbsensi: { page: 1, limit: 10 },
+        izin: { page: 1, limit: 10 },
+        sakit: { page: 1, limit: 10 },
+        asesmen: { page: 1, limit: 10 },
+        kebutuhan: { page: 1, limit: 10 },
+        inventaris: { page: 1, limit: 10 }
+      },
       html5QrCode: null,
       chartInstance: null
     };
@@ -3429,11 +3460,284 @@
     }
 
     /**
-     * Memuat Data Awal Pengaturan dan Metrik Dashboard
+     * =====================================================================
+     * MULTI-TIER PERSISTENT CACHE & SISTEM CLIENT-SIDE PAGINATION (ANTI-LEMOT)
+     * =====================================================================
+     */
+    const CACHE_PREFIX = 'esowali_cache_';
+    const DEFAULT_CACHE_TTL = 10 * 60 * 1000; // 10 menit
+
+    function setLocalCache(key, data, ttlMs) {
+      try {
+        const record = {
+          timestamp: Date.now(),
+          ttl: ttlMs || DEFAULT_CACHE_TTL,
+          data: data
+        };
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(record));
+      } catch (e) {
+        console.warn('Gagal menyimpan cache ' + key + ' ke localStorage:', e);
+      }
+    }
+
+    function getLocalCache(key) {
+      try {
+        const item = localStorage.getItem(CACHE_PREFIX + key);
+        if (!item) return null;
+        const record = JSON.parse(item);
+        const isExpired = Date.now() - record.timestamp > (record.ttl || DEFAULT_CACHE_TTL);
+        return {
+          data: record.data,
+          isExpired: isExpired,
+          timestamp: record.timestamp
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function invalidateLocalCache(key) {
+      try {
+        if (key) {
+          localStorage.removeItem(CACHE_PREFIX + key);
+        } else {
+          const keysToRemove = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.indexOf(CACHE_PREFIX) === 0) {
+              keysToRemove.push(k);
+            }
+          }
+          keysToRemove.forEach(function (k) {
+            localStorage.removeItem(k);
+          });
+        }
+      } catch (e) {}
+    }
+
+    /**
+     * Memotong data array untuk Pagination Cerdas
+     */
+    function paginateList(list, page, limit) {
+      if (!list || !Array.isArray(list)) list = [];
+      page = Math.max(1, parseInt(page) || 1);
+      limit = Math.max(1, parseInt(limit) || 10);
+      const totalItems = list.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+      if (page > totalPages) page = totalPages;
+      const startIndex = (page - 1) * limit;
+      const endIndex = Math.min(startIndex + limit, totalItems);
+      const items = list.slice(startIndex, endIndex);
+      return {
+        items: items,
+        page: page,
+        limit: limit,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        startIndex: totalItems === 0 ? 0 : startIndex + 1,
+        endIndex: endIndex
+      };
+    }
+
+    /**
+     * Merender Bilah Navigasi Pagination Responsif (HP & Desktop)
+     */
+    function renderPaginationControls(containerId, pag, onPageChangeFnName, onLimitChangeFnName) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      if (!pag || pag.totalItems === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const start = pag.startIndex;
+      const end = pag.endIndex;
+      const total = pag.totalItems;
+      const page = pag.page;
+      const totalPages = pag.totalPages;
+      const limit = pag.limit;
+
+      let pageButtonsHtml = '';
+      const pageNumbers = [];
+      if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+      } else {
+        pageNumbers.push(1);
+        if (page > 3) pageNumbers.push('...');
+        const startPage = Math.max(2, page - 1);
+        const endPage = Math.min(totalPages - 1, page + 1);
+        for (let i = startPage; i <= endPage; i++) {
+          if (!pageNumbers.includes(i)) pageNumbers.push(i);
+        }
+        if (page < totalPages - 2) pageNumbers.push('...');
+        if (!pageNumbers.includes(totalPages)) pageNumbers.push(totalPages);
+      }
+
+      pageNumbers.forEach(function (p) {
+        if (p === '...') {
+          pageButtonsHtml += '<span class="px-2 py-1 text-slate-400 text-xs font-semibold select-none">...</span>';
+        } else if (p === page) {
+          pageButtonsHtml += '<button type="button" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold bg-navy text-white shadow-sm ring-1 ring-navy/20 cursor-default">' + p + '</button>';
+        } else {
+          pageButtonsHtml += '<button type="button" onclick="' + onPageChangeFnName + '(' + p + ')" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-slate-700 hover:text-navy hover:bg-slate-100 border border-slate-200 transition">' + p + '</button>';
+        }
+      });
+
+      const prevDisabled = page <= 1;
+      const nextDisabled = page >= totalPages;
+
+      const prevBtn = '<button type="button" onclick="' + onPageChangeFnName + '(' + (page - 1) + ')" ' + (prevDisabled ? 'disabled class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium text-slate-300 border border-slate-200 cursor-not-allowed"' : 'class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-slate-700 hover:text-navy hover:bg-slate-100 border border-slate-200 transition"') + '><span class="hidden sm:inline">&larr; </span>Sebelumnya</button>';
+
+      const nextBtn = '<button type="button" onclick="' + onPageChangeFnName + '(' + (page + 1) + ')" ' + (nextDisabled ? 'disabled class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium text-slate-300 border border-slate-200 cursor-not-allowed"' : 'class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-slate-700 hover:text-navy hover:bg-slate-100 border border-slate-200 transition"') + '>Berikutnya<span class="hidden sm:inline"> &rarr;</span></button>';
+
+      const limitSelect = onLimitChangeFnName ? (
+        '<div class="flex items-center space-x-1.5 text-xs text-slate-600">' +
+        '<span>Baris:</span>' +
+        '<select onchange="' + onLimitChangeFnName + '(this.value)" class="px-2 py-1 border border-slate-200 rounded-lg text-xs bg-white text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-navy cursor-pointer">' +
+        '<option value="10"' + (limit === 10 ? ' selected' : '') + '>10</option>' +
+        '<option value="25"' + (limit === 25 ? ' selected' : '') + '>25</option>' +
+        '<option value="50"' + (limit === 50 ? ' selected' : '') + '>50</option>' +
+        '</select>' +
+        '</div>'
+      ) : '';
+
+      container.innerHTML =
+        '<div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-slate-50/90 border-t border-slate-200 rounded-b-xl">' +
+        '<div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">' +
+        '<span class="text-xs text-slate-500 font-medium">Menampilkan <strong class="text-slate-800">' + start + '&ndash;' + end + '</strong> dari <strong class="text-slate-800">' + total + '</strong> data</span>' +
+        limitSelect +
+        '</div>' +
+        '<div class="flex items-center space-x-1 sm:space-x-1.5 w-full sm:w-auto justify-center sm:justify-end overflow-x-auto py-0.5">' +
+        prevBtn +
+        pageButtonsHtml +
+        nextBtn +
+        '</div>' +
+        '</div>';
+    }
+
+    // Helper Kunci Unik Siswa (Aman Terhadap Pagination & Indexing)
+    function getSiswaByIdOrIndex(key) {
+      if (!appState.cache.siswa) return null;
+      if (typeof key === 'number') {
+        return appState.cache.siswa[key] || null;
+      }
+      const sKey = String(key).trim();
+      const found = appState.cache.siswa.find(function (s) {
+        return String(s.nisn).trim() === sKey || String(s.nik || '').trim() === sKey;
+      });
+      if (found) return found;
+      const num = parseInt(key);
+      if (!isNaN(num) && appState.cache.siswa[num]) return appState.cache.siswa[num];
+      return null;
+    }
+
+    // Event Handler Pagination Tiap Modul
+    function changeShiftPage(p) {
+      appState.pagination.shift.page = p;
+      renderJadwalShiftTable(appState.cache.shift || []);
+    }
+    function changeShiftLimit(l) {
+      appState.pagination.shift.limit = parseInt(l) || 10;
+      appState.pagination.shift.page = 1;
+      renderJadwalShiftTable(appState.cache.shift || []);
+    }
+
+    function changeSiswaPage(p) {
+      appState.pagination.siswa.page = p;
+      renderSiswaTable(window.currentFilteredSiswa || appState.cache.siswa || []);
+    }
+    function changeSiswaLimit(l) {
+      appState.pagination.siswa.limit = parseInt(l) || 10;
+      appState.pagination.siswa.page = 1;
+      renderSiswaTable(window.currentFilteredSiswa || appState.cache.siswa || []);
+    }
+
+    function changeRiwayatAbsensiPage(p) {
+      appState.pagination.riwayatAbsensi.page = p;
+      renderRiwayatAbsensiTable(window.currentFilteredRiwayatAbsensi || appState.cache.riwayatAbsensi || []);
+    }
+    function changeRiwayatAbsensiLimit(l) {
+      appState.pagination.riwayatAbsensi.limit = parseInt(l) || 10;
+      appState.pagination.riwayatAbsensi.page = 1;
+      renderRiwayatAbsensiTable(window.currentFilteredRiwayatAbsensi || appState.cache.riwayatAbsensi || []);
+    }
+
+    function changeIzinPage(p) {
+      appState.pagination.izin.page = p;
+      renderIzinTable(appState.cache.izin || []);
+    }
+    function changeIzinLimit(l) {
+      appState.pagination.izin.limit = parseInt(l) || 10;
+      appState.pagination.izin.page = 1;
+      renderIzinTable(appState.cache.izin || []);
+    }
+
+    function changeSakitPage(p) {
+      appState.pagination.sakit.page = p;
+      renderSakitTable(appState.cache.sakit || []);
+    }
+    function changeSakitLimit(l) {
+      appState.pagination.sakit.limit = parseInt(l) || 10;
+      appState.pagination.sakit.page = 1;
+      renderSakitTable(appState.cache.sakit || []);
+    }
+
+    function changeAsesmenPage(p) {
+      appState.pagination.asesmen.page = p;
+      renderPelanggaranTable(appState.cache.pelanggaran || []);
+    }
+    function changeAsesmenLimit(l) {
+      appState.pagination.asesmen.limit = parseInt(l) || 10;
+      appState.pagination.asesmen.page = 1;
+      renderPelanggaranTable(appState.cache.pelanggaran || []);
+    }
+
+    function changeKebutuhanPage(p) {
+      appState.pagination.kebutuhan.page = p;
+      renderKebutuhanDanInventarisTables();
+    }
+    function changeKebutuhanLimit(l) {
+      appState.pagination.kebutuhan.limit = parseInt(l) || 10;
+      appState.pagination.kebutuhan.page = 1;
+      renderKebutuhanDanInventarisTables();
+    }
+
+    function changeInventarisPage(p) {
+      appState.pagination.inventaris.page = p;
+      renderKebutuhanDanInventarisTables();
+    }
+    function changeInventarisLimit(l) {
+      appState.pagination.inventaris.limit = parseInt(l) || 10;
+      appState.pagination.inventaris.page = 1;
+      renderKebutuhanDanInventarisTables();
+    }
+
+    /**
+     * Memuat Data Awal Pengaturan dan Metrik Dashboard (Stale-While-Revalidate)
      */
     function fetchInitialData() {
+      // 1. Tampilkan data dari Persistent Cache secara instan (0.05 detik)
+      const cached = getLocalCache('initialData');
+      if (cached && cached.data) {
+        const res = cached.data;
+        if (res.settings) {
+          appState.settings = Object.assign(appState.settings, res.settings);
+          syncSettingsToUI();
+        }
+        if (res.metrics) {
+          appState.metrics = res.metrics;
+          renderMetrics(res.metrics);
+        }
+        if (res.serverTime) {
+          const timeEl = document.getElementById('dashboardServerTime');
+          if (timeEl) timeEl.innerText = res.serverTime;
+        }
+      }
+
+      // 2. Revalidasi data paling segar dari Google Apps Script di latar belakang
       callBackend('apiGetInitialData', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('initialData', res);
           if (res.settings) {
             appState.settings = Object.assign(appState.settings, res.settings);
             syncSettingsToUI();
@@ -3450,6 +3754,72 @@
       });
       // Ambil data wali untuk pipeline dashboard & dropdown surat izin
       fetchWaliData();
+    }
+
+    // Asset Vektor SVG DataURI Bawaan Resmi (100% Bebas CORS & Instan Offline untuk ID Card / Avatar)
+    const DEFAULT_SRMA_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231E3A8A"/><stop offset="100%" stop-color="%230F172A"/></linearGradient><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23FBBF24"/><stop offset="100%" stop-color="%23D97706"/></linearGradient></defs><rect width="100" height="100" rx="20" fill="url(%23g1)"/><circle cx="50" cy="50" r="38" fill="none" stroke="url(%23g2)" stroke-width="2.5"/><path d="M50 20 L53 32 L65 32 L55 40 L59 52 L50 44 L41 52 L45 40 L35 32 L47 32 Z" fill="url(%23g2)"/><path d="M30 68 C38 60 46 62 50 66 C54 62 62 60 70 68 C62 64 54 65 50 72 C46 65 38 64 30 68 Z" fill="%23FFFFFF"/><circle cx="50" cy="38" r="4" fill="%23FFFFFF"/></svg>';
+    const DEFAULT_AVATAR_MALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><circle cx="60" cy="46" r="26" fill="%23FDBA74"/><path d="M60 20 C46 20 38 28 38 38 C38 42 42 45 44 45 C48 34 56 30 66 30 C74 30 78 35 82 45 C84 45 86 40 82 34 C78 24 70 20 60 20 Z" fill="%230F172A"/><path d="M30 115 C30 92 42 82 60 82 C78 82 90 92 90 115 L90 140 L30 140 Z" fill="%23FFFFFF"/><polygon points="60,88 53,105 60,130 67,105" fill="%231E3A8A"/><polygon points="56,84 64,84 62,90 58,90" fill="%230F172A"/></svg>';
+    const DEFAULT_AVATAR_FEMALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><path d="M60 24 C44 24 36 36 36 55 C36 78 44 88 44 88 L32 115 C32 115 42 140 60 140 C78 140 88 115 88 115 L76 88 C76 88 84 78 84 55 C84 36 76 24 60 24 Z" fill="%23FFFFFF"/><circle cx="60" cy="56" r="20" fill="%23FDBA74"/><path d="M46 54 C46 44 52 38 60 38 C68 38 74 44 74 54 C74 65 67 72 60 72 C53 72 46 65 46 54 Z" fill="%23FDBA74"/><polygon points="60,94 54,108 60,126 66,108" fill="%231E3A8A"/></svg>';
+
+    /**
+     * Konversi Gambar URL Eksternal ke DataURI Base64 Secara Aman
+     * Menjamin elemen <img> pada ID Card 100% bebas dari batasan CORS saat di-render oleh html2canvas.
+     */
+    function safeSetImageWithDataUri(imgEl, rawUrl, fallbackDataUri) {
+      if (!imgEl) return;
+      if (!rawUrl || rawUrl === fallbackDataUri) {
+        imgEl.removeAttribute('crossorigin');
+        imgEl.src = fallbackDataUri;
+        return;
+      }
+      const trimmed = String(rawUrl).trim();
+      if (!trimmed) {
+        imgEl.removeAttribute('crossorigin');
+        imgEl.src = fallbackDataUri;
+        return;
+      }
+
+      // Jika sudah DataURI, pakai langsung
+      if (trimmed.indexOf('data:') === 0) {
+        imgEl.removeAttribute('crossorigin');
+        imgEl.src = trimmed;
+        return;
+      }
+
+      const formatted = formatImageUrl(trimmed, fallbackDataUri);
+      if (formatted.indexOf('data:') === 0) {
+        imgEl.removeAttribute('crossorigin');
+        imgEl.src = formatted;
+        return;
+      }
+
+      // Gunakan placeholder fallback terlebih dahulu sementara gambar sedang diuji/dikonversi
+      imgEl.src = fallbackDataUri;
+
+      const testImg = new Image();
+      testImg.crossOrigin = 'anonymous';
+      testImg.onload = function () {
+        try {
+          const cvs = document.createElement('canvas');
+          cvs.width = testImg.naturalWidth || testImg.width || 200;
+          cvs.height = testImg.naturalHeight || testImg.height || 200;
+          const ctx = cvs.getContext('2d');
+          ctx.drawImage(testImg, 0, 0);
+          const dataUri = cvs.toDataURL('image/png');
+          imgEl.removeAttribute('crossorigin');
+          imgEl.src = dataUri;
+        } catch (e) {
+          // Jika kanvas tertular CORS taint, tetap gunakan formatted dengan anonymous
+          imgEl.crossOrigin = 'anonymous';
+          imgEl.src = formatted;
+        }
+      };
+      testImg.onerror = function () {
+        // Fallback jika URL gagal diakses
+        imgEl.removeAttribute('crossorigin');
+        imgEl.src = fallbackDataUri;
+      };
+      testImg.src = formatted;
     }
 
     /**
@@ -3838,7 +4208,7 @@
           '<div class="h-1 w-full absolute top-0 left-0 ' + topBarGradient + '"></div>' +
           '<div class="flex items-start space-x-3">' +
           '<div class="relative flex-shrink-0">' +
-          '<img src="' + fotoSrc + '" class="w-13 h-13 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + fotoSrc + '" loading="lazy" decoding="async" class="w-13 h-13 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
           '<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="Pegawai Aktif"></span>' +
           '</div>' +
           '<div class="flex-1 min-w-0 leading-tight space-y-1">' +
@@ -4001,8 +4371,10 @@
     }
 
     function refreshDashboardData() {
+      invalidateLocalCache();
       fetchInitialData();
-      showToast('Data dashboard telah diperbarui.', 'info');
+      if (appState.activeMenu) loadModuleData(appState.activeMenu);
+      showToast('Cache dibersihkan & data disinkronkan.', 'info');
     }
 
     // =====================================================================
@@ -4168,8 +4540,16 @@
     // =====================================================================
 
     function fetchWaliData() {
+      const cached = getLocalCache('wali');
+      if (cached && cached.data) {
+        appState.cache.wali = cached.data;
+        renderWaliList(cached.data);
+        renderWaliPipeline(cached.data);
+        populateWaliPiketDropdowns();
+      }
       callBackend('apiGetWaliList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('wali', res.data);
           appState.cache.wali = res.data;
           renderWaliList(res.data);
           renderWaliPipeline(res.data);
@@ -4223,7 +4603,7 @@
           '<div>' +
           '<div class="flex items-center space-x-3.5 pb-3.5 border-b border-slate-100">' +
           '<div class="relative flex-shrink-0">' +
-          '<img src="' + foto + '" class="w-14 h-14 object-cover rounded-2xl border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-14 h-14 object-cover rounded-2xl border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
           '<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="Pegawai Aktif"></span>' +
           '</div>' +
           '<div class="overflow-hidden space-y-1 flex-1">' +
@@ -4315,6 +4695,8 @@
         if (res && res.success) {
           closeModalWali();
           showToast(res.message, 'success');
+          invalidateLocalCache('wali');
+          invalidateLocalCache('initialData');
           appState.cache.wali = null;
           fetchWaliData();
           fetchInitialData();
@@ -4395,8 +4777,17 @@
     }
 
     function fetchJadwalShiftData() {
+      const cached = getLocalCache('shift');
+      if (cached && cached.data) {
+        appState.cache.shift = cached.data;
+        renderPiketHariIni(cached.data);
+        if (appState.currentUser) {
+          renderJadwalShiftTable(cached.data);
+        }
+      }
       callBackend('apiGetJadwalShiftList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('shift', res.data);
           appState.cache.shift = res.data;
           renderPiketHariIni(res.data);
           if (appState.currentUser) {
@@ -4881,6 +5272,7 @@
 
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="' + (isAdmin ? '8' : '7') + '" class="py-8 text-center text-slate-400">Belum ada data jadwal shift tersimpan. ' + (isAdmin ? 'Silakan klik tombol <strong>+ Tambah Jadwal Shift</strong>.' : '') + '</td></tr>';
+        renderPaginationControls('paginationShift', null);
         return;
       }
 
@@ -4916,11 +5308,14 @@
 
       if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="' + (isAdmin ? '8' : '7') + '" class="py-8 text-center text-slate-400">Tidak ada jadwal shift yang sesuai filter pencarian.</td></tr>';
+        renderPaginationControls('paginationShift', null);
         return;
       }
 
-      filtered.forEach(function (item) {
-        const originalIndex = list.findIndex(function (x) { return x.id === item.id; });
+      const pag = paginateList(filtered, appState.pagination.shift.page, appState.pagination.shift.limit);
+      appState.pagination.shift.page = pag.page;
+
+      pag.items.forEach(function (item) {
         const jabLabel = resolveJabatanWali(item);
         const isAsuh = jabLabel.toLowerCase().indexOf('asuh') !== -1;
         const katBadge = isAsuh
@@ -4947,7 +5342,7 @@
         if (isAdmin) {
           aksiCol = '<td class="py-3 px-3 text-center whitespace-nowrap">' +
             '<div class="inline-flex items-center space-x-1">' +
-            '<button onclick="editShiftByIndex(' + originalIndex + ')" class="p-1 text-navy hover:text-maroon rounded hover:bg-slate-100 transition" title="Edit Jadwal Shift">' +
+            '<button onclick="editShiftByIndex(\'' + item.id + '\')" class="p-1 text-navy hover:text-maroon rounded hover:bg-slate-100 transition" title="Edit Jadwal Shift">' +
             '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>' +
             '</button>' +
             '<button onclick="deleteShiftById(\'' + item.id + '\', \'' + item.namaPetugas + '\')" class="p-1 text-red-600 hover:text-red-800 rounded hover:bg-red-50 transition" title="Hapus Jadwal">' +
@@ -4976,9 +5371,12 @@
           aksiCol;
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationShift', pag, 'changeShiftPage', 'changeShiftLimit');
     }
 
     function filterJadwalShift() {
+      appState.pagination.shift.page = 1;
       renderJadwalShiftTable(appState.cache.shift || []);
     }
 
@@ -5035,14 +5433,25 @@
       document.getElementById('modalShift').classList.add('hidden');
     }
 
-    function editShiftByIndex(idx) {
+    function editShiftByIndex(idxOrId) {
       const isAdmin = appState.currentUser && appState.currentUser.role.toLowerCase() === 'admin';
       if (!isAdmin) {
         showToast('Akses ditolak: Hanya Admin yang dapat mengedit jadwal shift.', 'warning');
         return;
       }
 
-      const item = appState.cache.shift ? appState.cache.shift[idx] : null;
+      let item = null;
+      if (appState.cache.shift) {
+        if (typeof idxOrId === 'number') {
+          item = appState.cache.shift[idxOrId];
+        } else {
+          item = appState.cache.shift.find(function (x) { return String(x.id) === String(idxOrId); });
+          if (!item) {
+            const num = parseInt(idxOrId);
+            if (!isNaN(num)) item = appState.cache.shift[num];
+          }
+        }
+      }
       if (!item) return;
 
       document.getElementById('shiftId').value = item.id || '';
@@ -5072,6 +5481,7 @@
       callBackend('apiDeleteJadwalShift', id, function (res) {
         if (res && res.success) {
           showToast(res.message, 'success');
+          invalidateLocalCache('shift');
           appState.cache.shift = null;
           fetchJadwalShiftData();
         } else {
@@ -5109,6 +5519,7 @@
         if (res && res.success) {
           closeModalShift();
           showToast(res.message, 'success');
+          invalidateLocalCache('shift');
           appState.cache.shift = null;
           fetchJadwalShiftData();
         } else {
@@ -5125,12 +5536,24 @@
     // =====================================================================
 
     function fetchSiswaData(callback) {
+      const cached = getLocalCache('siswa');
+      let hasCallbackRun = false;
+      if (cached && cached.data) {
+        appState.cache.siswa = cached.data;
+        renderSiswaTable(cached.data);
+        populateSiswaDropdowns(cached.data);
+        if (callback) {
+          callback();
+          hasCallbackRun = true;
+        }
+      }
       callBackend('apiGetSiswaList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('siswa', res.data);
           appState.cache.siswa = res.data;
           renderSiswaTable(res.data);
           populateSiswaDropdowns(res.data);
-          if (callback) callback();
+          if (callback && !hasCallbackRun) callback();
         }
       });
     }
@@ -5140,6 +5563,8 @@
       const thAksi = document.getElementById('thAksiSiswa');
       if (!tbody) return;
       tbody.innerHTML = '';
+
+      window.currentFilteredSiswa = list;
 
       const isLogged = !!appState.currentUser;
       const isAdminOrAsuh = isLogged && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asuh') !== -1);
@@ -5157,10 +5582,14 @@
 
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="' + colSpanCount + '" class="py-8 text-center text-slate-400">Belum ada data siswa terdaftar.</td></tr>';
+        renderPaginationControls('paginationSiswa', null);
         return;
       }
 
-      list.forEach(function (s, idx) {
+      const pag = paginateList(list, appState.pagination.siswa.page, appState.pagination.siswa.limit);
+      appState.pagination.siswa.page = pag.page;
+
+      pag.items.forEach(function (s) {
         const defaultAvatar = s.jenisKelamin === 'Perempuan'
           ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
           : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
@@ -5175,15 +5604,15 @@
         if (isLogged) {
           let editBtn = '';
           if (isAdminOrAsuh) {
-            editBtn = '<button onclick="editSiswaByIndex(' + idx + ')" title="Edit Siswa" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">' +
+            editBtn = '<button onclick="editSiswaByIndex(\'' + s.nisn + '\')" title="Edit Siswa" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">' +
               '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>' +
               '</button>';
           }
           aksiTd = '<td class="py-2.5 px-4 text-center space-x-1.5">' +
-            '<button onclick="previewIdCardByIndex(' + idx + ')" title="Cetak ID Card" class="p-1.5 bg-navy hover:bg-navy-700 text-white rounded-lg shadow-sm">' +
+            '<button onclick="previewIdCardByIndex(\'' + s.nisn + '\')" title="Cetak ID Card" class="p-1.5 bg-navy hover:bg-navy-700 text-white rounded-lg shadow-sm">' +
             '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2H9.17A3.001 3.001 0 0112 14z"></path></svg>' +
             '</button>' +
-            '<button onclick="previewPortofolioByIndex(' + idx + ')" title="Portofolio Lengkap" class="p-1.5 bg-maroon hover:bg-maroon-700 text-white rounded-lg shadow-sm">' +
+            '<button onclick="previewPortofolioByIndex(\'' + s.nisn + '\')" title="Portofolio Lengkap" class="p-1.5 bg-maroon hover:bg-maroon-700 text-white rounded-lg shadow-sm">' +
             '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>' +
             '</button>' +
             editBtn +
@@ -5194,7 +5623,7 @@
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML =
           '<td class="py-2.5 px-4 flex items-center space-x-3">' +
-          '<img src="' + foto + '" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="this.src=\'' + defaultAvatar + '\'">' +
           '<div><span class="font-bold text-slate-800">' + s.nama + '</span></div>' +
           '</td>' +
           '<td class="py-2.5 px-3 font-mono font-medium text-slate-600">' + s.nisn + '</td>' +
@@ -5205,6 +5634,8 @@
           aksiTd;
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationSiswa', pag, 'changeSiswaPage', 'changeSiswaLimit');
     }
 
     function filterSiswaTable() {
@@ -5220,6 +5651,8 @@
         return matchQ && matchG;
       });
 
+      appState.pagination.siswa.page = 1;
+      window.currentFilteredSiswa = filtered;
       renderSiswaTable(filtered);
     }
 
@@ -5234,7 +5667,7 @@
     }
 
     function editSiswaByIndex(idx) {
-      const s = appState.cache.siswa[idx];
+      const s = getSiswaByIdOrIndex(idx);
       if (!s) return;
       document.getElementById('sisNama').value = s.nama;
       document.getElementById('sisNisn').value = s.nisn;
@@ -5308,6 +5741,8 @@
         if (res && res.success) {
           closeModalSiswa();
           showToast(res.message, 'success');
+          invalidateLocalCache('siswa');
+          invalidateLocalCache('initialData');
           appState.cache.siswa = null;
           fetchSiswaData();
           fetchInitialData();
@@ -5327,7 +5762,7 @@
         openModalLogin();
         return;
       }
-      const s = appState.cache.siswa[idx];
+      const s = getSiswaByIdOrIndex(idx);
       if (!s) return;
 
       document.getElementById('idCardNama').innerText = s.nama;
@@ -5335,38 +5770,15 @@
       document.getElementById('idCardJk').innerText = s.jenisKelamin;
       document.getElementById('idCardKamar').innerText = s.noKamar || '-';
 
-      const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan'
-        ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
-        : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+      const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
       const idCardFotoEl = document.getElementById('idCardFoto');
       if (idCardFotoEl) {
-        idCardFotoEl.crossOrigin = 'anonymous';
-        idCardFotoEl.onerror = function () {
-          if (this.src.indexOf('images.weserv.nl') !== -1 && s.fotoUrl && s.fotoUrl.indexOf('drive.google.com') !== -1) {
-            let id = '';
-            const matchD = s.fotoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            if (matchD && matchD[1]) id = matchD[1];
-            else {
-              const matchId = s.fotoUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-              if (matchId && matchId[1]) id = matchId[1];
-            }
-            if (id) {
-              this.src = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w800';
-              return;
-            }
-          }
-          this.src = defaultSiswaAvatar;
-        };
-        idCardFotoEl.src = formatImageUrl(s.fotoUrl, defaultSiswaAvatar);
+        safeSetImageWithDataUri(idCardFotoEl, s.fotoUrl, defaultSiswaAvatar);
       }
 
       const idCardLogoEl = document.getElementById('idCardLogo');
       if (idCardLogoEl) {
-        idCardLogoEl.crossOrigin = 'anonymous';
-        idCardLogoEl.onerror = function () {
-          this.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
-        };
-        idCardLogoEl.src = formatImageUrl(appState.settings.LOGO_URL, 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+        safeSetImageWithDataUri(idCardLogoEl, appState.settings.LOGO_URL, DEFAULT_SRMA_LOGO);
       }
 
       // Generate Barcode QR Code Dinamis Bersih & Berkontras Tinggi (Khusus Absensi Cepat)
@@ -5431,16 +5843,13 @@
         openModalLogin();
         return;
       }
-      const s = appState.cache.siswa[idx];
+      const s = getSiswaByIdOrIndex(idx);
       if (!s) return;
 
-      const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan'
-        ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
-        : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+      const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
       const portoFotoEl = document.getElementById('portoFoto');
       if (portoFotoEl) {
-        portoFotoEl.onerror = function () { this.src = defaultSiswaAvatar; };
-        portoFotoEl.src = formatImageUrl(s.fotoUrl, defaultSiswaAvatar);
+        safeSetImageWithDataUri(portoFotoEl, s.fotoUrl, defaultSiswaAvatar);
       }
       document.getElementById('portoNama').innerText = s.nama;
       document.getElementById('portoNisnNik').innerText = s.nisn + ' / ' + (s.nik || '-');
@@ -5556,6 +5965,8 @@
       callBackend('apiSaveAbsensiBatch', [records, sesi, d, petugas], function (res) {
         if (res && res.success) {
           showToast(res.message, 'success');
+          invalidateLocalCache('riwayatAbsensi');
+          invalidateLocalCache('initialData');
           loadAbsensiForSession();
         } else {
           showToast(res ? res.message : 'Gagal simpan absensi.', 'error');
@@ -5610,12 +6021,7 @@
       const supportedFormats = (typeof Html5QrcodeSupportedFormats !== 'undefined') ? [
         Html5QrcodeSupportedFormats.QR_CODE,
         Html5QrcodeSupportedFormats.CODE_128,
-        Html5QrcodeSupportedFormats.CODE_39,
-        Html5QrcodeSupportedFormats.EAN_13,
-        Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.UPC_A,
-        Html5QrcodeSupportedFormats.UPC_E,
-        Html5QrcodeSupportedFormats.CODABAR
+        Html5QrcodeSupportedFormats.CODE_39
       ] : undefined;
 
       if (!appState.html5QrCode) {
@@ -5644,7 +6050,14 @@
         }
 
         const scanConfig = {
-          fps: 20
+          fps: 20,
+          qrbox: function (viewfinderWidth, viewfinderHeight) {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edge = Math.floor(minEdge * 0.72);
+            return { width: Math.max(200, edge), height: Math.max(200, edge) };
+          },
+          aspectRatio: 1.0,
+          disableFlip: false
         };
 
         appState.html5QrCode.start(
@@ -5678,6 +6091,13 @@
           }
         ).then(function () {
           qrScanningActive = true;
+          // Pastikan video element mengisi penuh area tanpa terpangkas atau tersudut
+          const vid = document.querySelector('#qrReader video');
+          if (vid) {
+            vid.style.width = '100%';
+            vid.style.height = '100%';
+            vid.style.objectFit = 'cover';
+          }
           if (placeholder) placeholder.classList.add('hidden');
           if (scanOverlay) scanOverlay.classList.remove('hidden');
           if (btnStart) btnStart.classList.add('hidden');
@@ -5784,32 +6204,42 @@
 
     /**
      * Ekstraktor NISN Cerdas dari QR Code
-     * Mampu mengenali QR Code berkonten teks penuh KTA mau pun barcode NISN numerik polos
+     * Mampu mengenali QR Code berkonten JSON, teks berformat KTA, mau pun barcode NISN numerik polos
      */
     function extractNisnFromQr(rawText) {
       if (!rawText) return '';
-      const text = rawText.toString().trim();
+      const text = String(rawText).trim();
 
-      // 1. Cek format terstruktur: "NISN: 1234567890" atau "NISN : 1234567890"
-      const matchNisn = text.match(/NISN\s*:\s*([0-9a-zA-Z\-_]+)/i);
+      // 1. Coba parse JSON terlebih dahulu (jika QR memuat payload JSON stringify)
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && (parsed.nisn || parsed.id || parsed.NISN)) {
+          return String(parsed.nisn || parsed.id || parsed.NISN).trim();
+        }
+      } catch (e) {
+        // Bukan JSON, lanjutkan parsing teks biasa
+      }
+
+      // 2. Cek format terstruktur: "NISN: 1234567890" atau "NISN : 1234567890" (atau di dalam kutip/tag)
+      const matchNisn = text.match(/NISN["'\s]*:?["'\s]*([0-9a-zA-Z\-_]+)/i);
       if (matchNisn && matchNisn[1]) {
         return matchNisn[1].trim();
       }
 
-      // 2. Jika seluruh string adalah angka 8-16 digit (NISN standar)
+      // 3. Jika seluruh string adalah angka 8-16 digit (NISN standar)
       const matchPure = text.match(/^\d{8,16}$/);
       if (matchPure) {
         return matchPure[0];
       }
 
-      // 3. Fallback: Cari deretan angka 8-16 digit pertama dalam teks
+      // 4. Fallback: Cari deretan angka 8-16 digit pertama dalam teks
       const matchAnyDigits = text.match(/\b\d{8,16}\b/);
       if (matchAnyDigits) {
         return matchAnyDigits[0];
       }
 
-      // 4. Jika tidak cocok, kembalikan baris pertama bersih
-      return text.split('\n')[0].trim();
+      // 5. Jika tidak cocok, kembalikan baris pertama bersih
+      return text.split('\n')[0].replace(/[^0-9a-zA-Z\-_]/g, '').trim();
     }
 
     /**
@@ -5943,13 +6373,20 @@
     }
 
     function loadRiwayatAbsensi(force) {
-      if (!force && appState.cache.riwayatAbsensi && appState.cache.riwayatAbsensi.length > 0) {
-        filterRiwayatAbsensi();
-        return;
+      if (!force) {
+        if (appState.cache.riwayatAbsensi && appState.cache.riwayatAbsensi.length > 0) {
+          filterRiwayatAbsensi();
+          return;
+        }
+        const cached = getLocalCache('riwayatAbsensi');
+        if (cached && cached.data && cached.data.length > 0) {
+          appState.cache.riwayatAbsensi = cached.data;
+          filterRiwayatAbsensi();
+        }
       }
 
       const tbody = document.getElementById('tbodyRiwayatAbsensi');
-      if (tbody) {
+      if (tbody && (!appState.cache.riwayatAbsensi || appState.cache.riwayatAbsensi.length === 0)) {
         tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400">' +
           '<div class="flex items-center justify-center space-x-2">' +
           '<svg class="animate-spin h-5 w-5 text-navy" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>' +
@@ -5959,11 +6396,12 @@
 
       callBackend('apiGetAbsensiData', ['SEMUA', 'SEMUA'], function (res) {
         if (res && res.success) {
+          setLocalCache('riwayatAbsensi', res.data || []);
           appState.cache.riwayatAbsensi = res.data || [];
           filterRiwayatAbsensi();
         } else {
           showToast('Gagal memuat riwayat kegiatan: ' + (res ? res.message : 'Error'), 'error');
-          if (tbody) {
+          if (tbody && (!appState.cache.riwayatAbsensi || appState.cache.riwayatAbsensi.length === 0)) {
             tbody.innerHTML = '<tr><td colspan="9" class="py-6 text-center text-rose-500 font-medium">Gagal memuat riwayat kegiatan. Silakan coba kembali.</td></tr>';
           }
         }
@@ -5997,6 +6435,7 @@
         return true;
       });
 
+      appState.pagination.riwayatAbsensi.page = 1;
       window.currentFilteredRiwayatAbsensi = filtered;
       renderRiwayatAbsensiTable(filtered);
     }
@@ -6049,10 +6488,14 @@
           '<svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>' +
           '<span class="font-medium text-xs text-slate-500">Tidak ada riwayat kegiatan siswa yang sesuai filter.</span>' +
           '</div></td></tr>';
+        renderPaginationControls('paginationRiwayatAbsensi', null);
         return;
       }
 
-      records.forEach(function (item, idx) {
+      const pag = paginateList(records, appState.pagination.riwayatAbsensi.page, appState.pagination.riwayatAbsensi.limit);
+      appState.pagination.riwayatAbsensi.page = pag.page;
+
+      pag.items.forEach(function (item, idx) {
         let badgeStatus = '';
         const st = (item.status || 'Hadir').toLowerCase();
         if (st === 'hadir') {
@@ -6065,14 +6508,16 @@
           badgeStatus = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300">Alpa</span>';
         }
 
-        const editBtn = '<button onclick="openModalEditRiwayatAbsensi(' + idx + ')" class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-navy/5 hover:bg-navy text-navy hover:text-white font-bold text-xs transition border border-navy/20 hover:border-navy shadow-xs" title="Edit Presensi Siswa">' +
+        const rowNumber = pag.startIndex + idx;
+        const itemIdentifier = item.id || (pag.startIndex - 1 + idx);
+        const editBtn = '<button onclick="openModalEditRiwayatAbsensi(\'' + itemIdentifier + '\')" class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-navy/5 hover:bg-navy text-navy hover:text-white font-bold text-xs transition border border-navy/20 hover:border-navy shadow-xs" title="Edit Presensi Siswa">' +
           '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>' +
           '<span>Edit</span></button>';
 
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
         tr.innerHTML =
-          '<td class="py-2.5 px-3 text-center font-bold text-slate-400">' + (idx + 1) + '</td>' +
+          '<td class="py-2.5 px-3 text-center font-bold text-slate-400">' + rowNumber + '</td>' +
           '<td class="py-2.5 px-3">' +
           '<div class="font-bold text-slate-800 text-xs">' + (item.tanggal || '-') + '</div>' +
           '<span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-navy-50 text-navy border border-navy-100">' + (item.sesi || '-') + '</span>' +
@@ -6086,11 +6531,22 @@
           '<td class="py-2.5 px-3 text-center whitespace-nowrap">' + editBtn + '</td>';
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationRiwayatAbsensi', pag, 'changeRiwayatAbsensiPage', 'changeRiwayatAbsensiLimit');
     }
 
     function openModalEditRiwayatAbsensi(idx) {
       const list = window.currentFilteredRiwayatAbsensi || appState.cache.riwayatAbsensi || [];
-      const item = list[idx];
+      let item = null;
+      if (typeof idx === 'number') {
+        item = list[idx];
+      } else {
+        item = list.find(function (r) { return String(r.id) === String(idx); });
+        if (!item) {
+          const num = parseInt(idx);
+          if (!isNaN(num)) item = list[num];
+        }
+      }
       if (!item) return;
 
       document.getElementById('editAbsensiId').value = item.id || '';
@@ -6199,6 +6655,7 @@
               found.tanggal = tglStr;
               found.sesi = sesi;
               found.petugas = petugas;
+              setLocalCache('riwayatAbsensi', appState.cache.riwayatAbsensi);
             }
           }
 
@@ -6225,8 +6682,14 @@
     // =====================================================================
 
     function fetchIzinData() {
+      const cached = getLocalCache('izin');
+      if (cached && cached.data) {
+        appState.cache.izin = cached.data;
+        renderIzinTable(cached.data);
+      }
       callBackend('apiGetIzinList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('izin', res.data);
           appState.cache.izin = res.data;
           renderIzinTable(res.data);
         }
@@ -6235,6 +6698,7 @@
 
     function switchIzinSubTab(tab) {
       appState.izinSubTab = tab;
+      appState.pagination.izin.page = 1;
       const tAktif = document.getElementById('tabIzinAktif');
       const tRiwayat = document.getElementById('tabIzinRiwayat');
 
@@ -6256,6 +6720,7 @@
 
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Belum ada catatan surat izin.</td></tr>';
+        renderPaginationControls('paginationIzin', null);
         return;
       }
 
@@ -6267,12 +6732,16 @@
 
       if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada data siswa pada kategori ini.</td></tr>';
+        renderPaginationControls('paginationIzin', null);
         return;
       }
 
+      const pag = paginateList(filtered, appState.pagination.izin.page, appState.pagination.izin.limit);
+      appState.pagination.izin.page = pag.page;
+
       const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
 
-      filtered.forEach(function (item, idx) {
+      pag.items.forEach(function (item) {
         const isAktif = (item.status || '').toLowerCase().indexOf('aktif') !== -1;
         const statusBadge = isAktif
           ? '<span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-amber-200 animate-pulse">Aktif di Luar</span>'
@@ -6299,6 +6768,8 @@
           '</td>';
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationIzin', pag, 'changeIzinPage', 'changeIzinLimit');
     }
 
     function populateSiswaDropdowns(list) {
@@ -6620,6 +7091,9 @@
             appState.metrics = res.metrics;
             renderMetrics(res.metrics);
           }
+          invalidateLocalCache('izin');
+          invalidateLocalCache('siswa');
+          invalidateLocalCache('initialData');
           appState.cache.izin = null;
           appState.cache.siswa = null;
           fetchIzinData();
@@ -6679,6 +7153,9 @@
               appState.metrics = res.metrics;
               renderMetrics(res.metrics);
             }
+            invalidateLocalCache('izin');
+            invalidateLocalCache('siswa');
+            invalidateLocalCache('initialData');
             appState.cache.izin = null;
             appState.cache.siswa = null;
             fetchIzinData();
@@ -6755,8 +7232,14 @@
     }
 
     function fetchSakitData() {
+      const cached = getLocalCache('sakit');
+      if (cached && cached.data) {
+        appState.cache.sakit = cached.data;
+        renderSakitTable(cached.data);
+      }
       callBackend('apiGetSakitList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('sakit', res.data);
           appState.cache.sakit = res.data;
           renderSakitTable(res.data);
         }
@@ -6770,10 +7253,14 @@
 
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada siswa yang sedang sakit.</td></tr>';
+        renderPaginationControls('paginationSakit', null);
         return;
       }
 
-      list.forEach(function (item) {
+      const pag = paginateList(list, appState.pagination.sakit.page, appState.pagination.sakit.limit);
+      appState.pagination.sakit.page = pag.page;
+
+      pag.items.forEach(function (item) {
         const isSakit = (item.status || '').toLowerCase().indexOf('sakit') !== -1;
         const statusBadge = isSakit
           ? '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-rose-200 animate-pulse">Sakit di Asrama</span>'
@@ -6797,6 +7284,8 @@
           '<td class="py-2.5 px-3 text-center">' + btnSembuh + '</td>';
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationSakit', pag, 'changeSakitPage', 'changeSakitLimit');
     }
 
     function autoFillSiswaSakit() {
@@ -6867,6 +7356,9 @@
             appState.metrics = res.metrics;
             renderMetrics(res.metrics);
           }
+          invalidateLocalCache('sakit');
+          invalidateLocalCache('siswa');
+          invalidateLocalCache('initialData');
           appState.cache.sakit = null;
           appState.cache.siswa = null;
           fetchSakitData();
@@ -6920,6 +7412,9 @@
           }
 
           // 4. Sinkronisasi data menyeluruh di latar belakang
+          invalidateLocalCache('sakit');
+          invalidateLocalCache('siswa');
+          invalidateLocalCache('initialData');
           fetchSakitData();
           fetchSiswaData();
           fetchInitialData();
@@ -6931,8 +7426,14 @@
 
     // Pelanggaran & Asesmen
     function fetchPelanggaranData() {
+      const cached = getLocalCache('pelanggaran');
+      if (cached && cached.data) {
+        appState.cache.pelanggaran = cached.data;
+        renderPelanggaranTable(cached.data);
+      }
       callBackend('apiGetPelanggaranList', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('pelanggaran', res.data);
           appState.cache.pelanggaran = res.data;
           renderPelanggaranTable(res.data);
         }
@@ -6946,10 +7447,14 @@
 
       if (!list || list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada catatan pelanggaran atau asesmen.</td></tr>';
+        renderPaginationControls('paginationAsesmen', null);
         return;
       }
 
-      list.forEach(function (item) {
+      const pag = paginateList(list, appState.pagination.asesmen.page, appState.pagination.asesmen.limit);
+      appState.pagination.asesmen.page = pag.page;
+
+      pag.items.forEach(function (item) {
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML =
@@ -6962,6 +7467,8 @@
           '<td class="py-2.5 px-3 text-slate-500 italic">' + item.rtl + '</td>';
         tbody.appendChild(tr);
       });
+
+      renderPaginationControls('paginationAsesmen', pag, 'changeAsesmenPage', 'changeAsesmenLimit');
     }
 
     function autoFillSiswaAsesmen() {
@@ -7021,6 +7528,7 @@
         if (res && res.success) {
           closeModalCatatAsesmen();
           showToast(res.message, 'success');
+          invalidateLocalCache('pelanggaran');
           appState.cache.pelanggaran = null;
           fetchPelanggaranData();
         } else {
@@ -7057,8 +7565,15 @@
     }
 
     function fetchKebutuhanInventarisData() {
+      const cached = getLocalCache('kebutuhan_inv');
+      if (cached && cached.data) {
+        appState.cache.kebutuhan = cached.data.kebutuhan;
+        appState.cache.inventaris = cached.data.inventaris;
+        renderKebutuhanDanInventarisTables();
+      }
       callBackend('apiGetKebutuhanDanInventaris', undefined, function (res) {
         if (res && res.success) {
+          setLocalCache('kebutuhan_inv', res);
           appState.cache.kebutuhan = res.kebutuhan;
           appState.cache.inventaris = res.inventaris;
           renderKebutuhanDanInventarisTables();
@@ -7074,10 +7589,13 @@
         const listK = appState.cache.kebutuhan;
         if (!listK || listK.length === 0) {
           tbodyK.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada usulan kebutuhan asrama.</td></tr>';
+          renderPaginationControls('paginationKebutuhan', null);
         } else {
           const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
+          const pagK = paginateList(listK, appState.pagination.kebutuhan.page, appState.pagination.kebutuhan.limit);
+          appState.pagination.kebutuhan.page = pagK.page;
 
-          listK.forEach(function (item) {
+          pagK.items.forEach(function (item) {
             const isDiterima = (item.status || '').toLowerCase().indexOf('diterima') !== -1;
             const statusBadge = isDiterima
               ? '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Sudah Diterima</span>'
@@ -7100,6 +7618,7 @@
               '<td class="py-2.5 px-4 text-center">' + btnTerima + '</td>';
             tbodyK.appendChild(tr);
           });
+          renderPaginationControls('paginationKebutuhan', pagK, 'changeKebutuhanPage', 'changeKebutuhanLimit');
         }
       }
 
@@ -7110,15 +7629,18 @@
         const listInv = appState.cache.inventaris;
         if (!listInv || listInv.length === 0) {
           tbodyInv.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada barang inventaris terdaftar.</td></tr>';
+          renderPaginationControls('paginationInventaris', null);
         } else {
           const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
+          const pagInv = paginateList(listInv, appState.pagination.inventaris.page, appState.pagination.inventaris.limit);
+          appState.pagination.inventaris.page = pagInv.page;
 
-          listInv.forEach(function (item, idx) {
+          pagInv.items.forEach(function (item) {
             const defItemFoto = 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300';
             const foto = formatImageUrl(item.fotoBarang, defItemFoto);
             let editBtn = '';
             if (isAsramaOrAdmin) {
-              editBtn = '<button onclick="openEditInventarisByIndex(' + idx + ')" class="px-2.5 py-1 bg-navy hover:bg-navy-700 text-white rounded text-xs font-medium">Edit Jumlah/Kondisi</button>';
+              editBtn = '<button onclick="openEditInventarisByIndex(\'' + (item.noBarang || item.id) + '\')" class="px-2.5 py-1 bg-navy hover:bg-navy-700 text-white rounded text-xs font-medium">Edit Jumlah/Kondisi</button>';
             }
 
             const tr = document.createElement('tr');
@@ -7126,7 +7648,7 @@
             tr.innerHTML =
               '<td class="py-2.5 px-3 font-mono font-bold text-navy">' + item.noBarang + '</td>' +
               '<td class="py-2.5 px-4 flex items-center space-x-3">' +
-              '<img src="' + foto + '" class="w-10 h-10 object-cover rounded border border-slate-200" onerror="this.src=\'' + defItemFoto + '\'">' +
+              '<img src="' + foto + '" loading="lazy" decoding="async" class="w-10 h-10 object-cover rounded border border-slate-200" onerror="this.src=\'' + defItemFoto + '\'">' +
               '<div><span class="font-bold text-slate-900">' + item.namaBarang + '</span></div>' +
               '</td>' +
               '<td class="py-2.5 px-2 font-bold text-slate-800">' + item.jumlah + ' Unit</td>' +
@@ -7136,6 +7658,7 @@
               '<td class="py-2.5 px-3 text-center">' + editBtn + '</td>';
             tbodyInv.appendChild(tr);
           });
+          renderPaginationControls('paginationInventaris', pagInv, 'changeInventarisPage', 'changeInventarisLimit');
         }
       }
     }
@@ -7167,6 +7690,7 @@
         if (res && res.success) {
           closeModalTambahKebutuhan();
           showToast(res.message, 'success');
+          invalidateLocalCache('kebutuhan_inv');
           appState.cache.kebutuhan = null;
           fetchKebutuhanInventarisData();
         } else {
@@ -7217,6 +7741,7 @@
           if (res && res.success) {
             closeModalTerimaKebutuhan();
             showToast(res.message, 'success');
+            invalidateLocalCache('kebutuhan_inv');
             appState.cache.kebutuhan = null;
             appState.cache.inventaris = null;
             fetchKebutuhanInventarisData();
@@ -7230,8 +7755,21 @@
       });
     }
 
-    function openEditInventarisByIndex(idx) {
-      const item = appState.cache.inventaris[idx];
+    function openEditInventarisByIndex(idxOrId) {
+      let item = null;
+      if (appState.cache.inventaris) {
+        if (typeof idxOrId === 'number') {
+          item = appState.cache.inventaris[idxOrId];
+        } else {
+          item = appState.cache.inventaris.find(function (it) {
+            return String(it.noBarang) === String(idxOrId) || String(it.id) === String(idxOrId);
+          });
+          if (!item) {
+            const num = parseInt(idxOrId);
+            if (!isNaN(num)) item = appState.cache.inventaris[num];
+          }
+        }
+      }
       if (!item) return;
 
       document.getElementById('editInvNoBarang').value = item.noBarang;
@@ -7265,6 +7803,7 @@
         if (res && res.success) {
           closeModalEditInventaris();
           showToast(res.message, 'success');
+          invalidateLocalCache('kebutuhan_inv');
           appState.cache.inventaris = null;
           fetchKebutuhanInventarisData();
         } else {
@@ -7366,6 +7905,19 @@
       if (elId === 'idCardContainer') {
         clone.classList.add('idcard-print-target');
       }
+
+      // Salin data piksel canvas (misal QR code) ke elemen clone agar tidak blank saat cetak
+      const origCanvases = targetEl.querySelectorAll('canvas');
+      const cloneCanvases = clone.querySelectorAll('canvas');
+      for (let i = 0; i < origCanvases.length; i++) {
+        if (cloneCanvases[i]) {
+          cloneCanvases[i].width = origCanvases[i].width;
+          cloneCanvases[i].height = origCanvases[i].height;
+          const destCtx = cloneCanvases[i].getContext('2d');
+          if (destCtx) destCtx.drawImage(origCanvases[i], 0, 0);
+        }
+      }
+
       printArea.appendChild(clone);
       document.body.appendChild(printArea);
 
