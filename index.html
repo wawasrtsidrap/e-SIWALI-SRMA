@@ -630,7 +630,7 @@
               </div>
               <h1
                 class="text-2xl sm:text-4xl lg:text-3xl xl:text-4xl font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                Selamat Datang Pada e-SIWALI
+                Selamat Datang di e-SIWALI
               </h1>
               <p
                 class="text-slate-200 text-xs sm:text-sm leading-relaxed max-w-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
@@ -1915,6 +1915,7 @@
               <table class="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead class="bg-slate-800 text-white font-semibold">
                   <tr>
+                    <th class="py-3 px-3">Waktu Input (WITA)</th>
                     <th class="py-3 px-3">Nama Siswa(i)</th>
                     <th class="py-3 px-2">Kamar</th>
                     <th class="py-3 px-2">BPJS / Faskes</th>
@@ -2008,7 +2009,7 @@
                   <th class="py-3 px-4">Nama Barang / Kebutuhan</th>
                   <th class="py-3 px-3">Jumlah</th>
                   <th class="py-3 px-3">Estimasi Harga</th>
-                  <th class="py-3 px-3">Tanggal Usul</th>
+                  <th class="py-3 px-3">Tanggal & Waktu Usul (WITA)</th>
                   <th class="py-3 px-3">Pemohon</th>
                   <th class="py-3 px-3">Status</th>
                   <th class="py-3 px-4 text-center">Verifikasi Tiba</th>
@@ -2864,9 +2865,42 @@
           </div>
         </div>
         <div>
-          <label class="block font-semibold text-slate-700 mb-1">Upload Bukti Foto Kedatangan Siswa(i) *</label>
-          <input type="file" id="verifFotoFile" accept="image/*" required
-            class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+          <label class="block font-semibold text-slate-700 mb-1">Bukti Foto Kedatangan Siswa(i) *</label>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openIzinCameraModal('verifFotoFile', 'Foto Kedatangan Siswa')"
+                class="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center space-x-1.5 shadow-sm">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span>Ambil Foto via Kamera</span>
+              </button>
+              <label class="cursor-pointer py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">
+                <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                <span>Pilih Berkas</span>
+                <input type="file" id="verifFotoFile" accept="image/*" class="hidden" onchange="handleIzinFileSelected(this, 'verifFotoFile')">
+              </label>
+            </div>
+            <div id="previewBox_verifFotoFile" class="hidden p-2 bg-emerald-50/90 border border-emerald-300 rounded-xl flex items-center justify-between">
+              <div class="flex items-center space-x-2.5 overflow-hidden">
+                <img id="previewImg_verifFotoFile" src="" alt="Thumbnail" class="w-12 h-12 object-cover rounded-lg border border-emerald-400 shadow-sm shrink-0 bg-white">
+                <div class="truncate">
+                  <span class="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    <span>&#10003;</span><span>Foto Siap Disimpan</span>
+                  </span>
+                  <p id="previewName_verifFotoFile" class="text-xs font-bold text-slate-800 truncate mt-0.5">Hasil Kamera</p>
+                </div>
+              </div>
+              <button type="button" onclick="clearIzinPhotoSlot('verifFotoFile')" class="text-rose-600 hover:text-rose-800 text-xs font-bold px-2 py-1 rounded-lg hover:bg-rose-50 transition">
+                Hapus
+              </button>
+            </div>
+          </div>
           <p class="text-[10px] text-slate-400 mt-1">Foto fisik bukti siswa telah tiba kembali di lingkungan asrama.</p>
         </div>
         <div class="pt-2 flex justify-end space-x-2">
@@ -2989,7 +3023,10 @@
     <div
       class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <h3 class="font-extrabold text-base text-rose-800">Pencatatan Siswa Sakit di Asrama</h3>
+        <div>
+          <h3 class="font-extrabold text-base text-rose-800">Pencatatan Siswa Sakit di Asrama</h3>
+          <p class="text-[11px] text-slate-500">Waktu Input: <span id="sakitWaktuRealtimeLabel" class="font-mono font-bold text-rose-700">Realtime WITA</span></p>
+        </div>
         <button onclick="closeModalCatatSakit()" class="text-slate-400 hover:text-slate-600">&times;</button>
       </div>
       <form id="formCatatSakit" onsubmit="event.preventDefault(); submitCatatSakit();" class="space-y-3 text-xs">
@@ -3140,7 +3177,10 @@
     class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <h3 class="font-extrabold text-base text-navy">Usulkan Kebutuhan Asrama</h3>
+        <div>
+          <h3 class="font-extrabold text-base text-navy">Usulkan Kebutuhan Asrama</h3>
+          <p class="text-[11px] text-slate-500">Waktu Usul: <span id="kebutuhanWaktuRealtimeLabel" class="font-mono font-bold text-navy">Realtime WITA</span></p>
+        </div>
         <button onclick="closeModalTambahKebutuhan()" class="text-slate-400 hover:text-slate-600">&times;</button>
       </div>
       <form id="formTambahKebutuhan" onsubmit="event.preventDefault(); submitTambahKebutuhan();"
@@ -7089,21 +7129,26 @@
       const dropSakit = document.getElementById('sakitSiswaSelect');
       const dropAsesmen = document.getElementById('asesmenSiswaSelect');
 
+      // Urutkan daftar siswa secara alfabetis (A-Z)
+      const sortedList = (list || []).slice().sort(function (a, b) {
+        return (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' });
+      });
+
       if (dropIzin) {
         dropIzin.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
-        list.forEach(function (s) {
+        sortedList.forEach(function (s) {
           dropIzin.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ' - ' + (s.noKamar || '') + ')</option>';
         });
       }
       if (dropSakit) {
         dropSakit.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
-        list.forEach(function (s) {
+        sortedList.forEach(function (s) {
           dropSakit.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ')</option>';
         });
       }
       if (dropAsesmen) {
         dropAsesmen.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
-        list.forEach(function (s) {
+        sortedList.forEach(function (s) {
           dropAsesmen.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ')</option>';
         });
       }
@@ -7451,34 +7496,51 @@
 
     /**
      * Mengisi Pilihan Dropdown Wali Asuh Piket & Wali Asrama Piket pada Formulir Surat Izin
+     * Filter ketat:
+     * - Field Wali Asuh Piket HANYA menampilkan wali yang jabatannya Wali Asuh
+     * - Field Wali Asrama Piket HANYA menampilkan wali yang jabatannya Wali Asrama
+     * Masing-masing daftar diurutkan alfabetis (A-Z)
      */
     function populateWaliPiketDropdowns() {
       const dropAsuh = document.getElementById('izinWaliAsuhPiket');
       const dropAsrama = document.getElementById('izinWaliAsramaPiket');
       if (!dropAsuh && !dropAsrama) return;
 
-      const list = appState.cache.wali || [];
+      const list = (appState.cache.wali || []).slice().sort(function (a, b) {
+        return (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' });
+      });
 
       if (dropAsuh) {
         dropAsuh.innerHTML = '<option value="">-- Pilih Wali Asuh Piket --</option>';
-        list.forEach(function (w) {
-          const isAsuh = (w.jabatan || '').toLowerCase().indexOf('asuh') !== -1;
+        const listAsuh = list.filter(function (w) {
+          const jab = (w.jabatan || '').toLowerCase();
+          return jab.indexOf('asuh') !== -1 && jab.indexOf('asrama') === -1;
+        });
+        const targetAsuh = listAsuh.length > 0 ? listAsuh : list.filter(function (w) {
+          return (w.jabatan || '').toLowerCase().indexOf('asuh') !== -1;
+        });
+
+        targetAsuh.forEach(function (w) {
           const opt = document.createElement('option');
           opt.value = w.nama;
           opt.innerText = w.nama + ' (' + (w.jabatan || 'Wali Asuh') + ')';
-          if (isAsuh && dropAsuh.options.length === 1) opt.selected = true;
+          if (dropAsuh.options.length === 1) opt.selected = true;
           dropAsuh.appendChild(opt);
         });
       }
 
       if (dropAsrama) {
         dropAsrama.innerHTML = '<option value="">-- Pilih Wali Asrama Piket --</option>';
-        list.forEach(function (w) {
-          const isAsrama = (w.jabatan || '').toLowerCase().indexOf('asrama') !== -1;
+        const listAsrama = list.filter(function (w) {
+          const jab = (w.jabatan || '').toLowerCase();
+          return jab.indexOf('asrama') !== -1;
+        });
+
+        listAsrama.forEach(function (w) {
           const opt = document.createElement('option');
           opt.value = w.nama;
           opt.innerText = w.nama + ' (' + (w.jabatan || 'Wali Asrama') + ')';
-          if (isAsrama && dropAsrama.options.length === 1) opt.selected = true;
+          if (dropAsrama.options.length === 1) opt.selected = true;
           dropAsrama.appendChild(opt);
         });
       }
@@ -7625,29 +7687,30 @@
       if (document.getElementById('verifWaktuRealtimeLabel')) {
         document.getElementById('verifWaktuRealtimeLabel').innerText = getFormattedCurrentTime();
       }
-      const fileInput = document.getElementById('verifFotoFile');
-      if (fileInput) fileInput.value = '';
+      clearIzinPhotoSlot('verifFotoFile');
       document.getElementById('modalVerifikasiKembali').classList.remove('hidden');
     }
 
     function closeModalVerifikasiKembali() {
+      closeIzinCameraModal();
       document.getElementById('modalVerifikasiKembali').classList.add('hidden');
     }
 
     function submitVerifikasiKembali() {
       const noSurat = document.getElementById('verifNoSurat').value;
       const fileInput = document.getElementById('verifFotoFile');
-      if (!fileInput || !fileInput.files || !fileInput.files[0]) {
-        showToast('Unggah foto bukti kedatangan fisik terlebih dahulu.', 'error');
+      const photoFromCamera = (appState.tempIzinPhotos && appState.tempIzinPhotos['verifFotoFile']) ? appState.tempIzinPhotos['verifFotoFile'] : '';
+
+      if (!photoFromCamera && (!fileInput || !fileInput.files || !fileInput.files[0])) {
+        showToast('Ambil foto via kamera atau pilih berkas foto kedatangan fisik terlebih dahulu.', 'error');
         return;
       }
 
       const btn = document.getElementById('btnSaveVerifikasi');
       btn.disabled = true;
-      btn.innerText = 'Mengompres Foto...';
+      btn.innerText = 'Menyimpan...';
 
-      compressImageFile(fileInput.files[0], 1000, 1000, 0.78, function (fotoBase64) {
-        btn.innerText = 'Menyimpan...';
+      const doSendVerifikasi = function (fotoBase64) {
         const petugas = appState.currentUser ? appState.currentUser.namaLengkap : 'Piket Asrama';
 
         callBackend('apiVerifikasiKedatangan', [noSurat, fotoBase64, petugas], function (res) {
@@ -7655,6 +7718,7 @@
           btn.innerText = 'Simpan & Ubah Hadir di Asrama';
           if (res && res.success) {
             closeModalVerifikasiKembali();
+            clearIzinPhotoSlot('verifFotoFile');
             showToast(res.message, 'success');
             if (res.metrics) {
               appState.metrics = res.metrics;
@@ -7675,7 +7739,17 @@
           btn.disabled = false;
           btn.innerText = 'Simpan & Ubah Hadir di Asrama';
         });
-      });
+      };
+
+      if (photoFromCamera) {
+        doSendVerifikasi(photoFromCamera);
+      } else {
+        btn.innerText = 'Mengompres Foto...';
+        compressImageFile(fileInput.files[0], 1000, 1000, 0.78, function (fotoBase64) {
+          btn.innerText = 'Menyimpan...';
+          doSendVerifikasi(fotoBase64);
+        });
+      }
     }
 
     function previewSuratIzinByNoSurat(noSurat) {
@@ -7760,7 +7834,7 @@
       tbody.innerHTML = '';
 
       if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada siswa yang sedang sakit.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400">Tidak ada siswa yang sedang sakit.</td></tr>';
         renderPaginationControls('paginationSakit', null);
         return;
       }
@@ -7779,9 +7853,14 @@
           btnSembuh = '<button onclick="tandaiSembuhById(\'' + item.id + '\')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm transition">Tandai Sembuh</button>';
         }
 
+        const waktuInputStr = item.tanggalCatat
+          ? (item.tanggalCatat.indexOf('WITA') !== -1 ? item.tanggalCatat : item.tanggalCatat + ' WITA')
+          : '-';
+
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML =
+          '<td class="py-2.5 px-3 font-mono text-xs text-slate-600 whitespace-nowrap">' + waktuInputStr + '</td>' +
           '<td class="py-2.5 px-3 font-bold text-slate-900">' + item.nama + '</td>' +
           '<td class="py-2.5 px-2 font-medium text-navy">' + (item.noKamar || '-') + '</td>' +
           '<td class="py-2.5 px-2 text-slate-600 text-xs">' + item.noBpjs + '<br><span class="text-slate-400">' + item.faskes + '</span></td>' +
@@ -7815,6 +7894,9 @@
     function openModalCatatSakit() {
       document.getElementById('formCatatSakit').reset();
       autoFillSiswaSakit();
+      if (document.getElementById('sakitWaktuRealtimeLabel')) {
+        document.getElementById('sakitWaktuRealtimeLabel').innerText = getFormattedCurrentTime();
+      }
       document.getElementById('modalCatatSakit').classList.remove('hidden');
     }
 
@@ -8116,13 +8198,17 @@
               btnTerima = '<button onclick="openTerimaKebutuhanModal(\'' + item.id + '\', \'' + item.namaBarang + '\', ' + item.jumlah + ')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm transition">Tandai Diterima & Masuk Aset</button>';
             }
 
+            const waktuUsulStr = item.tanggal
+              ? (item.tanggal.indexOf('WITA') !== -1 ? item.tanggal : item.tanggal + ' WITA')
+              : '-';
+
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition';
             tr.innerHTML =
               '<td class="py-2.5 px-4 font-bold text-slate-800">' + item.namaBarang + '</td>' +
               '<td class="py-2.5 px-3 font-semibold text-slate-900">' + item.jumlah + ' Unit</td>' +
               '<td class="py-2.5 px-3 font-mono text-slate-600">Rp ' + Number(item.estimasiHarga || 0).toLocaleString('id-ID') + '</td>' +
-              '<td class="py-2.5 px-3 text-slate-500">' + item.tanggal + '</td>' +
+              '<td class="py-2.5 px-3 font-mono text-xs text-slate-600 whitespace-nowrap">' + waktuUsulStr + '</td>' +
               '<td class="py-2.5 px-3 text-slate-600">' + item.pemohon + '</td>' +
               '<td class="py-2.5 px-3">' + statusBadge + '</td>' +
               '<td class="py-2.5 px-4 text-center">' + btnTerima + '</td>';
@@ -8175,6 +8261,9 @@
 
     function openModalTambahKebutuhan() {
       document.getElementById('formTambahKebutuhan').reset();
+      if (document.getElementById('kebutuhanWaktuRealtimeLabel')) {
+        document.getElementById('kebutuhanWaktuRealtimeLabel').innerText = getFormattedCurrentTime();
+      }
       document.getElementById('modalTambahKebutuhan').classList.remove('hidden');
     }
 
