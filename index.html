@@ -598,73 +598,102 @@
 
     <!-- VIEW 1: BERANDA -->
     <section id="view-beranda" class="space-y-6">
-      <!-- Jumbotron Sambutan Split Hero Modern Estetik -->
+      <!-- Jumbotron Sambutan Split Hero Modern Estetik (Ultra-Contrast Midnight Navy) -->
       <div
-        class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-slate-900 text-white shadow-2xl border border-white/10">
-        <!-- Ornamen Latar & Cahaya Ambien -->
-        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-navy/40 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-maroon/30 blur-3xl pointer-events-none"></div>
+        class="relative overflow-hidden rounded-2xl text-white shadow-2xl border border-white/10"
+        style="background: linear-gradient(135deg, #061524 0%, #0B2238 45%, #2A0B14 100%);">
+        <!-- Ornamen Latar & Cahaya Ambien Mewah -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 right-1/3 w-96 h-96 rounded-full bg-maroon/25 blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-center min-h-[340px]">
+        <!-- Tombol Pintas Ganti Foto Khusus Admin -->
+        <button id="btnQuickChangeBanner" onclick="openModalSettingsToBanner()"
+          class="hidden absolute top-3.5 right-3.5 z-20 bg-slate-900/90 hover:bg-slate-900 text-amber-300 hover:text-amber-200 text-xs font-bold px-3 py-1.5 rounded-xl border border-amber-400/40 backdrop-blur-md shadow-xl transition-all flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
+            </path>
+          </svg>
+          <span>Ganti Foto Banner</span>
+        </button>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[350px]">
           <!-- Kolom Kiri: Teks & Aksi (lg:col-span-7) -->
-          <div class="p-6 sm:p-10 lg:py-12 lg:pr-4 lg:col-span-7 space-y-4">
+          <div class="p-6 sm:p-10 lg:py-12 lg:pr-6 lg:col-span-7 space-y-4 flex flex-col justify-center">
             <div
-              class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-300 border border-white/15 shadow-sm">
+              class="inline-flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 border border-emerald-400/30 shadow-md w-fit">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>Sistem Digital Keasramaan & Pengasuhan</span>
             </div>
-            <h1 class="text-2xl sm:text-4xl lg:text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+            <h1
+              class="text-2xl sm:text-4xl lg:text-3xl xl:text-4xl font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Selamat Datang Pada Sistem Digital Keasramaan dan Pengasuhan Sekolah Rakyat
             </h1>
-            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl">
-              Aplikasi resmi <strong id="heroInstansiName" class="text-amber-300">SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG (JENJANG SRMA)</strong>. Cerdas Bersama Tumbuh Setara, Bersaudara dan Saling Menjaga.
+            <p class="text-slate-200 text-xs sm:text-sm leading-relaxed max-w-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+              Aplikasi resmi <strong id="heroInstansiName"
+                class="text-white font-extrabold">SEKOLAH RAKYAT TERINTEGRASI
+                SIDENRENG RAPPANG (JENJANG SRMA)</strong>. Cerdas Bersama Tumbuh Setara, Bersaudara dan Saling Menjaga.
             </p>
             <div class="pt-2 flex flex-wrap items-center gap-3">
               <button onclick="navigateMenu('dashboard')"
-                class="bg-white hover:bg-slate-100 text-navy font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 flex items-center space-x-2">
+                class="bg-white hover:bg-slate-100 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-full sm:rounded-xl shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center space-x-2">
                 <span>Buka Dashboard Utama</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                  </path>
                 </svg>
               </button>
               <button onclick="navigateMenu('siswa')"
-                class="bg-maroon hover:bg-maroon-700 text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all border border-white/20 shadow-sm">
+                class="bg-[#7F1D1D] hover:bg-[#991B1B] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-full sm:rounded-xl transition-all border border-red-500/40 shadow-lg">
                 Direktori Data Siswa
               </button>
             </div>
             <!-- Fitur Unggulan Mini Pill -->
-            <div class="pt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
-              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
-                <span class="text-amber-400">&bull;</span>
+            <div class="pt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-200">
+              <span
+                class="inline-flex items-center space-x-1.5 bg-slate-900/90 border border-white/20 px-3 py-1.5 rounded-lg shadow-sm font-semibold backdrop-blur-md">
+                <span class="text-amber-400 font-bold">&bull;</span>
                 <span>11 Sesi Presensi Harian</span>
               </span>
-              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
-                <span class="text-emerald-400">&bull;</span>
+              <span
+                class="inline-flex items-center space-x-1.5 bg-slate-900/90 border border-white/20 px-3 py-1.5 rounded-lg shadow-sm font-semibold backdrop-blur-md">
+                <span class="text-emerald-400 font-bold">&bull;</span>
                 <span>Monitoring Kesehatan & Adab</span>
               </span>
-              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
-                <span class="text-sky-400">&bull;</span>
+              <span
+                class="inline-flex items-center space-x-1.5 bg-slate-900/90 border border-white/20 px-3 py-1.5 rounded-lg shadow-sm font-semibold backdrop-blur-md">
+                <span class="text-sky-400 font-bold">&bull;</span>
                 <span>ID Card Digital QR Code</span>
               </span>
             </div>
           </div>
 
           <!-- Kolom Kanan: Foto Showcase Visual dengan Gradient Soft-Fade (lg:col-span-5) -->
-          <div class="relative h-64 sm:h-80 lg:h-full lg:min-h-[360px] lg:col-span-5 overflow-hidden flex items-center justify-center p-4 lg:p-0">
+          <div
+            class="relative min-h-[260px] sm:min-h-[320px] lg:min-h-full lg:col-span-5 overflow-hidden flex items-stretch">
             <!-- Gambar Banner -->
             <img id="heroBannerImg"
               src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80"
               alt="Kegiatan Siswa Asrama SRMA"
-              class="w-full h-full object-cover object-center rounded-xl lg:rounded-none lg:rounded-r-2xl shadow-inner transition-transform duration-700 hover:scale-105">
+              class="w-full h-full object-cover object-center rounded-b-2xl lg:rounded-b-none lg:rounded-r-2xl shadow-inner transition-transform duration-700 hover:scale-105"
+              onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80';">
 
-            <!-- Overlay Transisi Gradien Halus Menembus Background Navy (Mirip Referensi Pengguna) -->
-            <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-navy-950 via-navy-950/40 to-transparent pointer-events-none"></div>
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+            <!-- Overlay Transisi Gradien Halus Menembus Background Midnight Navy (Mirip Referensi Gambar 2) -->
+            <div
+              class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#061524] via-[#061524]/40 to-transparent pointer-events-none">
+            </div>
+            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#061524] to-transparent pointer-events-none">
+            </div>
 
             <!-- Badge Keterangan Gambar di Sudut Kanan Bawah -->
-            <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] text-slate-200 flex items-center space-x-1.5 pointer-events-none">
-              <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            <div
+              class="absolute bottom-3.5 right-3.5 bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-[11px] text-slate-100 flex items-center space-x-1.5 pointer-events-none shadow-xl">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                </path>
               </svg>
               <span>Dokumentasi SRMA SRT 1</span>
             </div>
@@ -2723,6 +2752,61 @@
     </div>
   </div>
 
+  <!-- Modal Live Camera Capture (Pengambilan Foto Surat Izin Langsung) -->
+  <div id="modalIzinCamera"
+    class="fixed inset-0 z-[60] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl space-y-3 sm:space-y-4 text-white">
+      <div class="flex justify-between items-center pb-2.5 border-b border-slate-800">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></div>
+          <div>
+            <h3 id="izinCameraModalTitle" class="font-bold text-sm sm:text-base text-white">Ambil Foto Surat Izin</h3>
+            <p class="text-[11px] text-slate-400">Posisikan kamera tepat pada objek atau siswa/penjemput</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeIzinCameraModal()" class="text-slate-400 hover:text-white text-xl p-1 leading-none">&times;</button>
+      </div>
+
+      <!-- Viewfinder Video Box -->
+      <div class="relative bg-black rounded-xl overflow-hidden aspect-[4/3] flex items-center justify-center border border-slate-800 shadow-inner">
+        <video id="izinCameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+        <canvas id="izinCameraCanvas" class="hidden"></canvas>
+        <div id="izinCameraLoading" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center space-y-2">
+          <svg class="animate-spin h-8 w-8 text-amber-400" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <p class="text-xs text-slate-300">Menghubungkan ke kamera...</p>
+        </div>
+      </div>
+
+      <!-- Camera Action Controls -->
+      <div class="flex items-center justify-between gap-2 pt-1">
+        <button type="button" onclick="switchIzinCameraFacing()"
+          class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center space-x-1.5 shadow-sm">
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>Balik Kamera</span>
+        </button>
+
+        <button type="button" onclick="captureIzinPhotoSnapshot()"
+          class="flex-1 py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span>Jepret Foto Sekarang</span>
+        </button>
+
+        <button type="button" onclick="closeIzinCameraModal()"
+          class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl border border-slate-700 transition">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Verifikasi Kedatangan Siswa (Ubah Status Menjadi Hadir di Asrama) -->
   <div id="modalVerifikasiKembali"
     class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -4636,6 +4720,7 @@
 
       // Tampilkan tombol aksi sesuai role
       toggleBtn('btnSettingsAdmin', isAdmin);
+      toggleBtn('btnQuickChangeBanner', isAdmin);
       toggleBtn('btnKelolaUserAdmin', isAdmin);
       toggleBtn('btnTambahWali', isAdmin);
       toggleBtn('btnTambahShift', isAdmin);
@@ -7011,6 +7096,50 @@
         pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' WITA';
     }
 
+    /**
+     * Render Komponen Slot Foto Formulir Surat Izin:
+     * Mendukung Ambil Foto via Kamera Langsung (Snapshot) atau Pilih Berkas Galeri
+     */
+    function renderIzinPhotoSlotMarkup(slotId, labelText, isRequired) {
+      const reqBadge = isRequired ? '<span class="text-rose-500 font-bold">*</span>' : '<span class="text-slate-400 text-xs font-normal">(Opsional)</span>';
+      return '<div class="space-y-1.5">' +
+        '<label class="block font-semibold text-slate-700 text-xs sm:text-sm">' + labelText + ' ' + reqBadge + '</label>' +
+        '<div class="space-y-2">' +
+          '<div class="flex items-center gap-2">' +
+            '<button type="button" onclick="openIzinCameraModal(\'' + slotId + '\', \'' + labelText + '\')" ' +
+              'class="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl border border-slate-700 shadow-sm transition flex items-center justify-center space-x-1.5">' +
+              '<svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>' +
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>' +
+              '</svg>' +
+              '<span>Ambil Foto via Kamera</span>' +
+            '</button>' +
+            '<label class="cursor-pointer py-2 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition flex items-center space-x-1.5 shadow-sm">' +
+              '<svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>' +
+              '</svg>' +
+              '<span>Pilih Berkas</span>' +
+              '<input type="file" id="' + slotId + '" accept="image/*" class="hidden" onchange="handleIzinFileSelected(this, \'' + slotId + '\')">' +
+            '</label>' +
+          '</div>' +
+          '<div id="previewBox_' + slotId + '" class="hidden p-2 bg-emerald-50/90 border border-emerald-300 rounded-xl flex items-center justify-between">' +
+            '<div class="flex items-center space-x-2.5 overflow-hidden">' +
+              '<img id="previewImg_' + slotId + '" src="" alt="Thumbnail" class="w-12 h-12 object-cover rounded-lg border border-emerald-400 shadow-sm shrink-0 bg-white">' +
+              '<div class="truncate">' +
+                '<span class="inline-flex items-center space-x-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">' +
+                  '<span>&#10003;</span><span>Foto Siap Disimpan</span>' +
+                '</span>' +
+                '<p id="previewName_' + slotId + '" class="text-xs font-bold text-slate-800 truncate mt-0.5">Hasil Kamera</p>' +
+              '</div>' +
+            '</div>' +
+            '<button type="button" onclick="clearIzinPhotoSlot(\'' + slotId + '\')" class="text-rose-600 hover:text-rose-800 text-xs font-bold px-2 py-1 rounded-lg hover:bg-rose-50 transition">' +
+              'Hapus' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
     function renderDynamicIzinFields() {
       const jenis = document.getElementById('izinJenisSelect').value;
       const container = document.getElementById('dynamicIzinFields');
@@ -7049,14 +7178,8 @@
           '</select>' +
           '</div>' +
           '</div>' +
-          '<div>' +
-          '<label class="block font-semibold text-slate-700 mb-1">Upload Foto Identitas Penjemput (KTP/SIM) *</label>' +
-          '<input type="file" id="izinFoto1" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">' +
-          '</div>' +
-          '<div>' +
-          '<label class="block font-semibold text-slate-700 mb-1">Upload Foto Penjemput dengan Siswa *</label>' +
-          '<input type="file" id="izinFoto2" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">' +
-          '</div>';
+          renderIzinPhotoSlotMarkup('izinFoto1', 'Upload / Foto Identitas Penjemput (KTP/SIM)', true) +
+          renderIzinPhotoSlotMarkup('izinFoto2', 'Upload / Foto Penjemput dengan Siswa', true);
       } else if (jenis === 'Izin Pulang Darurat/Sakit') {
         container.innerHTML =
           '<div class="p-2.5 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1 text-xs mb-1">' +
@@ -7089,10 +7212,7 @@
           '</select>' +
           '</div>' +
           '</div>' +
-          '<div>' +
-          '<label class="block font-semibold text-slate-700 mb-1">Upload Foto Kepulangan Siswa(i) *</label>' +
-          '<input type="file" id="izinFoto1" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">' +
-          '</div>';
+          renderIzinPhotoSlotMarkup('izinFoto1', 'Upload / Foto Kepulangan Siswa(i)', true);
       } else {
         // Izin Keluar Ringkas
         container.innerHTML =
@@ -7126,10 +7246,150 @@
           '</select>' +
           '</div>' +
           '</div>' +
-          '<div>' +
-          '<label class="block font-semibold text-slate-700 mb-1">Upload Foto Siswa Izin Keluar *</label>' +
-          '<input type="file" id="izinFoto1" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200">' +
-          '</div>';
+          renderIzinPhotoSlotMarkup('izinFoto1', 'Upload / Foto Siswa Izin Keluar', true);
+      }
+    }
+
+    /**
+     * Handler Manajemen Kamera Live Snapshot (Formulir Penerbitan Surat Izin)
+     */
+    let currentIzinCameraSlot = null;
+    let currentIzinCameraFacing = 'environment';
+    let currentIzinMediaStream = null;
+
+    function openIzinCameraModal(slotId, title) {
+      currentIzinCameraSlot = slotId;
+      const titleEl = document.getElementById('izinCameraModalTitle');
+      if (titleEl) titleEl.innerText = title || 'Ambil Foto Surat Izin';
+      const modal = document.getElementById('modalIzinCamera');
+      if (modal) modal.classList.remove('hidden');
+      startIzinCameraStream();
+    }
+
+    function startIzinCameraStream() {
+      const loading = document.getElementById('izinCameraLoading');
+      if (loading) loading.classList.remove('hidden');
+      if (currentIzinMediaStream) {
+        currentIzinMediaStream.getTracks().forEach(function (track) { track.stop(); });
+        currentIzinMediaStream = null;
+      }
+      const constraints = {
+        video: {
+          facingMode: currentIzinCameraFacing,
+          width: { ideal: 1280 },
+          height: { ideal: 960 }
+        },
+        audio: false
+      };
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (loading) loading.classList.add('hidden');
+        showToast('Perangkat tidak mendukung pengambilan foto langsung.', 'error');
+        closeIzinCameraModal();
+        return;
+      }
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(function (stream) {
+          currentIzinMediaStream = stream;
+          const video = document.getElementById('izinCameraVideo');
+          if (video) {
+            video.srcObject = stream;
+            video.play();
+          }
+          if (loading) loading.classList.add('hidden');
+        })
+        .catch(function (err) {
+          console.warn('Camera stream initial failed, retrying generic video:', err);
+          navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function (stream) {
+              currentIzinMediaStream = stream;
+              const video = document.getElementById('izinCameraVideo');
+              if (video) {
+                video.srcObject = stream;
+                video.play();
+              }
+              if (loading) loading.classList.add('hidden');
+            })
+            .catch(function (err2) {
+              if (loading) loading.classList.add('hidden');
+              showToast('Gagal mengakses kamera: ' + (err2.message || 'Periksa izin kamera.'), 'error');
+              closeIzinCameraModal();
+            });
+        });
+    }
+
+    function switchIzinCameraFacing() {
+      currentIzinCameraFacing = currentIzinCameraFacing === 'environment' ? 'user' : 'environment';
+      startIzinCameraStream();
+    }
+
+    function captureIzinPhotoSnapshot() {
+      const video = document.getElementById('izinCameraVideo');
+      const canvas = document.getElementById('izinCameraCanvas');
+      if (!video || !canvas || !currentIzinMediaStream) {
+        showToast('Kamera belum aktif.', 'error');
+        return;
+      }
+      const w = video.videoWidth || 640;
+      const h = video.videoHeight || 480;
+      canvas.width = Math.min(w, 1000);
+      canvas.height = Math.round((canvas.width / w) * h);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Data = canvas.toDataURL('image/jpeg', 0.82);
+
+      if (currentIzinCameraSlot) {
+        if (!appState.tempIzinPhotos) appState.tempIzinPhotos = {};
+        appState.tempIzinPhotos[currentIzinCameraSlot] = base64Data;
+
+        const box = document.getElementById('previewBox_' + currentIzinCameraSlot);
+        const img = document.getElementById('previewImg_' + currentIzinCameraSlot);
+        const name = document.getElementById('previewName_' + currentIzinCameraSlot);
+        if (box && img) {
+          img.src = base64Data;
+          if (name) name.innerText = 'Foto Kamera Langsung (' + getFormattedCurrentTime() + ')';
+          box.classList.remove('hidden');
+        }
+        showToast('Foto berhasil dijepret & tersimpan!', 'success');
+      }
+      closeIzinCameraModal();
+    }
+
+    function closeIzinCameraModal() {
+      if (currentIzinMediaStream) {
+        currentIzinMediaStream.getTracks().forEach(function (track) { track.stop(); });
+        currentIzinMediaStream = null;
+      }
+      const modal = document.getElementById('modalIzinCamera');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function clearIzinPhotoSlot(slotId) {
+      if (appState.tempIzinPhotos) {
+        appState.tempIzinPhotos[slotId] = '';
+      }
+      const fileInput = document.getElementById(slotId);
+      if (fileInput) fileInput.value = '';
+      const box = document.getElementById('previewBox_' + slotId);
+      const img = document.getElementById('previewImg_' + slotId);
+      if (box) box.classList.add('hidden');
+      if (img) img.src = '';
+    }
+
+    function handleIzinFileSelected(input, slotId) {
+      if (input && input.files && input.files[0]) {
+        const file = input.files[0];
+        compressImageFile(file, 1000, 1000, 0.78, function (base64) {
+          if (!appState.tempIzinPhotos) appState.tempIzinPhotos = {};
+          appState.tempIzinPhotos[slotId] = base64;
+          const box = document.getElementById('previewBox_' + slotId);
+          const img = document.getElementById('previewImg_' + slotId);
+          const name = document.getElementById('previewName_' + slotId);
+          if (box && img) {
+            img.src = base64;
+            if (name) name.innerText = file.name;
+            box.classList.remove('hidden');
+          }
+        });
       }
     }
 
@@ -7189,6 +7449,7 @@
     }
 
     function openModalTambahIzin() {
+      appState.tempIzinPhotos = { izinFoto1: '', izinFoto2: '' };
       document.getElementById('formTambahIzin').reset();
       renderDynamicIzinFields();
       autoFillSiswaIzin();
@@ -7197,6 +7458,7 @@
     }
 
     function closeModalTambahIzin() {
+      closeIzinCameraModal();
       document.getElementById('modalTambahIzin').classList.add('hidden');
     }
 
@@ -7222,12 +7484,28 @@
         formattedBatasWaktu = dParts[2] + '/' + dParts[1] + '/' + dParts[0] + ' ' + parts[1] + ' WITA';
       }
 
+      const foto1Data = (appState.tempIzinPhotos && appState.tempIzinPhotos.izinFoto1) || '';
+      const foto2Data = (appState.tempIzinPhotos && appState.tempIzinPhotos.izinFoto2) || '';
+      const file1 = document.getElementById('izinFoto1');
+      const file2 = document.getElementById('izinFoto2');
+      const jenis = document.getElementById('izinJenisSelect').value;
+
+      // Validasi wajib foto
+      if (!foto1Data && (!file1 || !file1.files || !file1.files[0])) {
+        showToast('Foto bukti pertama wajib diambil via kamera atau dipilih dari berkas.', 'error');
+        return;
+      }
+      if (jenis === 'Izin Pulang Rutin' && !foto2Data && (!file2 || !file2.files || !file2.files[0])) {
+        showToast('Foto penjemput bersama siswa wajib diambil via kamera atau dipilih dari berkas.', 'error');
+        return;
+      }
+
       const btn = document.getElementById('btnSubmitIzin');
       btn.disabled = true;
       btn.innerText = 'Menerbitkan...';
 
       const payload = {
-        jenisIzin: document.getElementById('izinJenisSelect').value,
+        jenisIzin: jenis,
         nisn: s.nisn,
         nama: s.nama,
         jenisKelamin: s.jenisKelamin,
@@ -7238,16 +7516,16 @@
         hubungan: document.getElementById('izinHubungan') ? document.getElementById('izinHubungan').value : '-',
         waliAsuhPiket: document.getElementById('izinWaliAsuhPiket') ? document.getElementById('izinWaliAsuhPiket').value : '-',
         waliAsramaPiket: document.getElementById('izinWaliAsramaPiket') ? document.getElementById('izinWaliAsramaPiket').value : '-',
-        fotoBukti1Base64: '',
-        fotoBukti2Base64: '',
+        fotoBukti1Base64: foto1Data,
+        fotoBukti2Base64: foto2Data,
         petugas: appState.currentUser ? appState.currentUser.namaLengkap : 'Wali Asrama'
       };
 
-      const file1 = document.getElementById('izinFoto1');
-      const file2 = document.getElementById('izinFoto2');
-
       const processFoto2 = function () {
-        if (file2 && file2.files && file2.files[0]) {
+        if (payload.fotoBukti2Base64) {
+          btn.innerText = 'Menerbitkan...';
+          sendIzinPayload(payload, btn);
+        } else if (file2 && file2.files && file2.files[0]) {
           btn.innerText = 'Mengompres Foto 2...';
           compressImageFile(file2.files[0], 1000, 1000, 0.78, function (base64_2) {
             payload.fotoBukti2Base64 = base64_2;
@@ -7260,7 +7538,9 @@
         }
       };
 
-      if (file1 && file1.files && file1.files[0]) {
+      if (payload.fotoBukti1Base64) {
+        processFoto2();
+      } else if (file1 && file1.files && file1.files[0]) {
         btn.innerText = 'Mengompres Foto 1...';
         compressImageFile(file1.files[0], 1000, 1000, 0.78, function (base64_1) {
           payload.fotoBukti1Base64 = base64_1;
@@ -8046,6 +8326,17 @@
       const bannerFileInput = document.getElementById('setBannerFile');
       if (bannerFileInput) bannerFileInput.value = '';
       document.getElementById('modalSettings').classList.remove('hidden');
+    }
+
+    function openModalSettingsToBanner() {
+      openModalSettings();
+      setTimeout(function () {
+        const el = document.getElementById('setBannerUrl');
+        if (el) {
+          el.focus();
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
     }
 
     function closeModalSettings() {
