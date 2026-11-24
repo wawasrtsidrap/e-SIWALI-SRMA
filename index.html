@@ -619,9 +619,9 @@
           <span>Ganti Foto Banner</span>
         </button>
 
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[350px]">
-          <!-- Kolom Kiri: Teks & Aksi (lg:col-span-7) -->
-          <div class="p-6 sm:p-10 lg:py-12 lg:pr-6 lg:col-span-7 space-y-4 flex flex-col justify-center">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[420px] sm:min-h-[460px] lg:min-h-[480px]">
+          <!-- Kolom Kiri: Teks & Aksi (Disesuaikan Menjadi lg:col-span-5 agar Area Foto Lebih Luas) -->
+          <div class="p-6 sm:p-8 lg:py-10 lg:pl-8 lg:pr-4 lg:col-span-5 xl:col-span-5 space-y-3.5 flex flex-col justify-center">
             <div
               class="inline-flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-300 border border-emerald-400/30 shadow-md w-fit">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -670,21 +670,21 @@
             </div>
           </div>
 
-          <!-- Kolom Kanan: Foto Showcase Visual dengan Gradient Soft-Fade (lg:col-span-5) -->
+          <!-- Kolom Kanan: Foto Showcase Luas & Utuh (lg:col-span-7) -->
           <div
-            class="relative min-h-[260px] sm:min-h-[320px] lg:min-h-full lg:col-span-5 overflow-hidden flex items-stretch">
+            class="relative min-h-[300px] sm:min-h-[380px] lg:min-h-full lg:col-span-7 xl:col-span-7 overflow-hidden flex items-stretch">
             <!-- Gambar Banner -->
             <img id="heroBannerImg"
               src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80"
               alt="Kegiatan Siswa Asrama SRMA"
-              class="w-full h-full object-cover object-center rounded-b-2xl lg:rounded-b-none lg:rounded-r-2xl shadow-inner transition-transform duration-700 hover:scale-105"
+              class="w-full h-full object-cover object-center rounded-b-2xl lg:rounded-b-none lg:rounded-r-2xl shadow-inner transition-transform duration-700 hover:scale-[1.02]"
               onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80';">
 
-            <!-- Overlay Transisi Gradien Halus Menembus Background Midnight Navy (Mirip Referensi Gambar 2) -->
+            <!-- Overlay Halus Hanya Pada Tepian Sambungan Kiri (Agar Semua Orang di Foto Terlihat Jelas) -->
             <div
-              class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#061524] via-[#061524]/40 to-transparent pointer-events-none">
+              class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#061524] via-[#061524]/20 via-10% to-transparent to-25% pointer-events-none">
             </div>
-            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#061524] to-transparent pointer-events-none">
+            <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#061524]/60 to-transparent pointer-events-none">
             </div>
 
             <!-- Badge Keterangan Gambar di Sudut Kanan Bawah -->
@@ -3476,11 +3476,20 @@
      */
     const DEFAULT_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz7TOe5XqX3lvGfSl7gB_rPHetEP1ZFV_S_md0MPiZiY7SSG1ufR-9rLp2w-5tCKvrzVA/exec';
 
-    // Asset Vektor SVG DataURI Bawaan Resmi (100% Bebas CORS & Instan Offline untuk ID Card / Avatar)
-    const DEFAULT_SRMA_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231E3A8A"/><stop offset="100%" stop-color="%230F172A"/></linearGradient><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23FBBF24"/><stop offset="100%" stop-color="%23D97706"/></linearGradient></defs><rect width="100" height="100" rx="20" fill="url(%23g1)"/><circle cx="50" cy="50" r="38" fill="none" stroke="url(%23g2)" stroke-width="2.5"/><path d="M50 20 L53 32 L65 32 L55 40 L59 52 L50 44 L41 52 L45 40 L35 32 L47 32 Z" fill="url(%23g2)"/><path d="M30 68 C38 60 46 62 50 66 C54 62 62 60 70 68 C62 64 54 65 50 72 C46 65 38 64 30 68 Z" fill="%23FFFFFF"/><circle cx="50" cy="38" r="4" fill="%23FFFFFF"/></svg>';
-    const DEFAULT_AVATAR_MALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><circle cx="60" cy="46" r="26" fill="%23FDBA74"/><path d="M60 20 C46 20 38 28 38 38 C38 42 42 45 44 45 C48 34 56 30 66 30 C74 30 78 35 82 45 C84 45 86 40 82 34 C78 24 70 20 60 20 Z" fill="%230F172A"/><path d="M30 115 C30 92 42 82 60 82 C78 82 90 92 90 115 L90 140 L30 140 Z" fill="%23FFFFFF"/><polygon points="60,88 53,105 60,130 67,105" fill="%231E3A8A"/><polygon points="56,84 64,84 62,90 58,90" fill="%230F172A"/></svg>';
-    const DEFAULT_AVATAR_FEMALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><path d="M60 24 C44 24 36 36 36 55 C36 78 44 88 44 88 L32 115 C32 115 42 140 60 140 C78 140 88 115 88 115 L76 88 C76 88 84 78 84 55 C84 36 76 24 60 24 Z" fill="%23FFFFFF"/><circle cx="60" cy="56" r="20" fill="%23FDBA74"/><path d="M46 54 C46 44 52 38 60 38 C68 38 74 44 74 54 C74 65 67 72 60 72 C53 72 46 65 46 54 Z" fill="%23FDBA74"/><polygon points="60,94 54,108 60,126 66,108" fill="%231E3A8A"/></svg>';
+    // Asset Vektor SVG DataURI Base64 Bawaan Resmi (100% Bebas CORS, Bebas Kutip Rusak & Instan Offline)
+    const DEFAULT_SRMA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImcxIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUUzQThBIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMEYxNzJBIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImcyIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkJCRjI0Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRDk3NzA2Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIyMCIgZmlsbD0idXJsKCNnMSkiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIzOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2cyKSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNNTAgMjAgTDUzIDMyIEw2NSAzMiBMNTUgNDAgTDU5IDUyIEw1MCA0NCBMNDEgNTIgTDQ1IDQwIEwzNSAzMiBMNDcgMzIgWiIgZmlsbD0idXJsKCNnMikiLz48cGF0aCBkPSJNMzAgNjggQzM4IDYwIDQ2IDYyIDUwIDY2IEM1NCA2MiA2MiA2MCA3MCA2OCBDNjIgNjQgNTQgNjUgNTAgNzIgQzQ2IDY1IDM4IDY0IDMwIDY4IFoiIGZpbGw9IiNGRkZGRkYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjM4IiByPSI0IiBmaWxsPSIjRkZGRkZGIi8+PC9zdmc+';
+    const DEFAULT_AVATAR_MALE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTQwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iIzFFMjkzQiIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDYiIHI9IjI2IiBmaWxsPSIjRkRCQTc0Ii8+PHBhdGggZD0iTTYwIDIwIEM0NiAyMCAzOCAyOCAzOCAzOCBDMzggNDIgNDIgNDUgNDQgNDUgQzQ4IDM0IDU2IDMwIDY2IDMwIEM3NCAzMCA3OCAzNSA4MiA0NSBDODQgNDUgODYgNDAgODIgMzQgQzc4IDI0IDcwIDIwIDYwIDIwIFoiIGZpbGw9IiMwRjE3MkEiLz48cGF0aCBkPSJNMzAgMTE1IEMzMCA5MiA0MiA4MiA2MCA4MiBDNzggODIgOTAgOTIgOTAgMTE1IEw5MCAxNDAgTDMwIDE0MCBaIiBmaWxsPSIjRkZGRkZGIi8+PHBvbHlnb24gcG9pbnRzPSI2MCw4OCA1MywxMDUgNjAsMTMwIDY3LDEwNSIgZmlsbD0iIzFFM0E4QSIvPjxwb2x5Z29uIHBvaW50cz0iNTYsODQgNjQsODQgNjIsOTAgNTgsOTAiIGZpbGw9IiMwRjE3MkEiLz48L3N2Zz4=';
+    const DEFAULT_AVATAR_FEMALE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTQwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iIzFFMjkzQiIvPjxwYXRoIGQ9Ik02MCAyNCBDNDQgMjQgMzYgMzYgMzYgNTUgQzM2IDc4IDQ0IDg4IDQ0IDg4IEwzMiAxMTUgQzMyIDExNSA0MiAxNDAgNjAgMTQwIEM3OCAxNDAgODggMTE1IDg4IDExNSBMNzYgODggQzc2IDg4IDg0IDc4IDg0IDU1IEM4NCAzNiA3NiAyNCA2MCAyNCBaIiBmaWxsPSIjRkZGRkZGIi8+PGNpcmNsZSBjeD0iNjAiIGN5PSI1NiIgcj0iMjAiIGZpbGw9IiNGREJBNzQiLz48cGF0aCBkPSJNNDYgNTQgQzQ2IDQ0IDUyIDM4IDYwIDM4IEM2OCAzOCA3NCA0NCA3NCA1NCBDNzQgNjUgNjcgNzIgNjAgNzIgQzUzIDcyIDQ2IDY1IDQ2IDU0IFoiIGZpbGw9IiNGREJBNzQiLz48cG9seWdvbiBwb2ludHM9IjYwLDk0IDU0LDEwOCA2MCwxMjYgNjYsMTA4IiBmaWxsPSIjMUUzQThBIi8+PC9zdmc+';
     const DEFAULT_BANNER_HERO = 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80';
+
+    /**
+     * Fallback Penanganan Error Gambar Avatar Siswa & Pegawai (Bebas Kutip & Aman XSS)
+     */
+    function handleAvatarFallback(imgEl, jk) {
+      if (!imgEl) return;
+      imgEl.onerror = null;
+      imgEl.src = (jk === 'Perempuan' || jk === 'P') ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
+    }
 
     /**
      * WAKTU RESMI INDONESIA TENGAH (WITA - UTC+8)
@@ -4439,7 +4448,7 @@
           '<div class="h-1 w-full absolute top-0 left-0 ' + topBarGradient + '"></div>' +
           '<div class="flex items-start space-x-3">' +
           '<div class="relative flex-shrink-0">' +
-          '<img src="' + fotoSrc + '" loading="lazy" decoding="async" class="w-13 h-13 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + fotoSrc + '" loading="lazy" decoding="async" class="w-13 h-13 rounded-2xl object-cover border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="handleAvatarFallback(this, \'' + (item.jenisKelamin || '') + '\')">' +
           '<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="Pegawai Aktif"></span>' +
           '</div>' +
           '<div class="flex-1 min-w-0 leading-tight space-y-1">' +
@@ -4845,7 +4854,7 @@
           '<div>' +
           '<div class="flex items-center space-x-3.5 pb-3.5 border-b border-slate-100">' +
           '<div class="relative flex-shrink-0">' +
-          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-14 h-14 object-cover rounded-2xl border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-14 h-14 object-cover rounded-2xl border-2 border-white shadow-md ring-2 ring-slate-200 group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300" onerror="handleAvatarFallback(this, \'' + (item.jenisKelamin || '') + '\')">' +
           '<span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="Pegawai Aktif"></span>' +
           '</div>' +
           '<div class="overflow-hidden space-y-1 flex-1">' +
@@ -5871,7 +5880,7 @@
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML =
           '<td class="py-2.5 px-4 flex items-center space-x-3">' +
-          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="this.src=\'' + defaultAvatar + '\'">' +
+          '<img src="' + foto + '" loading="lazy" decoding="async" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="handleAvatarFallback(this, \'' + (s.jenisKelamin || '') + '\')">' +
           '<div><span class="font-bold text-slate-800">' + s.nama + '</span></div>' +
           '</td>' +
           '<td class="py-2.5 px-3 font-mono font-medium text-slate-600">' + s.nisn + '</td>' +
