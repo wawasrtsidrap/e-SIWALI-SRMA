@@ -170,17 +170,21 @@
       padding: 0 !important;
     }
 
-    #qrReader video {
+    #qrReader video,
+    #qrReader__scan_region video,
+    div[id*="qrReader"] video {
       width: 100% !important;
       height: 100% !important;
       min-width: 100% !important;
       min-height: 100% !important;
+      max-width: 100% !important;
       max-height: 440px !important;
       object-fit: cover !important;
       display: block !important;
       position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
       border-radius: 1rem;
     }
 
@@ -239,7 +243,7 @@
         min-height: 85.6mm !important;
         max-height: 85.6mm !important;
         margin: 0 auto !important;
-        padding: 3.5mm !important;
+        padding: 2.5mm !important;
         box-sizing: border-box !important;
         border-radius: 3mm !important;
         border: 1px solid #CBD5E1 !important;
@@ -247,6 +251,10 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         page-break-inside: avoid !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        overflow: hidden !important;
       }
     }
   </style>
@@ -268,7 +276,7 @@
       onclick="navigateMenu('beranda')">
       <div
         class="relative p-1 bg-white rounded-2xl shadow-md ring-2 ring-white/95 group-hover:ring-amber-400 transition-all duration-300 flex items-center justify-center flex-shrink-0">
-        <img id="sidebarLogoImg" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" alt="Logo"
+        <img id="sidebarLogoImg" src="" alt="Logo SRMA"
           class="w-10 h-10 object-contain filter drop-shadow-sm">
         <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -417,7 +425,7 @@
             onclick="navigateMenu('beranda')">
             <div
               class="relative p-1 bg-white rounded-2xl shadow-md ring-2 ring-white/95 group-hover:ring-amber-400 transition-all duration-300 flex items-center justify-center flex-shrink-0">
-              <img id="navLogoImg" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png" alt="Logo"
+              <img id="navLogoImg" src="" alt="Logo SRMA"
                 class="w-10 h-10 object-contain filter drop-shadow-sm">
             </div>
             <div class="min-w-0">
@@ -590,35 +598,76 @@
 
     <!-- VIEW 1: BERANDA -->
     <section id="view-beranda" class="space-y-6">
-      <!-- Jumbotron Sambutan -->
+      <!-- Jumbotron Sambutan Split Hero Modern Estetik -->
       <div
-        class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy via-navy-800 to-maroon text-white p-6 sm:p-10 shadow-lg">
-        <div class="relative z-10 max-w-3xl space-y-4">
-          <div
-            class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-amber-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Sistem Digital Keasramaan & Pengasuhan</span>
+        class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-slate-900 text-white shadow-2xl border border-white/10">
+        <!-- Ornamen Latar & Cahaya Ambien -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-navy/40 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 right-1/4 w-96 h-96 rounded-full bg-maroon/30 blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-center min-h-[340px]">
+          <!-- Kolom Kiri: Teks & Aksi (lg:col-span-7) -->
+          <div class="p-6 sm:p-10 lg:py-12 lg:pr-4 lg:col-span-7 space-y-4">
+            <div
+              class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-amber-300 border border-white/15 shadow-sm">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Sistem Digital Keasramaan & Pengasuhan</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl lg:text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+              Selamat Datang Pada Sistem Digital Keasramaan dan Pengasuhan Sekolah Rakyat
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl">
+              Aplikasi resmi <strong id="heroInstansiName" class="text-amber-300">SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG (JENJANG SRMA)</strong>. Cerdas Bersama Tumbuh Setara, Bersaudara dan Saling Menjaga.
+            </p>
+            <div class="pt-2 flex flex-wrap items-center gap-3">
+              <button onclick="navigateMenu('dashboard')"
+                class="bg-white hover:bg-slate-100 text-navy font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 flex items-center space-x-2">
+                <span>Buka Dashboard Utama</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </button>
+              <button onclick="navigateMenu('siswa')"
+                class="bg-maroon hover:bg-maroon-700 text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all border border-white/20 shadow-sm">
+                Direktori Data Siswa
+              </button>
+            </div>
+            <!-- Fitur Unggulan Mini Pill -->
+            <div class="pt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                <span class="text-amber-400">&bull;</span>
+                <span>11 Sesi Presensi Harian</span>
+              </span>
+              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                <span class="text-emerald-400">&bull;</span>
+                <span>Monitoring Kesehatan & Adab</span>
+              </span>
+              <span class="inline-flex items-center space-x-1 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                <span class="text-sky-400">&bull;</span>
+                <span>ID Card Digital QR Code</span>
+              </span>
+            </div>
           </div>
-          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            Selamat Datang Pada Sistem Digital Keasramaan dan Pengasuhan Sekolah Rakyat
-          </h1>
-          <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
-            Aplikasi resmi <strong id="heroInstansiName">SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG (JENJANG
-              SRMA)</strong>. Cerdas Bersama Tumbuh Setara, Bersaudarah dan Saling Menjaga.
-          </p>
-          <div class="pt-2 flex flex-wrap gap-3">
-            <button onclick="navigateMenu('dashboard')"
-              class="bg-white text-navy font-bold text-sm px-5 py-2.5 rounded-xl shadow-md hover:bg-slate-100 transition-all flex items-center space-x-2">
-              <span>Buka Dashboard Utama</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
-                </path>
+
+          <!-- Kolom Kanan: Foto Showcase Visual dengan Gradient Soft-Fade (lg:col-span-5) -->
+          <div class="relative h-64 sm:h-80 lg:h-full lg:min-h-[360px] lg:col-span-5 overflow-hidden flex items-center justify-center p-4 lg:p-0">
+            <!-- Gambar Banner -->
+            <img id="heroBannerImg"
+              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80"
+              alt="Kegiatan Siswa Asrama SRMA"
+              class="w-full h-full object-cover object-center rounded-xl lg:rounded-none lg:rounded-r-2xl shadow-inner transition-transform duration-700 hover:scale-105">
+
+            <!-- Overlay Transisi Gradien Halus Menembus Background Navy (Mirip Referensi Pengguna) -->
+            <div class="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-navy-950 via-navy-950/40 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-navy-950 to-transparent pointer-events-none"></div>
+
+            <!-- Badge Keterangan Gambar di Sudut Kanan Bawah -->
+            <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-[10px] text-slate-200 flex items-center space-x-1.5 pointer-events-none">
+              <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-            </button>
-            <button onclick="navigateMenu('siswa')"
-              class="bg-maroon hover:bg-maroon-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all border border-white/20">
-              Direktori Data Siswa
-            </button>
+              <span>Dokumentasi SRMA SRT 1</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1344,9 +1393,15 @@
     <section id="view-absensi" class="hidden space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
-          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Absensi 11 Sesi & Riwayat Kegiatan</h2>
+          <div class="flex items-center space-x-2">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Absensi 11 Sesi & Riwayat Kegiatan</h2>
+            <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-full text-[11px] font-semibold">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="witaClockBadge">WITA (UTC+8)</span>
+            </span>
+          </div>
           <p class="text-xs sm:text-sm text-slate-500">Pemindaian QR Code ID Card digital, pencatatan presensi sesi, dan
-            rekap riwayat kegiatan</p>
+            rekap riwayat kegiatan zona resmi Sulawesi Selatan</p>
         </div>
         <div class="flex items-center space-x-2">
           <button id="btnSimpanAbsensiBatch" onclick="simpanAbsensiBatch()"
@@ -2097,6 +2152,26 @@
             oninput="document.getElementById('previewLogoSettings').src = this.value"
             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-navy">
         </div>
+        <!-- Pengaturan Foto Hero Banner Beranda -->
+        <div class="pt-2 border-t border-slate-100">
+          <label class="block font-semibold text-slate-700 mb-1">Foto Banner Beranda (Kegiatan Santri / Asrama)</label>
+          <input type="file" id="setBannerFile" accept="image/*" onchange="previewBannerFile(this)"
+            class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-navy-50 file:text-navy hover:file:bg-navy-100">
+        </div>
+        <div class="flex items-center space-x-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <img id="previewBannerSettings" src=""
+            class="w-16 h-10 object-cover rounded bg-slate-900 border border-slate-300">
+          <div class="text-[11px] text-slate-600 flex-1">
+            <span class="font-bold text-slate-800 block">Preview Banner Beranda</span>
+            <span class="text-[10px] text-slate-400">Tampil estetik pada jumbotron selamat datang beranda.</span>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Atau Gunakan Tautan URL Banner (Alternatif)</label>
+          <input type="text" id="setBannerUrl" placeholder="https://..."
+            oninput="document.getElementById('previewBannerSettings').src = this.value"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-navy">
+        </div>
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Alamat Lengkap</label>
           <textarea id="setAlamat" rows="2"
@@ -2381,61 +2456,57 @@
       <!-- Area Fisik Kartu ID Card -->
       <div class="flex justify-center items-center py-1">
         <div id="idCardContainer"
-          class="w-[280px] sm:w-[305px] aspect-[54/85.6] bg-gradient-to-b from-navy via-navy-800 to-maroon text-white rounded-2xl p-4 shadow-2xl relative overflow-hidden border border-white/20 flex flex-col justify-between items-center text-center select-none">
+          class="w-[280px] sm:w-[295px] aspect-[54/85.6] bg-gradient-to-b from-navy via-navy-800 to-maroon text-white rounded-2xl p-3 shadow-2xl relative overflow-hidden border border-white/20 flex flex-col justify-between items-center text-center select-none">
           <!-- Ornamen Kilau Diagonal & Watermark Halus -->
           <div class="absolute -right-12 -top-12 w-36 h-36 rounded-full bg-white/5 pointer-events-none"></div>
           <div class="absolute -left-12 -bottom-12 w-36 h-36 rounded-full bg-amber-400/5 pointer-events-none"></div>
           <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500"></div>
 
           <!-- 1. Header Kop Lembaga Resmi (Portrait Center) -->
-          <div class="w-full pb-2 border-b border-white/20 flex flex-col items-center space-y-1">
+          <div class="w-full pb-1 border-b border-white/20 flex flex-col items-center space-y-0.5">
             <img id="idCardLogo" src="" alt="Logo SRMA"
-              class="w-9 h-9 rounded-xl bg-white p-0.5 object-contain shadow-md ring-1 ring-white/40">
+              class="w-8 h-8 rounded-lg bg-white p-0.5 object-contain shadow ring-1 ring-white/40">
             <div class="leading-tight px-1">
-              <h5 class="text-[8.5px] font-black uppercase tracking-wider text-amber-300 leading-tight">SEKOLAH RAKYAT
+              <h5 class="text-[8px] font-black uppercase tracking-wider text-amber-300 leading-tight">SEKOLAH RAKYAT
                 TERINTEGRASI SIDENRENG RAPPANG</h5>
-              <div class="text-[8px] font-extrabold text-white tracking-widest uppercase mt-0.5">JENJANG SRMA</div>
-              <div class="text-[6.5px] text-slate-300 leading-tight line-clamp-1">Jl. Poros Sidrap – Enrekang Desa Mario
-                Kec. Kulo Kab. Sidenreng Rappang</div>
+              <div class="text-[7.5px] font-extrabold text-white tracking-widest uppercase mt-0.2">JENJANG SRMA</div>
+              <div class="text-[6px] text-slate-300 leading-tight line-clamp-1">Jl. Poros Sidrap – Enrekang Desa Mario Kec. Kulo Kab. Sidenreng Rappang</div>
             </div>
           </div>
 
           <!-- 2. Pasfoto Siswa Vertikal & Lencana Status -->
-          <div class="pt-1.5 flex flex-col items-center w-full">
+          <div class="pt-0.5 flex flex-col items-center w-full">
             <div class="relative">
               <img id="idCardFoto" src=""
-                class="w-20 h-26 sm:w-22 sm:h-28 object-cover rounded-xl border-2 border-amber-300 shadow-md bg-slate-800">
+                class="w-18 h-22 sm:w-20 sm:h-24 object-cover rounded-lg border-2 border-amber-300 shadow bg-slate-800">
               <span
-                class="absolute -bottom-1.5 inset-x-0 mx-auto w-max px-2 py-0.2 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-black text-[7.5px] rounded-full uppercase shadow">SISWA
-                AKTIF</span>
+                class="absolute -bottom-1 inset-x-0 mx-auto w-max px-2 py-0.2 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 font-black text-[7px] rounded-full uppercase shadow">SISWA AKTIF</span>
             </div>
 
             <!-- Identitas Lengkap Siswa -->
-            <div class="mt-2.5 space-y-0.5 w-full">
+            <div class="mt-1.5 space-y-0.5 w-full">
               <span
-                class="inline-block bg-white/15 text-amber-300 text-[7.5px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-white/10">KARTU
-                TANDA SISWA</span>
+                class="inline-block bg-white/15 text-amber-300 text-[7px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider border border-white/10">KARTU TANDA SISWA</span>
               <h4 id="idCardNama"
-                class="font-black text-xs sm:text-sm text-white truncate max-w-[240px] mx-auto mt-0.5">Nama Siswa</h4>
-              <p class="text-[10px] text-slate-200">NISN: <span id="idCardNisn"
+                class="font-black text-xs text-white truncate max-w-[230px] mx-auto mt-0.5 leading-snug">Nama Siswa</h4>
+              <p class="text-[9.5px] text-slate-200">NISN: <span id="idCardNisn"
                   class="font-mono font-bold text-amber-300">0000000000</span></p>
-              <p class="text-[9.5px] text-slate-300"><span id="idCardJk">Laki-laki</span> &bull; <span id="idCardKamar"
+              <p class="text-[8.5px] text-slate-300"><span id="idCardJk">Laki-laki</span> &bull; <span id="idCardKamar"
                   class="text-white font-medium">Al-Ghazali 01</span></p>
             </div>
           </div>
 
           <!-- 3. Barcode QR Code Absensi di Bagian Bawah -->
-          <div class="w-full pt-1 flex flex-col items-center">
-            <div class="bg-white p-1 rounded-xl shadow-lg border border-amber-300/40">
-              <div id="idCardQrContainer" class="flex items-center justify-center min-w-[90px] min-h-[90px]"></div>
+          <div class="w-full pt-0.5 flex flex-col items-center">
+            <div class="bg-white p-1 rounded-lg shadow border border-amber-300/40">
+              <div id="idCardQrContainer" class="flex items-center justify-center min-w-[72px] min-h-[72px]"></div>
             </div>
-            <span class="text-[7px] text-slate-300 tracking-wider font-bold mt-1 uppercase">SCAN VERIFIKASI
-              ABSENSI</span>
+            <span class="text-[6.5px] text-amber-200 tracking-wider font-bold mt-0.5 uppercase">SCAN VERIFIKASI ABSENSI</span>
           </div>
 
           <!-- 4. Footer Bar ID Card -->
           <div
-            class="w-full pt-1 border-t border-white/20 flex items-center justify-between text-[6.5px] sm:text-[7px] text-slate-300">
+            class="w-full pt-1 border-t border-white/20 flex items-center justify-between text-[6.5px] text-slate-300">
             <span>KTA RESMI SRMA SRT 1</span>
             <span class="font-bold text-amber-300">SISTEM e-SIWALI</span>
           </div>
@@ -2481,7 +2552,7 @@
       <div id="portofolioPrintArea" class="p-6 bg-white border border-slate-200 rounded-xl space-y-5 text-slate-800">
         <!-- Kop Resmi Lembaga -->
         <div class="flex items-center space-x-4 pb-4 border-b-2 border-navy">
-          <img id="portoKopLogo" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png"
+          <img id="portoKopLogo" src="" alt="Logo SRMA"
             class="w-14 h-14 object-contain">
           <div class="flex-1 text-center">
             <h2 class="text-base sm:text-lg font-black text-navy uppercase tracking-wide">SEKOLAH RAKYAT TERINTEGRASI
@@ -2717,7 +2788,7 @@
         class="p-8 bg-white border border-slate-200 rounded-xl space-y-5 text-slate-900 text-xs leading-relaxed">
         <!-- Kop Surat Resmi Lembaga -->
         <div class="flex items-center space-x-4 pb-4 border-b-2 border-slate-900">
-          <img id="suratKopLogo" src="https://cdn-icons-png.flaticon.com/512/3135/3135768.png"
+          <img id="suratKopLogo" src="" alt="Logo SRMA"
             class="w-14 h-14 object-contain">
           <div class="flex-1 text-center">
             <h2 class="text-base font-black uppercase tracking-wide text-navy">SEKOLAH RAKYAT TERINTEGRASI SIDENRENG
@@ -3321,6 +3392,92 @@
      */
     const DEFAULT_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbz7TOe5XqX3lvGfSl7gB_rPHetEP1ZFV_S_md0MPiZiY7SSG1ufR-9rLp2w-5tCKvrzVA/exec';
 
+    // Asset Vektor SVG DataURI Bawaan Resmi (100% Bebas CORS & Instan Offline untuk ID Card / Avatar)
+    const DEFAULT_SRMA_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231E3A8A"/><stop offset="100%" stop-color="%230F172A"/></linearGradient><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23FBBF24"/><stop offset="100%" stop-color="%23D97706"/></linearGradient></defs><rect width="100" height="100" rx="20" fill="url(%23g1)"/><circle cx="50" cy="50" r="38" fill="none" stroke="url(%23g2)" stroke-width="2.5"/><path d="M50 20 L53 32 L65 32 L55 40 L59 52 L50 44 L41 52 L45 40 L35 32 L47 32 Z" fill="url(%23g2)"/><path d="M30 68 C38 60 46 62 50 66 C54 62 62 60 70 68 C62 64 54 65 50 72 C46 65 38 64 30 68 Z" fill="%23FFFFFF"/><circle cx="50" cy="38" r="4" fill="%23FFFFFF"/></svg>';
+    const DEFAULT_AVATAR_MALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><circle cx="60" cy="46" r="26" fill="%23FDBA74"/><path d="M60 20 C46 20 38 28 38 38 C38 42 42 45 44 45 C48 34 56 30 66 30 C74 30 78 35 82 45 C84 45 86 40 82 34 C78 24 70 20 60 20 Z" fill="%230F172A"/><path d="M30 115 C30 92 42 82 60 82 C78 82 90 92 90 115 L90 140 L30 140 Z" fill="%23FFFFFF"/><polygon points="60,88 53,105 60,130 67,105" fill="%231E3A8A"/><polygon points="56,84 64,84 62,90 58,90" fill="%230F172A"/></svg>';
+    const DEFAULT_AVATAR_FEMALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><path d="M60 24 C44 24 36 36 36 55 C36 78 44 88 44 88 L32 115 C32 115 42 140 60 140 C78 140 88 115 88 115 L76 88 C76 88 84 78 84 55 C84 36 76 24 60 24 Z" fill="%23FFFFFF"/><circle cx="60" cy="56" r="20" fill="%23FDBA74"/><path d="M46 54 C46 44 52 38 60 38 C68 38 74 44 74 54 C74 65 67 72 60 72 C53 72 46 65 46 54 Z" fill="%23FDBA74"/><polygon points="60,94 54,108 60,126 66,108" fill="%231E3A8A"/></svg>';
+    const DEFAULT_BANNER_HERO = 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80';
+
+    /**
+     * WAKTU RESMI INDONESIA TENGAH (WITA - UTC+8)
+     * Menjamin tanggal dan jam dihitung berdasarkan lokasi Sidenreng Rappang (Sulawesi Selatan)
+     * secara independen dari konfigurasi waktu lokal browser atau perangkat.
+     */
+    function getWitaDateObj() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      return new Date(utc + (3600000 * 8)); // UTC + 8 Jam (WITA)
+    }
+
+    function getWitaDateIso() {
+      const w = getWitaDateObj();
+      const y = w.getFullYear();
+      const m = String(w.getMonth() + 1).padStart(2, '0');
+      const d = String(w.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    function getWitaDateDisplay() {
+      const w = getWitaDateObj();
+      const d = String(w.getDate()).padStart(2, '0');
+      const m = String(w.getMonth() + 1).padStart(2, '0');
+      const y = w.getFullYear();
+      return d + '/' + m + '/' + y;
+    }
+
+    function getWitaTimeString() {
+      const w = getWitaDateObj();
+      const h = String(w.getHours()).padStart(2, '0');
+      const m = String(w.getMinutes()).padStart(2, '0');
+      const s = String(w.getSeconds()).padStart(2, '0');
+      return h + ':' + m + ':' + s + ' WITA';
+    }
+
+    function updateWitaLiveClock() {
+      const el = document.getElementById('witaClockBadge');
+      if (el) {
+        el.innerText = 'WITA (UTC+8): ' + getWitaTimeString().replace(' WITA', '');
+      }
+    }
+
+    /**
+     * Konversi Gambar URL ke Base64 DataURI Aman Khusus Saat Ekspor Gambar (html2canvas)
+     */
+    function convertImgToDataUri(url, callback) {
+      if (!url || typeof url !== 'string' || url.indexOf('data:') === 0) {
+        callback(url);
+        return;
+      }
+      const trimmed = url.trim();
+      if (!trimmed) {
+        callback('');
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        try {
+          const cvs = document.createElement('canvas');
+          cvs.width = img.naturalWidth || img.width || 200;
+          cvs.height = img.naturalHeight || img.height || 200;
+          const ctx = cvs.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          callback(cvs.toDataURL('image/png'));
+        } catch (e) {
+          callback(trimmed);
+        }
+      };
+      img.onerror = function () {
+        callback(trimmed);
+      };
+      // Jika URL Google Drive thumbnail, lewatkan proxy cors wsrv.nl agar canvas tidak taint
+      if (trimmed.indexOf('drive.google.com') !== -1) {
+        img.src = 'https://wsrv.nl/?url=' + encodeURIComponent(trimmed);
+      } else {
+        img.src = trimmed;
+      }
+    }
+
     /**
      * STATE MANAGEMENT CLIENT-SIDE
      * Dilengkapi In-Memory Caching untuk perpindahan menu 0-detik (instant)
@@ -3334,7 +3491,8 @@
       kebutuhanSubTab: 'usulan',
       settings: {
         NAMA_INSTANSI: 'SRT 1 Sidenreng Rappang Jenjang SRMA',
-        LOGO_URL: 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png',
+        LOGO_URL: DEFAULT_SRMA_LOGO,
+        BANNER_BERANDA_URL: DEFAULT_BANNER_HERO,
         ALAMAT: 'Jl. Poros Rappang, Kab. Sidenreng Rappang, Sulawesi Selatan',
         KONTAK: '0812-3456-7890 / srt1sidrap@sekolahrakyat.sch.id'
       },
@@ -3366,10 +3524,14 @@
 
     // Inisialisasi Saat Halaman Dimuat
     document.addEventListener('DOMContentLoaded', function () {
-      // Set input tanggal hari ini secara default
-      const today = new Date().toISOString().split('T')[0];
+      // Set input tanggal hari ini secara default sesuai zona WITA (Sulawesi Selatan - UTC+8)
+      const today = getWitaDateIso();
       const absTgl = document.getElementById('absensiTanggalInput');
       if (absTgl) absTgl.value = today;
+
+      // Jalankan interval jam live WITA
+      updateWitaLiveClock();
+      setInterval(updateWitaLiveClock, 1000);
 
       // Cek sesi login tersimpan di localStorage
       const savedUser = localStorage.getItem('esowali_user');
@@ -3767,70 +3929,36 @@
       fetchWaliData(forceRefresh);
     }
 
-    // Asset Vektor SVG DataURI Bawaan Resmi (100% Bebas CORS & Instan Offline untuk ID Card / Avatar)
-    const DEFAULT_SRMA_LOGO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231E3A8A"/><stop offset="100%" stop-color="%230F172A"/></linearGradient><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23FBBF24"/><stop offset="100%" stop-color="%23D97706"/></linearGradient></defs><rect width="100" height="100" rx="20" fill="url(%23g1)"/><circle cx="50" cy="50" r="38" fill="none" stroke="url(%23g2)" stroke-width="2.5"/><path d="M50 20 L53 32 L65 32 L55 40 L59 52 L50 44 L41 52 L45 40 L35 32 L47 32 Z" fill="url(%23g2)"/><path d="M30 68 C38 60 46 62 50 66 C54 62 62 60 70 68 C62 64 54 65 50 72 C46 65 38 64 30 68 Z" fill="%23FFFFFF"/><circle cx="50" cy="38" r="4" fill="%23FFFFFF"/></svg>';
-    const DEFAULT_AVATAR_MALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><circle cx="60" cy="46" r="26" fill="%23FDBA74"/><path d="M60 20 C46 20 38 28 38 38 C38 42 42 45 44 45 C48 34 56 30 66 30 C74 30 78 35 82 45 C84 45 86 40 82 34 C78 24 70 20 60 20 Z" fill="%230F172A"/><path d="M30 115 C30 92 42 82 60 82 C78 82 90 92 90 115 L90 140 L30 140 Z" fill="%23FFFFFF"/><polygon points="60,88 53,105 60,130 67,105" fill="%231E3A8A"/><polygon points="56,84 64,84 62,90 58,90" fill="%230F172A"/></svg>';
-    const DEFAULT_AVATAR_FEMALE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><rect width="120" height="140" fill="%231E293B"/><path d="M60 24 C44 24 36 36 36 55 C36 78 44 88 44 88 L32 115 C32 115 42 140 60 140 C78 140 88 115 88 115 L76 88 C76 88 84 78 84 55 C84 36 76 24 60 24 Z" fill="%23FFFFFF"/><circle cx="60" cy="56" r="20" fill="%23FDBA74"/><path d="M46 54 C46 44 52 38 60 38 C68 38 74 44 74 54 C74 65 67 72 60 72 C53 72 46 65 46 54 Z" fill="%23FDBA74"/><polygon points="60,94 54,108 60,126 66,108" fill="%231E3A8A"/></svg>';
-
     /**
-     * Konversi Gambar URL Eksternal ke DataURI Base64 Secara Aman
-     * Menjamin elemen <img> pada ID Card 100% bebas dari batasan CORS saat di-render oleh html2canvas.
+     * Konversi Gambar URL Eksternal Secara Aman (Anti-CORS Blocking & Anti-Blank)
+     * Langsung memuat CDN Google Drive dengan fallback offline DataURI tanpa memicu blokir CORS browser.
      */
     function safeSetImageWithDataUri(imgEl, rawUrl, fallbackDataUri) {
       if (!imgEl) return;
-      if (!rawUrl || rawUrl === fallbackDataUri) {
-        imgEl.removeAttribute('crossorigin');
-        imgEl.src = fallbackDataUri;
+      imgEl.removeAttribute('crossorigin');
+      const fallback = fallbackDataUri || DEFAULT_SRMA_LOGO;
+      if (!rawUrl || rawUrl === fallback) {
+        imgEl.src = fallback;
         return;
       }
       const trimmed = String(rawUrl).trim();
-      if (!trimmed) {
-        imgEl.removeAttribute('crossorigin');
-        imgEl.src = fallbackDataUri;
+      if (!trimmed || trimmed.indexOf('flaticon.com') !== -1) {
+        imgEl.src = fallback;
         return;
       }
 
-      // Jika sudah DataURI, pakai langsung
+      // Jika sudah berupa DataURI, pakai langsung
       if (trimmed.indexOf('data:') === 0) {
-        imgEl.removeAttribute('crossorigin');
         imgEl.src = trimmed;
         return;
       }
 
-      const formatted = formatImageUrl(trimmed, fallbackDataUri);
-      if (formatted.indexOf('data:') === 0) {
+      const formatted = formatImageUrl(trimmed, fallback);
+      imgEl.src = formatted;
+      imgEl.onerror = function () {
         imgEl.removeAttribute('crossorigin');
-        imgEl.src = formatted;
-        return;
-      }
-
-      // Gunakan placeholder fallback terlebih dahulu sementara gambar sedang diuji/dikonversi
-      imgEl.src = fallbackDataUri;
-
-      const testImg = new Image();
-      testImg.crossOrigin = 'anonymous';
-      testImg.onload = function () {
-        try {
-          const cvs = document.createElement('canvas');
-          cvs.width = testImg.naturalWidth || testImg.width || 200;
-          cvs.height = testImg.naturalHeight || testImg.height || 200;
-          const ctx = cvs.getContext('2d');
-          ctx.drawImage(testImg, 0, 0);
-          const dataUri = cvs.toDataURL('image/png');
-          imgEl.removeAttribute('crossorigin');
-          imgEl.src = dataUri;
-        } catch (e) {
-          // Jika kanvas tertular CORS taint, tetap gunakan formatted dengan anonymous
-          imgEl.crossOrigin = 'anonymous';
-          imgEl.src = formatted;
-        }
+        imgEl.src = fallback;
       };
-      testImg.onerror = function () {
-        // Fallback jika URL gagal diakses
-        imgEl.removeAttribute('crossorigin');
-        imgEl.src = fallbackDataUri;
-      };
-      testImg.src = formatted;
     }
 
     /**
@@ -3934,28 +4062,42 @@
       const kopLogo = document.getElementById('portoKopLogo');
       const suratLogo = document.getElementById('suratKopLogo');
 
-      const logoUrl = formatImageUrl(appState.settings.LOGO_URL, 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+      const rawLogo = appState.settings.LOGO_URL;
+      const logoUrl = (!rawLogo || rawLogo.indexOf('flaticon.com') !== -1) ? DEFAULT_SRMA_LOGO : formatImageUrl(rawLogo, DEFAULT_SRMA_LOGO);
       const instansi = appState.settings.NAMA_INSTANSI || 'SRT 1 Sidenreng Rappang';
 
-      if (logoEl) logoEl.src = logoUrl;
+      if (logoEl) { logoEl.removeAttribute('crossorigin'); logoEl.src = logoUrl; }
       if (instansiEl) instansiEl.innerText = instansi;
       if (heroInstansi) heroInstansi.innerText = instansi;
       if (idLogo) {
-        idLogo.crossOrigin = 'anonymous';
+        idLogo.removeAttribute('crossorigin');
         idLogo.src = logoUrl;
       }
       if (kopLogo) {
-        kopLogo.crossOrigin = 'anonymous';
+        kopLogo.removeAttribute('crossorigin');
         kopLogo.src = logoUrl;
       }
       if (suratLogo) {
-        suratLogo.crossOrigin = 'anonymous';
+        suratLogo.removeAttribute('crossorigin');
         suratLogo.src = logoUrl;
       }
       const sideLogo = document.getElementById('sidebarLogoImg');
       const sideInstansi = document.getElementById('sidebarInstansiName');
-      if (sideLogo) sideLogo.src = logoUrl;
+      if (sideLogo) { sideLogo.removeAttribute('crossorigin'); sideLogo.src = logoUrl; }
       if (sideInstansi) sideInstansi.innerText = instansi;
+
+      updateHeroBannerUI();
+    }
+
+    /**
+     * Sinkronisasi Foto Banner Beranda
+     */
+    function updateHeroBannerUI() {
+      const bannerImg = document.getElementById('heroBannerImg');
+      if (bannerImg) {
+        const raw = appState.settings.BANNER_BERANDA_URL;
+        bannerImg.src = raw && raw.trim() ? formatImageUrl(raw, DEFAULT_BANNER_HERO) : DEFAULT_BANNER_HERO;
+      }
     }
 
     /**
@@ -4196,8 +4338,8 @@
         const cleanWa = waNumber.startsWith('0') ? '62' + waNumber.substring(1) : waNumber;
         const waLink = cleanWa ? 'https://wa.me/' + cleanWa : '#';
         const defaultAvatar = item.jenisKelamin === 'Perempuan'
-          ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
-          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+          ? DEFAULT_AVATAR_FEMALE
+          : DEFAULT_AVATAR_MALE;
         const fotoSrc = formatImageUrl(item.fotoUrl, defaultAvatar);
         const isAsrama = item.jabatan && item.jabatan.indexOf('Asrama') !== -1;
         const badgeClass = isAsrama
@@ -4589,8 +4731,8 @@
 
       list.forEach(function (item, idx) {
         const defaultAvatar = item.jenisKelamin === 'Perempuan'
-          ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
-          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+          ? DEFAULT_AVATAR_FEMALE
+          : DEFAULT_AVATAR_MALE;
         const foto = formatImageUrl(item.fotoUrl, defaultAvatar);
         const isAsuh = (item.jabatan || '').toLowerCase().indexOf('asuh') !== -1;
         const badgeColor = isAsuh
@@ -5612,8 +5754,8 @@
 
       pag.items.forEach(function (s) {
         const defaultAvatar = s.jenisKelamin === 'Perempuan'
-          ? 'https://cdn-icons-png.flaticon.com/512/4140/4140047.png'
-          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png';
+          ? DEFAULT_AVATAR_FEMALE
+          : DEFAULT_AVATAR_MALE;
         const foto = formatImageUrl(s.fotoUrl, defaultAvatar);
         const isHadir = (s.statusAsrama || '').toLowerCase().indexOf('hadir') !== -1;
         const statusBadge = isHadir
@@ -5811,8 +5953,8 @@
 
         new QRCode(qrBox, {
           text: qrContent,
-          width: 90,
-          height: 90,
+          width: 72,
+          height: 72,
           colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
@@ -5840,21 +5982,44 @@
       const nisn = document.getElementById('idCardNisn') ? document.getElementById('idCardNisn').innerText : 'siswa';
       const nama = document.getElementById('idCardNama') ? document.getElementById('idCardNama').innerText : 'kartu';
 
-      html2canvas(card, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: null,
-        logging: false
-      }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('ID Card berhasil diunduh sebagai gambar PNG!', 'success');
-      }).catch(function (err) {
-        showToast('Gagal mengunduh ID Card: ' + err.message, 'error');
-      });
+      const idCardFotoEl = document.getElementById('idCardFoto');
+      const origFotoSrc = idCardFotoEl ? idCardFotoEl.src : '';
+
+      const proceedHtml2Canvas = function () {
+        html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: null,
+          logging: false
+        }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('ID Card berhasil diunduh sebagai gambar PNG!', 'success');
+          if (idCardFotoEl && origFotoSrc) {
+            idCardFotoEl.src = origFotoSrc;
+          }
+        }).catch(function (err) {
+          showToast('Gagal mengunduh ID Card: ' + err.message, 'error');
+          if (idCardFotoEl && origFotoSrc) {
+            idCardFotoEl.src = origFotoSrc;
+          }
+        });
+      };
+
+      // Jika foto siswa adalah URL eksternal, konversi ke DataURI Base64 terlebih dahulu agar html2canvas tidak terblokir CORS
+      if (idCardFotoEl && origFotoSrc && origFotoSrc.indexOf('data:') !== 0) {
+        convertImgToDataUri(origFotoSrc, function (dataUri) {
+          if (dataUri && dataUri.indexOf('data:') === 0) {
+            idCardFotoEl.src = dataUri;
+          }
+          setTimeout(proceedHtml2Canvas, 100);
+        });
+      } else {
+        proceedHtml2Canvas();
+      }
     }
 
     // Modal Portofolio Siswa Format A4
@@ -6074,10 +6239,9 @@
           fps: 20,
           qrbox: function (viewfinderWidth, viewfinderHeight) {
             const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            const edge = Math.floor(minEdge * 0.72);
-            return { width: Math.max(200, edge), height: Math.max(200, edge) };
+            const edge = Math.floor(minEdge * 0.75);
+            return { width: Math.max(220, edge), height: Math.max(220, edge) };
           },
-          aspectRatio: 1.0,
           disableFlip: false
         };
 
@@ -6112,12 +6276,16 @@
           }
         ).then(function () {
           qrScanningActive = true;
-          // Pastikan video element mengisi penuh area tanpa terpangkas atau tersudut
+          // Pastikan video element mengisi penuh area di tengah tanpa terpangkas atau tersudut
           const vid = document.querySelector('#qrReader video');
           if (vid) {
             vid.style.width = '100%';
             vid.style.height = '100%';
             vid.style.objectFit = 'cover';
+            vid.style.position = 'absolute';
+            vid.style.top = '50%';
+            vid.style.left = '50%';
+            vid.style.transform = 'translate(-50%, -50%)';
           }
           if (placeholder) placeholder.classList.add('hidden');
           if (scanOverlay) scanOverlay.classList.remove('hidden');
@@ -7854,15 +8022,29 @@
       }
     }
 
+    function previewBannerFile(input) {
+      if (input && input.files && input.files[0]) {
+        compressImageFile(input.files[0], 1200, 600, 0.85, function (base64) {
+          const prev = document.getElementById('previewBannerSettings');
+          if (prev) prev.src = base64;
+        });
+      }
+    }
+
     function openModalSettings() {
       document.getElementById('setNamaInstansi').value = appState.settings.NAMA_INSTANSI || '';
-      document.getElementById('setLogoUrl').value = appState.settings.LOGO_URL || '';
+      document.getElementById('setLogoUrl').value = appState.settings.LOGO_URL && appState.settings.LOGO_URL !== DEFAULT_SRMA_LOGO ? appState.settings.LOGO_URL : '';
+      document.getElementById('setBannerUrl').value = appState.settings.BANNER_BERANDA_URL && appState.settings.BANNER_BERANDA_URL !== DEFAULT_BANNER_HERO ? appState.settings.BANNER_BERANDA_URL : '';
       document.getElementById('setAlamat').value = appState.settings.ALAMAT || '';
       document.getElementById('setKontak').value = appState.settings.KONTAK || '';
       const prev = document.getElementById('previewLogoSettings');
-      if (prev) prev.src = formatImageUrl(appState.settings.LOGO_URL, 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+      if (prev) prev.src = formatImageUrl(appState.settings.LOGO_URL, DEFAULT_SRMA_LOGO);
+      const prevBanner = document.getElementById('previewBannerSettings');
+      if (prevBanner) prevBanner.src = formatImageUrl(appState.settings.BANNER_BERANDA_URL, DEFAULT_BANNER_HERO);
       const fileInput = document.getElementById('setLogoFile');
       if (fileInput) fileInput.value = '';
+      const bannerFileInput = document.getElementById('setBannerFile');
+      if (bannerFileInput) bannerFileInput.value = '';
       document.getElementById('modalSettings').classList.remove('hidden');
     }
 
@@ -7873,7 +8055,8 @@
     function submitSettings() {
       const data = {
         NAMA_INSTANSI: document.getElementById('setNamaInstansi').value,
-        LOGO_URL: document.getElementById('setLogoUrl').value,
+        LOGO_URL: document.getElementById('setLogoUrl').value || appState.settings.LOGO_URL || DEFAULT_SRMA_LOGO,
+        BANNER_BERANDA_URL: document.getElementById('setBannerUrl').value || appState.settings.BANNER_BERANDA_URL || DEFAULT_BANNER_HERO,
         ALAMAT: document.getElementById('setAlamat').value,
         KONTAK: document.getElementById('setKontak').value
       };
@@ -7883,15 +8066,29 @@
       btn.innerText = 'Menyimpan...';
 
       const fileInput = document.getElementById('setLogoFile');
+      const bannerFileInput = document.getElementById('setBannerFile');
+
+      const processBannerAndSend = function () {
+        if (bannerFileInput && bannerFileInput.files && bannerFileInput.files[0]) {
+          btn.innerText = 'Mengompres Banner...';
+          compressImageFile(bannerFileInput.files[0], 1200, 600, 0.85, function (bannerB64) {
+            data.bannerBase64 = bannerB64;
+            btn.innerText = 'Menyimpan...';
+            sendSettingsData(data, btn);
+          });
+        } else {
+          sendSettingsData(data, btn);
+        }
+      };
+
       if (fileInput && fileInput.files && fileInput.files[0]) {
         btn.innerText = 'Mengompres Logo...';
         compressImageFile(fileInput.files[0], 800, 800, 0.85, function (base64) {
           data.logoBase64 = base64;
-          btn.innerText = 'Menyimpan...';
-          sendSettingsData(data, btn);
+          processBannerAndSend();
         });
       } else {
-        sendSettingsData(data, btn);
+        processBannerAndSend();
       }
     }
 
@@ -7903,7 +8100,11 @@
           if (res.logoUrl) {
             data.LOGO_URL = res.logoUrl;
           }
+          if (res.bannerUrl) {
+            data.BANNER_BERANDA_URL = res.bannerUrl;
+          }
           appState.settings = Object.assign(appState.settings, data);
+          setLocalCache('initialData', { settings: appState.settings, metrics: appState.metrics });
           syncSettingsToUI();
           closeModalSettings();
           showToast(res.message, 'success');
@@ -7932,6 +8133,19 @@
         clone.classList.add('idcard-print-target');
       }
 
+      // Pastikan semua gambar dalam clone dimuat secara eager dan sinkron (anti-blank cetak)
+      const cloneImgs = clone.querySelectorAll('img');
+      const origImgs = targetEl.querySelectorAll('img');
+      for (let i = 0; i < cloneImgs.length; i++) {
+        cloneImgs[i].removeAttribute('loading');
+        cloneImgs[i].setAttribute('loading', 'eager');
+        cloneImgs[i].setAttribute('decoding', 'sync');
+        cloneImgs[i].removeAttribute('crossorigin');
+        if (origImgs[i] && (origImgs[i].currentSrc || origImgs[i].src)) {
+          cloneImgs[i].src = origImgs[i].currentSrc || origImgs[i].src;
+        }
+      }
+
       // Salin data piksel canvas (misal QR code) ke elemen clone agar tidak blank saat cetak
       const origCanvases = targetEl.querySelectorAll('canvas');
       const cloneCanvases = clone.querySelectorAll('canvas');
@@ -7947,8 +8161,21 @@
       printArea.appendChild(clone);
       document.body.appendChild(printArea);
 
-      window.print();
-      document.body.removeChild(printArea);
+      // Berikan jeda render singkat agar DOM clone sepenuhnya tertata sebelum dialog cetak terbuka
+      setTimeout(function () {
+        window.print();
+      }, 150);
+
+      // Bersihkan printArea HANYA setelah dialog cetak ditutup
+      const cleanup = function () {
+        if (printArea.parentNode) {
+          printArea.parentNode.removeChild(printArea);
+        }
+        window.removeEventListener('afterprint', cleanup);
+      };
+      window.addEventListener('afterprint', cleanup);
+      // Timeout pengaman jika peramban tidak memicu event afterprint
+      setTimeout(cleanup, 25000);
     }
 
     function showToast(message, type) {
