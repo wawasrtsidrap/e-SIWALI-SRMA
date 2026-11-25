@@ -261,9 +261,9 @@
         min-height: 85.6mm !important;
         max-height: 85.6mm !important;
         margin: 0 auto !important;
-        padding: 2.5mm !important;
+        padding: 3mm !important;
         box-sizing: border-box !important;
-        border-radius: 3mm !important;
+        border-radius: 3.5mm !important;
         border: 1px solid #CBD5E1 !important;
         box-shadow: none !important;
         -webkit-print-color-adjust: exact !important;
@@ -273,6 +273,7 @@
         flex-direction: column !important;
         justify-content: space-between !important;
         overflow: hidden !important;
+        background-color: #ffffff !important;
       }
     }
   </style>
@@ -2547,49 +2548,70 @@
         <button onclick="closeModalIdCard()" class="text-slate-400 hover:text-slate-600">&times;</button>
       </div>
 
-      <!-- Area Fisik Kartu ID Card Sesuai Referensi Foto 2 -->
+      <!-- Area Fisik Kartu ID Card Sesuai Referensi Capture51 & Standar ISO 8.56 x 5.4 cm -->
       <div class="flex justify-center items-center py-1">
         <div id="idCardContainer"
-          class="w-[305px] sm:w-[325px] bg-white text-slate-800 rounded-[28px] p-5 shadow-2xl relative overflow-hidden border border-slate-200/90 flex flex-col justify-between select-none">
+          class="w-[316px] h-[501px] aspect-[54/85.6] bg-white text-slate-800 rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-200/90 flex flex-col justify-between select-none"
+          style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
           
-          <!-- Ornamen Pola Watermark Geometris Diamond Halus -->
-          <div class="absolute inset-0 pointer-events-none opacity-[0.035]"
-            style="background-image: linear-gradient(45deg, #0f172a 25%, transparent 25%), linear-gradient(-45deg, #0f172a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0f172a 75%), linear-gradient(-45deg, transparent 75%, #0f172a 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;">
-          </div>
-          <div class="absolute -right-16 -top-16 w-36 h-36 rounded-full bg-emerald-100/40 pointer-events-none blur-2xl"></div>
-          <div class="absolute -left-16 -bottom-16 w-36 h-36 rounded-full bg-slate-100/60 pointer-events-none blur-2xl"></div>
+          <!-- Garis Aksen Pita Atas ID Card -->
+          <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-600 via-teal-500 to-navy-800 pointer-events-none"></div>
 
-          <!-- 1. Header Kartu Pelajar & Asrama -->
-          <div class="w-full flex flex-col items-center justify-center space-y-1.5 mb-3.5 relative z-10">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F7EE] border border-[#A7E3C0] text-[#1B7043] shadow-xs">
+          <!-- Ornamen Pola Kisi-kisi Wajik Vektor Halus (Capture51 Watermark Anti-Checkerboard) -->
+          <svg class="absolute inset-0 w-full h-[65%] pointer-events-none opacity-40" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="cardGridPattern" width="22" height="22" patternUnits="userSpaceOnUse">
+                <path d="M11 0 L22 11 L11 22 L0 11 Z" fill="none" stroke="#A7E3C0" stroke-width="0.65"/>
+                <circle cx="11" cy="11" r="0.75" fill="#10B981"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#cardGridPattern)"/>
+          </svg>
+
+          <!-- 1. Header: Pill Lencana & Kop Lembaga Resmi dengan Logo -->
+          <div class="w-full flex flex-col items-center justify-center space-y-1.5 pt-0.5 relative z-10">
+            <!-- Pill Lencana Kartu Pelajar & Asrama -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E8F7EE] border border-[#A7E3C0] text-[#1B7043] shadow-2xs">
               <svg class="w-3.5 h-3.5 text-[#1B7043] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
               </svg>
-              <span class="text-[9.5px] font-black tracking-wider uppercase">KARTU PELAJAR & ASRAMA</span>
+              <span class="text-[9.5px] font-black uppercase" style="letter-spacing: normal !important;">KARTU PELAJAR & ASRAMA</span>
             </div>
-            <h4 id="idCardInstansiName" class="text-xs sm:text-[13px] font-black text-slate-900 tracking-tight text-center leading-tight uppercase px-1 line-clamp-1">
-              SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG
-            </h4>
+
+            <!-- Kop Lembaga Berdampingan: Logo Perusahaan / Instansi & Nama Resmi -->
+            <div class="flex items-center gap-2.5 px-1 py-1 w-full text-left border-b border-slate-100/90">
+              <div class="w-10 h-10 rounded-xl p-0.5 bg-white border border-slate-200 shadow-2xs flex items-center justify-center flex-shrink-0 ring-1 ring-emerald-500/20">
+                <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 id="idCardInstansiName" class="text-[11px] sm:text-[11.5px] font-black text-slate-900 leading-tight uppercase" style="letter-spacing: normal !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
+                  Sekolah Rakyat Kabupaten Sidenreng Rappang
+                </h4>
+                <p class="text-[8px] font-bold text-emerald-700 uppercase mt-0.5" style="letter-spacing: normal !important;">
+                  Jenjang SRMA &bull; Sistem Digital e-SIWALI
+                </p>
+              </div>
+            </div>
           </div>
 
-          <!-- 2. Area Tengah: 2 Kolom Berdampingan (Kiri: Pasfoto Siswa, Kanan: Badge SRMA + QR Code) -->
+          <!-- 2. Area Tengah: 2 Kolom Berdampingan (Kiri: Pasfoto Siswa Tanpa Bingkai + Efek Blur Bawah, Kanan: Badge SRMA + QR Code) -->
           <div class="w-full grid grid-cols-2 gap-3 items-center justify-items-center relative z-10 px-1 py-1">
-            <!-- Kolom Kiri: Pasfoto Siswa Vertikal Modern -->
-            <div class="relative w-32 h-44 sm:w-34 sm:h-46 rounded-2xl overflow-hidden shadow-sm border border-slate-200/90 bg-slate-100 flex-shrink-0">
-              <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover">
-              <!-- Efek Soft Fadeout di Dasar Foto Sesuai Referensi -->
-              <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/90 via-white/40 to-transparent pointer-events-none"></div>
+            <!-- Kolom Kiri: Pasfoto Siswa Tanpa Bingkai dengan Efek Blur Bawah Mulus Sesuai Capture51 -->
+            <div class="relative w-[130px] h-[175px] flex items-end justify-center overflow-hidden flex-shrink-0">
+              <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top">
+              <!-- Efek blur / dissolve halus di bagian bawah foto persis Capture51 -->
+              <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
             </div>
 
             <!-- Kolom Kanan: Status Jenjang SRMA & QR Code Absensi -->
             <div class="flex flex-col items-center justify-center space-y-2">
-              <span class="px-3.5 py-0.5 rounded-full bg-[#E2F7EB] text-[#1B7043] border border-[#A7E3C0] font-black text-[9.5px] tracking-wider uppercase shadow-xs">
+              <span class="px-3.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-[9.5px] shadow-xs uppercase" style="letter-spacing: normal !important;">
                 SRMA
               </span>
-              <div class="bg-white p-2 rounded-2xl shadow-md border border-slate-200/80 flex items-center justify-center">
+              <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200/90 flex items-center justify-center">
                 <div id="idCardQrContainer" class="flex items-center justify-center w-[84px] h-[84px]"></div>
               </div>
-              <div class="text-[7.5px] font-mono tracking-widest text-slate-400 font-bold uppercase text-center leading-tight">
+              <div class="text-[7.5px] font-mono font-bold text-slate-400 uppercase text-center leading-tight" style="letter-spacing: normal !important;">
                 <div>SCAN QR</div>
                 <div>VERIFIKASI DATA</div>
               </div>
@@ -2597,37 +2619,42 @@
           </div>
 
           <!-- 3. Area Bawah: Identitas Lengkap Siswa -->
-          <div class="w-full mt-4 pt-3 border-t border-slate-100 space-y-2.5 text-left relative z-10">
+          <div class="w-full bg-white/90 backdrop-blur-xs rounded-2xl p-2.5 border border-slate-200/80 space-y-1.5 text-left relative z-10 shadow-xs">
             <div>
-              <div class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">NAMA LENGKAP</div>
-              <h3 id="idCardNama" class="text-base sm:text-[17px] font-black text-slate-900 tracking-tight leading-tight uppercase truncate">
-                RAGIL SURYATANTRA
+              <div class="text-[7.5px] font-bold text-slate-400 uppercase" style="letter-spacing: normal !important;">NAMA LENGKAP</div>
+              <h3 id="idCardNama" class="text-sm sm:text-[15px] font-black text-slate-900 leading-snug uppercase truncate" style="letter-spacing: normal !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
+                NAMA LENGKAP SISWA
               </h3>
             </div>
 
             <!-- Grid 2 Kolom: NISN & No. Kamar -->
-            <div class="grid grid-cols-2 gap-2.5 pt-0.5">
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
               <div>
-                <div class="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-1">NISN</div>
-                <span id="idCardNisn" class="inline-block w-full bg-[#F1F5F9] text-slate-800 font-mono font-black text-xs px-2.5 py-1.5 rounded-xl border border-slate-200/90 text-center tracking-wider truncate">
-                  0084927165
+                <div class="text-[7.5px] font-bold text-slate-400 uppercase mb-0.5" style="letter-spacing: normal !important;">NISN</div>
+                <span id="idCardNisn" class="inline-block w-full bg-slate-50 text-slate-900 font-mono font-black text-[11px] px-2 py-1 rounded-xl border border-slate-200 text-center truncate shadow-2xs" style="letter-spacing: normal !important;">
+                  0000000000
                 </span>
               </div>
               <div>
-                <div class="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-1">NO. KAMAR</div>
-                <div class="inline-flex items-center justify-center gap-1.5 w-full bg-[#EBF7EE] text-[#1B7043] font-black text-xs px-2.5 py-1.5 rounded-xl border border-[#A7E3C0] text-center truncate">
+                <div class="text-[7.5px] font-bold text-slate-400 uppercase mb-0.5" style="letter-spacing: normal !important;">NO. KAMAR</div>
+                <div class="inline-flex items-center justify-center gap-1.5 w-full bg-[#EBF7EE] text-[#1B7043] font-bold text-[11px] px-2 py-1 rounded-xl border border-[#A7E3C0] text-center shadow-2xs" style="letter-spacing: normal !important;">
                   <svg class="w-3.5 h-3.5 text-[#1B7043] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
                   </svg>
-                  <span id="idCardKamar" class="truncate">A.Pa-K3.9</span>
+                  <span id="idCardKamar" class="font-black text-[11px] min-w-0">A.Pa-K3.9</span>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- 4. Footer Bar ID Card Prestisius -->
+          <div class="w-full flex items-center justify-between text-[7px] font-bold text-slate-400 uppercase px-1 pt-1 border-t border-slate-100" style="letter-spacing: normal !important;">
+            <span>KTA Santri Resmi</span>
+            <span class="text-emerald-700 font-black">e-SIWALI SRT SIDRAP</span>
+          </div>
+
           <!-- Elemen Kompatibilitas Script JS -->
           <span id="idCardJk" class="hidden"></span>
-          <img id="idCardLogo" src="" alt="Logo" class="hidden">
         </div>
       </div>
 
@@ -6172,11 +6199,14 @@
       document.getElementById('idCardNama').innerText = s.nama;
       document.getElementById('idCardNisn').innerText = s.nisn;
       if (document.getElementById('idCardJk')) document.getElementById('idCardJk').innerText = s.jenisKelamin;
-      document.getElementById('idCardKamar').innerText = s.noKamar || '-';
+      
+      // Ambil No. Kamar dengan proteksi data aman anti-blank
+      const kamarVal = (s.noKamar && String(s.noKamar).trim()) ? String(s.noKamar).trim() : (s.kamar || 'A.Pa-K3.9');
+      document.getElementById('idCardKamar').innerText = kamarVal;
 
       const instansiEl = document.getElementById('idCardInstansiName');
       if (instansiEl) {
-        instansiEl.innerText = (appState.settings && appState.settings.NAMA_INSTANSI) || 'SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG';
+        instansiEl.innerText = 'Sekolah Rakyat Kabupaten Sidenreng Rappang';
       }
 
       const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
@@ -6187,7 +6217,8 @@
 
       const idCardLogoEl = document.getElementById('idCardLogo');
       if (idCardLogoEl) {
-        safeSetImageWithDataUri(idCardLogoEl, appState.settings.LOGO_URL, DEFAULT_SRMA_LOGO);
+        const logoSrc = (appState.settings && appState.settings.LOGO_URL) || DEFAULT_SRMA_LOGO;
+        safeSetImageWithDataUri(idCardLogoEl, logoSrc, DEFAULT_SRMA_LOGO);
       }
 
       // Generate Barcode QR Code Dinamis Bersih & Berkontras Tinggi (Khusus Absensi Cepat)
@@ -6215,7 +6246,8 @@
     }
 
     /**
-     * Mengunduh Tampilan ID Card sebagai Gambar PNG Berkualitas Tinggi
+     * Mengunduh Tampilan ID Card sebagai Gambar PNG Berkualitas Tinggi Presisi 8.56 x 5.4 cm
+     * Mendukung Dual Pre-Conversion Base64 (Foto + Logo) agar Bebas CORS & Tidak Pernah Blank
      */
     function downloadIdCard() {
       const card = document.getElementById('idCardContainer');
@@ -6225,45 +6257,77 @@
         return;
       }
       showToast('Memproses ID Card untuk diunduh...', 'info');
-      const nisn = document.getElementById('idCardNisn') ? document.getElementById('idCardNisn').innerText : 'siswa';
-      const nama = document.getElementById('idCardNama') ? document.getElementById('idCardNama').innerText : 'kartu';
+      const nisn = document.getElementById('idCardNisn') ? document.getElementById('idCardNisn').innerText.trim() : 'siswa';
+      const nama = document.getElementById('idCardNama') ? document.getElementById('idCardNama').innerText.trim() : 'kartu';
 
       const idCardFotoEl = document.getElementById('idCardFoto');
       const origFotoSrc = idCardFotoEl ? idCardFotoEl.src : '';
+      const idCardLogoEl = document.getElementById('idCardLogo');
+      const origLogoSrc = idCardLogoEl ? idCardLogoEl.src : '';
 
       const proceedHtml2Canvas = function () {
-        html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: null,
-          logging: false
-        }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          showToast('ID Card berhasil diunduh sebagai gambar PNG!', 'success');
-          if (idCardFotoEl && origFotoSrc) {
-            idCardFotoEl.src = origFotoSrc;
-          }
-        }).catch(function (err) {
-          showToast('Gagal mengunduh ID Card: ' + err.message, 'error');
-          if (idCardFotoEl && origFotoSrc) {
-            idCardFotoEl.src = origFotoSrc;
-          }
+        const fontReadyPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+        fontReadyPromise.then(function () {
+          html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false,
+            onclone: function (clonedDoc) {
+              const clonedCard = clonedDoc.getElementById('idCardContainer');
+              if (clonedCard) {
+                clonedCard.style.letterSpacing = 'normal';
+                clonedCard.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+                const allTexts = clonedCard.querySelectorAll('*');
+                for (let i = 0; i < allTexts.length; i++) {
+                  allTexts[i].style.letterSpacing = 'normal';
+                  allTexts[i].style.textRendering = 'geometricPrecision';
+                }
+              }
+            }
+          }).then(function (canvas) {
+            const link = document.createElement('a');
+            link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('ID Card berhasil diunduh sebagai gambar PNG!', 'success');
+            if (idCardFotoEl && origFotoSrc) idCardFotoEl.src = origFotoSrc;
+            if (idCardLogoEl && origLogoSrc) idCardLogoEl.src = origLogoSrc;
+          }).catch(function (err) {
+            showToast('Gagal mengunduh ID Card: ' + err.message, 'error');
+            if (idCardFotoEl && origFotoSrc) idCardFotoEl.src = origFotoSrc;
+            if (idCardLogoEl && origLogoSrc) idCardLogoEl.src = origLogoSrc;
+          });
         });
       };
 
-      // Jika foto siswa adalah URL eksternal, konversi ke DataURI Base64 terlebih dahulu agar html2canvas tidak terblokir CORS
+      // Konversi simultan KEDUA gambar (Foto & Logo) ke Base64 DataURI sebelum memproses kanvas
+      let pendingConversions = 0;
+      const checkAndProceed = function () {
+        pendingConversions--;
+        if (pendingConversions <= 0) {
+          setTimeout(proceedHtml2Canvas, 120);
+        }
+      };
+
       if (idCardFotoEl && origFotoSrc && origFotoSrc.indexOf('data:') !== 0) {
+        pendingConversions++;
         convertImgToDataUri(origFotoSrc, function (dataUri) {
-          if (dataUri && dataUri.indexOf('data:') === 0) {
-            idCardFotoEl.src = dataUri;
-          }
-          setTimeout(proceedHtml2Canvas, 100);
+          if (dataUri && dataUri.indexOf('data:') === 0) idCardFotoEl.src = dataUri;
+          checkAndProceed();
         });
-      } else {
+      }
+
+      if (idCardLogoEl && origLogoSrc && origLogoSrc.indexOf('data:') !== 0) {
+        pendingConversions++;
+        convertImgToDataUri(origLogoSrc, function (dataUri) {
+          if (dataUri && dataUri.indexOf('data:') === 0) idCardLogoEl.src = dataUri;
+          checkAndProceed();
+        });
+      }
+
+      if (pendingConversions === 0) {
         proceedHtml2Canvas();
       }
     }
