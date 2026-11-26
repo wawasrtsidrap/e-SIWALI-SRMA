@@ -276,6 +276,18 @@
         background: #0B1E33 !important;
         color: #ffffff !important;
       }
+
+      .idcard-dual-print-container {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 8mm !important;
+        page-break-inside: avoid !important;
+        background: transparent !important;
+        margin: 0 auto !important;
+        padding: 4mm !important;
+      }
     }
   </style>
 </head>
@@ -2558,157 +2570,235 @@
     </div>
   </div>
 
-  <!-- Modal Preview ID Card Siswa Portrait & Download PNG -->
+  <!-- Modal Preview ID Card Siswa Portrait & Download PNG (Tampak Depan & Belakang) -->
   <div id="modalIdCard"
-    class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
     <div
-      class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-3.5 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      class="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-5 shadow-2xl space-y-3.5 max-h-[94vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100 no-print">
         <div>
-          <h3 class="font-extrabold text-sm text-navy">Kartu Tanda Siswa Digital</h3>
-          <p class="text-[11px] text-slate-500">Cetak & Download Format Gambar PNG</p>
+          <h3 class="font-extrabold text-sm sm:text-base text-navy">Kartu Tanda Siswa Digital (Tampak Depan & Belakang)</h3>
+          <p class="text-[11px] text-slate-500">Cetak & Download Format Gambar PNG Presisi Standar ISO 8.56 x 5.4 cm</p>
         </div>
-        <button onclick="closeModalIdCard()" class="text-slate-400 hover:text-slate-600">&times;</button>
+        <button onclick="closeModalIdCard()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
       </div>
 
-      <!-- Area Fisik Kartu ID Card Sesuai Referensi Capture51 & Standar ISO 8.56 x 5.4 cm -->
-      <div class="flex justify-center items-center py-1">
-        <div id="idCardContainer"
-          class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
-          style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
+      <!-- Area Fisik Kartu ID Card: Depan & Belakang Berdampingan -->
+      <div id="idCardPrintWrapper" class="flex flex-col lg:flex-row items-center justify-center gap-6 py-2">
+        
+        <!-- 1. TAMPAK DEPAN KARTU -->
+        <div class="flex flex-col items-center space-y-1.5 flex-shrink-0">
+          <span class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak Depan</span>
+          <div id="idCardContainer"
+            class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
+            style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
 
-          <!-- Ornamen Ambience Bulatan Gelap Elegan (Sesuai Referensi) -->
-          <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none">
-          </div>
-          <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none">
-          </div>
+            <!-- Ornamen Ambience Bulatan Gelap Elegan -->
+            <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none"></div>
 
-          <!-- 1. Header: Logo Lingkaran Putih & Kop Lembaga Resmi -->
-          <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
-            <!-- Logo Instansi dalam Lingkaran Putih -->
-            <div
-              class="w-11 h-11 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
-              <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
+            <!-- 1. Header: Logo Lingkaran Putih & Kop Lembaga Resmi -->
+            <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
+              <!-- Logo Instansi dalam Lingkaran Putih -->
+              <div class="w-11 h-11 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+                <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
+              </div>
+
+              <!-- Teks Instansi Warna Emas Amber & Putih -->
+              <h4 id="idCardInstansiName"
+                class="text-[10px] sm:text-[10.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold"
+                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
+                SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG
+              </h4>
+              <p class="text-[9px] font-bold text-white uppercase tracking-wider text-center mt-0.5">
+                JENJANG SRMA
+              </p>
+
+              <!-- Garis Pemisah Halus -->
+              <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
             </div>
 
-            <!-- Teks Instansi Warna Emas Amber & Putih (Enter pada KABUPATEN SIDENRENG RAPPANG Sesuai Permintaan) -->
-            <h4 id="idCardInstansiName"
-              class="text-[10px] sm:text-[10.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold"
-              style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
-              SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG
-            </h4>
-            <p class="text-[9px] font-bold text-white uppercase tracking-wider text-center mt-0.5">
-              JENJANG SRMA
-            </p>
+            <!-- Body Tengah: Foto, QR dan Identitas Siswa (Diturunkan Dikit & Ditata Seimbang Sesuai Permintaan) -->
+            <div class="w-full flex-1 flex flex-col justify-center my-auto pt-2 space-y-2 relative z-10">
+              <!-- 2. Area Pasfoto Siswa & Barcode Bersebelahan -->
+              <div class="w-full flex items-center justify-center gap-3">
+                <!-- Sisi Kiri: Pasfoto Siswa Sedikit Lebih Besar, Pas, dengan Background Abu-abu Samar -->
+                <div class="relative w-[126px] h-[166px] rounded-2xl bg-slate-200/25 shadow-inner flex items-end justify-center flex-shrink-0 overflow-hidden border border-white/10">
+                  <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top"
+                    style="object-fit: cover !important; object-position: top !important; -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);">
+                  <!-- Overlay gradien halus untuk memastikan efek blur/fadeout bawah konsisten di semua browser & hasil unduh -->
+                  <div class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#0E243A] via-[#0E243A]/60 to-transparent pointer-events-none"></div>
+                </div>
 
-            <!-- Garis Pemisah Halus -->
-            <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
-          </div>
-
-          <!-- 2. Area Tengah: Pasfoto Siswa & Barcode Bersebelahan (Tata Letak Sesuai Referensi) -->
-          <div class="w-full flex items-center justify-center gap-3.5 relative z-10 py-1">
-            <!-- Sisi Kiri: Pasfoto Siswa Tanpa Bingkai dengan Efek Blur/Fade Bawah Sesuai Referensi -->
-            <div class="relative w-[116px] h-[155px] flex items-end justify-center flex-shrink-0 overflow-hidden">
-              <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top"
-                style="object-fit: cover !important; object-position: top !important; -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%);">
-              <!-- Overlay gradien halus untuk memastikan efek blur/fadeout bawah konsisten di semua browser & hasil unduh -->
-              <div
-                class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#0E243A] via-[#0E243A]/50 to-transparent pointer-events-none">
-              </div>
-            </div>
-
-            <!-- Sisi Kanan: Barcode / QR Code Presisi & Pill Lencana SRMA Sesuai Referensi -->
-            <div class="flex flex-col items-center justify-center flex-shrink-0">
-              <!-- Pill Lencana: SRMA Sesuai Referensi -->
-              <div
-                class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-extrabold text-[8.5px] tracking-wider uppercase mb-1.5 shadow-sm">
-                SRMA
-              </div>
-              <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
-                <div id="idCardQrContainer" class="flex items-center justify-center w-[80px] h-[80px]"></div>
-              </div>
-              <!-- Teks Panduan 2 Baris Monospace Sesuai Referensi -->
-              <div
-                class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1.5 leading-tight">
-                <div>SCAN QR</div>
-                <div>VERIFIKASI DATA</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Area Identitas Siswa di Bawah: Tata Letak Rata Kiri dengan Kolom NISN & No. Kamar Sesuai Referensi -->
-          <div
-            class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg relative z-10 text-left">
-            <!-- Label & Nama Lengkap Siswa (Rata Kiri Sesuai Referensi) -->
-            <div class="w-full">
-              <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">NAMA
-                LENGKAP</span>
-              <h3 id="idCardNama"
-                class="text-base sm:text-[17px] font-bold text-white leading-tight uppercase tracking-wide break-words overflow-visible"
-                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
-                NAMA LENGKAP SISWA
-              </h3>
-            </div>
-
-            <!-- Dua Kolom Sejajar: NISN & NO. KAMAR Sesuai Tata Letak Referensi -->
-            <div class="grid grid-cols-2 gap-2 mt-2.5">
-              <!-- Kolom Kiri: NISN -->
-              <div>
-                <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NISN</span>
-                <div
-                  class="w-full py-1.5 px-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-inner flex items-center justify-center">
-                  <span id="idCardNisn"
-                    class="font-bold text-slate-200 font-mono text-[11px] sm:text-xs tracking-wider">0000000000</span>
+                <!-- Sisi Kanan: Barcode / QR Code Presisi & Pill Lencana SRMA Sesuai Referensi -->
+                <div class="flex flex-col items-center justify-center flex-shrink-0">
+                  <!-- Pill Lencana: SRMA Sesuai Referensi -->
+                  <div class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-extrabold text-[8.5px] tracking-wider uppercase mb-1.5 shadow-sm">
+                    SRMA
+                  </div>
+                  <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
+                    <div id="idCardQrContainer" class="flex items-center justify-center w-[80px] h-[80px]"></div>
+                  </div>
+                  <!-- Teks Panduan 2 Baris Monospace Sesuai Referensi -->
+                  <div class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1.5 leading-tight">
+                    <div>SCAN QR</div>
+                    <div>VERIFIKASI DATA</div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Kolom Kanan: NO. KAMAR -->
-              <div>
-                <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NO. KAMAR</span>
-                <div
-                  class="w-full py-1.5 px-2 rounded-xl bg-emerald-950/40 border border-emerald-500/50 shadow-inner flex items-center justify-center space-x-1.5">
-                  <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
-                  </svg>
-                  <span id="idCardKamar"
-                    class="text-[11px] sm:text-xs text-emerald-300 font-bold tracking-wide">A.Pa-K3.9</span>
+              <!-- 3. Area Identitas Siswa di Bawah: Rata Kiri dengan Kolom NISN & No. Kamar Sesuai Referensi -->
+              <div class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg text-left">
+                <!-- Label & Nama Lengkap Siswa -->
+                <div class="w-full">
+                  <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">NAMA LENGKAP</span>
+                  <h3 id="idCardNama"
+                    class="text-base sm:text-[17px] font-bold text-white leading-tight uppercase tracking-wide break-words overflow-visible"
+                    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
+                    NAMA LENGKAP SISWA
+                  </h3>
                 </div>
+
+                <!-- Dua Kolom Sejajar: NISN & NO. KAMAR -->
+                <div class="grid grid-cols-2 gap-2 mt-2.5">
+                  <!-- Kolom Kiri: NISN -->
+                  <div>
+                    <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NISN</span>
+                    <div class="w-full py-1.5 px-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-inner flex items-center justify-center">
+                      <span id="idCardNisn" class="font-bold text-slate-200 font-mono text-[11px] sm:text-xs tracking-wider">0000000000</span>
+                    </div>
+                  </div>
+
+                  <!-- Kolom Kanan: NO. KAMAR -->
+                  <div>
+                    <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NO. KAMAR</span>
+                    <div class="w-full py-1.5 px-2 rounded-xl bg-emerald-950/40 border border-emerald-500/50 shadow-inner flex items-center justify-center space-x-1.5">
+                      <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
+                      </svg>
+                      <span id="idCardKamar" class="text-[11px] sm:text-xs text-emerald-300 font-bold tracking-wide">A.Pa-K3.9</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hidden element idCardJk agar kompatibilitas JavaScript tetap 100% aman -->
+                <span id="idCardJk" class="hidden">Laki-laki</span>
               </div>
             </div>
 
-            <!-- Hidden element idCardJk agar kompatibilitas JavaScript tetap 100% aman -->
-            <span id="idCardJk" class="hidden">Laki-laki</span>
+            <!-- 4. Footer Bar ID Card Depan -->
+            <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
+              <span></span>
+              <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
+            </div>
           </div>
+        </div>
 
-          <!-- 4. Footer Bar ID Card (Tulisan KTA Santri Resmi Telah Dihapus) -->
-          <div
-            class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
-            <span></span>
-            <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
+        <!-- 2. TAMPAK BELAKANG KARTU -->
+        <div class="flex flex-col items-center space-y-1.5 flex-shrink-0">
+          <span class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak Belakang</span>
+          <div id="idCardContainerBack"
+            class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
+            style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
+
+            <!-- Ornamen Ambience Bulatan Gelap Elegan -->
+            <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none"></div>
+
+            <!-- 1. Header Belakang: Logo & Identitas Lembaga -->
+            <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
+              <div class="w-10 h-10 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+                <img id="idCardLogoBack" src="" alt="Logo Instansi" class="w-full h-full object-contain">
+              </div>
+              <h4 id="idCardInstansiNameBack"
+                class="text-[9.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold"
+                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
+                SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG
+              </h4>
+              <p class="text-[8px] font-bold text-slate-300 uppercase tracking-wider text-center mt-0.5">
+                KARTU IDENTITAS SANTRI & ASRAMA
+              </p>
+              <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
+            </div>
+
+            <!-- 2. Konten Utama Belakang: Tata Tertib & Ketentuan Kartu -->
+            <div class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg relative z-10 text-left my-auto space-y-2">
+              <div class="flex items-center space-x-1.5 pb-1 border-b border-slate-700/50">
+                <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span class="text-[8.5px] font-extrabold text-amber-400 uppercase tracking-wider">TATA TERTIB & KETENTUAN KARTU</span>
+              </div>
+              <ol class="text-[7.5px] text-slate-300 space-y-1.5 list-decimal pl-3.5 leading-relaxed font-medium">
+                <li>Kartu ini adalah identitas resmi santri Sekolah Rakyat Kabupaten Sidenreng Rappang Jenjang SRMA.</li>
+                <li>Wajib dibawa pada saat presensi harian (11 sesi), perizinan keluar/pulang, dan kegiatan asrama.</li>
+                <li>Dilarang memindahtangankan, merusak, mencoret, atau menyalahgunakan kartu ini kepada pihak lain.</li>
+                <li>Apabila kartu hilang atau rusak, segera melapor ke bagian Pengasuhan / Wali Asrama.</li>
+                <li>Barangsiapa menemukan kartu ini dimohon mengembalikan ke Sekretariat Pengasuhan Asrama SRT Sidrap.</li>
+              </ol>
+            </div>
+
+            <!-- 3. Area Pengesahan Lembaga & Barcode QR Validasi -->
+            <div class="w-full flex items-center justify-between px-2.5 py-1.5 bg-slate-900/70 rounded-xl border border-slate-700/60 relative z-10 mb-1">
+              <div class="text-left text-[7.5px] leading-tight">
+                <p class="text-slate-400">Diterbitkan di: <span class="text-white font-semibold">Sidenreng Rappang</span></p>
+                <p class="text-slate-400 mt-0.5">Status: <span class="text-emerald-400 font-bold uppercase">Resmi & Terverifikasi</span></p>
+                <p class="text-amber-300 font-bold text-[7px] mt-1 tracking-wider">PENGASUHAN SANTRI SRMA</p>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="bg-white p-1 rounded-xl shadow border border-slate-200">
+                  <div id="idCardQrContainerBack" class="flex items-center justify-center w-[52px] h-[52px]"></div>
+                </div>
+                <span class="text-[6.5px] font-mono text-slate-400 font-bold mt-0.5 tracking-widest">VERIFIED</span>
+              </div>
+            </div>
+
+            <!-- 4. Footer Bar ID Card Belakang -->
+            <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
+              <span class="text-slate-400">BAGIAN BELAKANG</span>
+              <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Tombol Aksi: Cetak & Download PNG -->
+      <!-- Tombol Aksi: Cetak & Download Lengkap -->
       <div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-100 no-print">
         <button onclick="closeModalIdCard()"
           class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">Tutup</button>
-        <button onclick="downloadIdCard()"
-          class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
+        <button onclick="downloadIdCard('front')"
+          class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
           </svg>
-          <span>Download ID Card (PNG)</span>
+          <span>Unduh Depan</span>
         </button>
-        <button onclick="printElement('idCardContainer')"
+        <button onclick="downloadIdCard('back')"
+          class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <span>Unduh Belakang</span>
+        </button>
+        <button onclick="downloadBothIdCards()"
+          class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+          </svg>
+          <span>Unduh Keduanya (PNG)</span>
+        </button>
+        <button onclick="printBothIdCards()"
           class="px-3.5 py-2 bg-navy hover:bg-navy-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
             </path>
           </svg>
-          <span>Cetak ID Card</span>
+          <span>Cetak Kartu (Depan & Belakang)</span>
         </button>
       </div>
     </div>
@@ -6505,7 +6595,7 @@
         safeSetImageWithDataUri(idCardLogoEl, logoSrc, DEFAULT_SRMA_LOGO);
       }
 
-      // Generate Barcode QR Code Dinamis Bersih & Berkontras Tinggi (Khusus Absensi Cepat)
+      // Generate Barcode QR Code Dinamis Bersih & Berkontras Tinggi (Khusus Absensi Cepat Depan)
       const qrBox = document.getElementById('idCardQrContainer');
       qrBox.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
@@ -6523,6 +6613,34 @@
         });
       }
 
+      // Sinkronisasi Kop & Logo Bagian Belakang Kartu
+      const instansiBackEl = document.getElementById('idCardInstansiNameBack');
+      if (instansiBackEl) {
+        instansiBackEl.innerHTML = (instansiEl && instansiEl.innerHTML) ? instansiEl.innerHTML : 'SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG';
+      }
+      const idCardLogoBackEl = document.getElementById('idCardLogoBack');
+      if (idCardLogoBackEl) {
+        const logoSrc = (appState.settings && appState.settings.LOGO_URL) || DEFAULT_SRMA_LOGO;
+        safeSetImageWithDataUri(idCardLogoBackEl, logoSrc, DEFAULT_SRMA_LOGO);
+      }
+
+      // Generate Barcode QR Code Validasi Bagian Belakang Kartu
+      const qrBoxBack = document.getElementById('idCardQrContainerBack');
+      if (qrBoxBack) {
+        qrBoxBack.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          const qrBackContent = 'VERIFIED-SRMA-eSIWALI:' + ((s.nisn && String(s.nisn).trim()) ? String(s.nisn).trim() : (s.nama || 'SISWA'));
+          new QRCode(qrBoxBack, {
+            text: qrBackContent,
+            width: 52,
+            height: 52,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      }
+
       document.getElementById('modalIdCard').classList.remove('hidden');
     }
 
@@ -6532,22 +6650,26 @@
 
     /**
      * Mengunduh Tampilan ID Card sebagai Gambar PNG Berkualitas Tinggi Presisi 8.56 x 5.4 cm
+     * Mendukung 'front' (Tampak Depan) dan 'back' (Tampak Belakang)
      * Tema Navy-Maroon Klasik Prestisius & Dual Pre-Conversion Base64 (Foto + Logo) Bebas CORS & Anti-Glitch
      */
-    function downloadIdCard() {
-      const card = document.getElementById('idCardContainer');
+    function downloadIdCard(side) {
+      if (!side) side = 'front';
+      const targetId = (side === 'back') ? 'idCardContainerBack' : 'idCardContainer';
+      const card = document.getElementById(targetId);
       if (!card) return;
       if (typeof html2canvas === 'undefined') {
         showToast('Library pembuat gambar sedang dimuat, mohon coba sebentar lagi.', 'error');
         return;
       }
-      showToast('Memproses ID Card untuk diunduh...', 'info');
+      const sideLabel = (side === 'back') ? 'Tampak Belakang' : 'Tampak Depan';
+      showToast('Memproses ID Card (' + sideLabel + ') untuk diunduh...', 'info');
       const nisn = document.getElementById('idCardNisn') ? document.getElementById('idCardNisn').innerText.trim() : 'siswa';
       const nama = document.getElementById('idCardNama') ? document.getElementById('idCardNama').innerText.trim() : 'kartu';
 
-      const idCardFotoEl = document.getElementById('idCardFoto');
+      const idCardFotoEl = card.querySelector('#idCardFoto');
       const origFotoSrc = idCardFotoEl ? idCardFotoEl.src : '';
-      const idCardLogoEl = document.getElementById('idCardLogo');
+      const idCardLogoEl = card.querySelector('img[id^="idCardLogo"]');
       const origLogoSrc = idCardLogoEl ? idCardLogoEl.src : '';
 
       const proceedHtml2Canvas = function () {
@@ -6560,7 +6682,7 @@
             backgroundColor: '#0B1E33',
             logging: false,
             onclone: function (clonedDoc) {
-              const clonedCard = clonedDoc.getElementById('idCardContainer');
+              const clonedCard = clonedDoc.getElementById(targetId);
               if (clonedCard) {
                 clonedCard.style.letterSpacing = 'normal';
                 clonedCard.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
@@ -6582,7 +6704,7 @@
                   kamarEl.style.overflow = 'visible';
                   kamarEl.style.color = '#6ee7b7';
                 }
-                const instansiCloneEl = clonedCard.querySelector('#idCardInstansiName');
+                const instansiCloneEl = clonedCard.querySelector('#idCardInstansiName, #idCardInstansiNameBack');
                 if (instansiCloneEl) {
                   instansiCloneEl.style.overflow = 'visible';
                   instansiCloneEl.style.whiteSpace = 'normal';
@@ -6594,10 +6716,11 @@
             }
           }).then(function (canvas) {
             const link = document.createElement('a');
-            link.download = 'ID_CARD_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
+            const sideSuffix = (side === 'back') ? 'BELAKANG' : 'DEPAN';
+            link.download = 'ID_CARD_' + sideSuffix + '_' + nisn + '_' + nama.replace(/[^a-zA-Z0-9]/g, '_') + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
-            showToast('ID Card berhasil diunduh sebagai gambar PNG!', 'success');
+            showToast('ID Card (' + sideLabel + ') berhasil diunduh sebagai gambar PNG!', 'success');
             if (idCardFotoEl && origFotoSrc) idCardFotoEl.src = origFotoSrc;
             if (idCardLogoEl && origLogoSrc) idCardLogoEl.src = origLogoSrc;
           }).catch(function (err) {
@@ -6636,6 +6759,76 @@
       if (pendingConversions === 0) {
         proceedHtml2Canvas();
       }
+    }
+
+    /**
+     * Mengunduh KEDUA sisi ID Card (Depan & Belakang) secara berurutan
+     */
+    function downloadBothIdCards() {
+      downloadIdCard('front');
+      setTimeout(function () {
+        downloadIdCard('back');
+      }, 700);
+    }
+
+    /**
+     * Mencetak KEDUA sisi ID Card (Depan & Belakang) Berdampingan Siap Cetak Fisik / PVC
+     */
+    function printBothIdCards() {
+      const front = document.getElementById('idCardContainer');
+      const back = document.getElementById('idCardContainerBack');
+      if (!front || !back) return;
+
+      const printArea = document.createElement('div');
+      printArea.id = 'printArea';
+      printArea.className = 'idcard-dual-print-container';
+
+      const cloneFront = front.cloneNode(true);
+      cloneFront.classList.add('idcard-print-target');
+      const cloneBack = back.cloneNode(true);
+      cloneBack.classList.add('idcard-print-target');
+
+      // Pastikan semua gambar dan kanvas tercetak tajam
+      [ { orig: front, clone: cloneFront }, { orig: back, clone: cloneBack } ].forEach(function (pair) {
+        const cloneImgs = pair.clone.querySelectorAll('img');
+        const origImgs = pair.orig.querySelectorAll('img');
+        for (let i = 0; i < cloneImgs.length; i++) {
+          cloneImgs[i].removeAttribute('loading');
+          cloneImgs[i].setAttribute('loading', 'eager');
+          cloneImgs[i].setAttribute('decoding', 'sync');
+          cloneImgs[i].removeAttribute('crossorigin');
+          if (origImgs[i] && (origImgs[i].currentSrc || origImgs[i].src)) {
+            cloneImgs[i].src = origImgs[i].currentSrc || origImgs[i].src;
+          }
+        }
+        const origCanvases = pair.orig.querySelectorAll('canvas');
+        const cloneCanvases = pair.clone.querySelectorAll('canvas');
+        for (let i = 0; i < origCanvases.length; i++) {
+          if (cloneCanvases[i]) {
+            cloneCanvases[i].width = origCanvases[i].width;
+            cloneCanvases[i].height = origCanvases[i].height;
+            const destCtx = cloneCanvases[i].getContext('2d');
+            if (destCtx) destCtx.drawImage(origCanvases[i], 0, 0);
+          }
+        }
+      });
+
+      printArea.appendChild(cloneFront);
+      printArea.appendChild(cloneBack);
+      document.body.appendChild(printArea);
+
+      setTimeout(function () {
+        window.print();
+      }, 150);
+
+      const cleanup = function () {
+        if (printArea.parentNode) {
+          printArea.parentNode.removeChild(printArea);
+        }
+        window.removeEventListener('afterprint', cleanup);
+      };
+      window.addEventListener('afterprint', cleanup);
+      setTimeout(cleanup, 25000);
     }
 
     // Modal Portofolio Siswa Format A4
