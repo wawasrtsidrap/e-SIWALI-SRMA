@@ -264,7 +264,7 @@
         padding: 3mm !important;
         box-sizing: border-box !important;
         border-radius: 3.5mm !important;
-        border: 1px solid #22D3EE !important;
+        border: 1px solid #F59E0B !important;
         box-shadow: none !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -273,7 +273,7 @@
         flex-direction: column !important;
         justify-content: space-between !important;
         overflow: hidden !important;
-        background: #030B17 !important;
+        background: #0B1E33 !important;
         color: #ffffff !important;
       }
     }
@@ -2552,105 +2552,79 @@
       <!-- Area Fisik Kartu ID Card Sesuai Referensi Capture51 & Standar ISO 8.56 x 5.4 cm -->
       <div class="flex justify-center items-center py-1">
         <div id="idCardContainer"
-          class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#030B17] via-[#071D3A] to-[#020A14] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border-2 border-cyan-400/60 flex flex-col justify-between select-none shadow-[0_0_25px_rgba(34,211,238,0.35)]"
+          class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
           style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
           
-          <!-- Garis Aksen Pita Atas ID Card Biru Navy Neon -->
-          <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 shadow-[0_0_12px_rgba(34,211,238,0.8)] pointer-events-none"></div>
+          <!-- Ornamen Ambience Bulatan Gelap Elegan (Sesuai Referensi) -->
+          <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none"></div>
+          <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none"></div>
 
-          <!-- Ornamen Pola Kisi-kisi Wajik Vektor Halus Neon (Watermark Anti-Checkerboard) -->
-          <svg class="absolute inset-0 w-full h-[65%] pointer-events-none opacity-25" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="cardGridPattern" width="22" height="22" patternUnits="userSpaceOnUse">
-                <path d="M11 0 L22 11 L11 22 L0 11 Z" fill="none" stroke="#22D3EE" stroke-width="0.55"/>
-                <circle cx="11" cy="11" r="0.75" fill="#38BDF8"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#cardGridPattern)"/>
-          </svg>
-
-          <!-- 1. Header: Pill Lencana & Kop Lembaga Resmi dengan Logo -->
-          <div class="w-full flex flex-col items-center justify-center space-y-1.5 pt-0.5 relative z-10">
-            <!-- Pill Lencana Kartu Pelajar & Asrama Tema Biru Navy Neon -->
-            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#031527] border border-cyan-400/70 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.25)]">
-              <svg class="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-              </svg>
-              <span class="text-[9.5px] font-bold uppercase tracking-wider" style="letter-spacing: normal !important;">KARTU PELAJAR & ASRAMA</span>
+          <!-- 1. Header: Logo Lingkaran Putih & Kop Lembaga Resmi -->
+          <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
+            <!-- Logo Instansi dalam Lingkaran Putih -->
+            <div class="w-12 h-12 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+              <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
             </div>
 
-            <!-- Kop Lembaga Berdampingan: Logo Perusahaan / Instansi & Nama Resmi -->
-            <div class="flex items-center gap-2.5 px-1 py-1 w-full text-left border-b border-cyan-500/20">
-              <div class="w-10 h-10 rounded-xl p-0.5 bg-white border border-cyan-400/60 shadow-sm flex items-center justify-center flex-shrink-0 ring-1 ring-cyan-400/30">
-                <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
+            <!-- Teks Instansi Warna Emas Amber & Putih -->
+            <h4 id="idCardInstansiName" class="text-[10px] sm:text-[10.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
+              SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG
+            </h4>
+            <p class="text-[9px] font-bold text-white uppercase tracking-wider text-center mt-0.5">
+              JENJANG SRMA
+            </p>
+
+            <!-- Garis Pemisah Halus -->
+            <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
+          </div>
+
+          <!-- 2. Area Tengah: Pasfoto Siswa Berbingkai Emas dengan Badge SISWA AKTIF & Pill KARTU TANDA SISWA -->
+          <div class="w-full flex flex-col items-center justify-center relative z-10 py-0.5">
+            <!-- Wadah Pasfoto Siswa dengan Border Emas Amber & Badge SISWA AKTIF -->
+            <div class="relative w-[115px] h-[155px] rounded-2xl p-0.5 border-2 border-amber-400 bg-white shadow-md mx-auto flex items-center justify-center overflow-visible flex-shrink-0">
+              <div class="w-full h-full rounded-[14px] overflow-hidden bg-slate-100 flex items-center justify-center">
+                <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top" style="object-fit: cover !important; object-position: top !important;">
               </div>
-              <div class="flex-1 min-w-0">
-                <h4 id="idCardInstansiName" class="text-[11px] sm:text-[11.5px] font-bold text-white leading-tight uppercase" style="letter-spacing: normal !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
-                  Sekolah Rakyat Kabupaten Sidenreng Rappang
-                </h4>
-                <p class="text-[8px] font-semibold text-cyan-300 uppercase mt-0.5" style="letter-spacing: normal !important;">
-                  Jenjang SRMA &bull; Sistem Digital e-SIWALI
-                </p>
+              <!-- Badge SISWA AKTIF -->
+              <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-black text-[9px] px-3.5 py-0.5 rounded-full shadow-md uppercase tracking-wider whitespace-nowrap">
+                SISWA AKTIF
               </div>
+            </div>
+
+            <!-- Pill Lencana: KARTU TANDA SISWA -->
+            <div class="inline-flex items-center justify-center px-4 py-0.5 rounded-full bg-[#182C40] border border-slate-600/60 text-amber-400 font-extrabold text-[9.5px] tracking-wider shadow-inner uppercase mt-3.5 mx-auto">
+              KARTU TANDA SISWA
             </div>
           </div>
 
-          <!-- 2. Area Tengah: 2 Kolom Berdampingan (Kiri: Pasfoto Siswa Alami Tanpa Bingkai & Tidak Gepeng, Kanan: Badge SRMA + QR Code) -->
-          <div class="w-full grid grid-cols-2 gap-3 items-center justify-items-center relative z-10 px-1 py-1">
-            <!-- Kolom Kiri: Pasfoto Siswa Tanpa Bingkai (Rasio 3:4 Natural Anti-Gepeng, Bersih Tanpa Balok Gelap) -->
-            <div class="relative w-[126px] h-[168px] rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#040E1C]/60">
-              <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top" style="object-fit: cover !important; object-position: top !important;">
-            </div>
-
-            <!-- Kolom Kanan: Status Jenjang SRMA & QR Code Absensi -->
-            <div class="flex flex-col items-center justify-center space-y-2">
-              <span class="px-3.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-[9.5px] shadow-[0_0_10px_rgba(6,182,212,0.4)] uppercase" style="letter-spacing: normal !important;">
-                SRMA
-              </span>
-              <div class="bg-white p-2 rounded-2xl shadow-sm border-2 border-cyan-400/60 flex items-center justify-center ring-2 ring-cyan-400/20">
-                <div id="idCardQrContainer" class="flex items-center justify-center w-[84px] h-[84px]"></div>
-              </div>
-              <div class="text-[7.5px] font-mono font-bold text-cyan-300 uppercase text-center leading-tight" style="letter-spacing: normal !important;">
-                <div>SCAN QR</div>
-                <div>VERIFIKASI DATA</div>
-              </div>
-            </div>
+          <!-- 3. Area Identitas Siswa: Nama Bersih Anti-Glitch, NISN & Kamar -->
+          <div class="w-full text-center relative z-10 px-1 py-0.5 space-y-0.5">
+            <h3 id="idCardNama" class="text-sm sm:text-[15px] font-bold text-white leading-snug uppercase tracking-wide break-words overflow-visible" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
+              NAMA LENGKAP SISWA
+            </h3>
+            <p class="text-xs text-center text-slate-300 font-medium">
+              NISN: <span id="idCardNisn" class="font-bold text-amber-400 font-mono">0000000000</span>
+            </p>
+            <p class="text-xs text-center text-slate-300 font-medium">
+              <span id="idCardJk">Laki-laki</span> &bull; <span id="idCardKamar" class="text-slate-200 font-bold">A.Pa-K3.9</span>
+            </p>
           </div>
 
-          <!-- 3. Area Bawah: Identitas Lengkap Siswa -->
-          <div class="w-full bg-[#040E1C]/90 backdrop-blur-sm rounded-2xl p-2.5 border border-cyan-500/30 space-y-1.5 text-left relative z-10 shadow-xs">
-            <div>
-              <div class="text-[7.5px] font-bold text-cyan-400 uppercase tracking-wider" style="letter-spacing: normal !important;">NAMA LENGKAP</div>
-              <h3 id="idCardNama" class="text-sm sm:text-[14.5px] font-bold text-white leading-snug uppercase overflow-visible break-words" style="letter-spacing: normal !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
-                NAMA LENGKAP SISWA
-              </h3>
+          <!-- 4. Area QR Code Presisi -->
+          <div class="w-full flex flex-col items-center justify-center relative z-10 py-0.5">
+            <div class="bg-white p-2 rounded-2xl shadow-lg inline-block mx-auto border border-slate-200">
+              <div id="idCardQrContainer" class="flex items-center justify-center w-[84px] h-[84px]"></div>
             </div>
-
-            <!-- Grid 2 Kolom: NISN & No. Kamar -->
-            <div class="grid grid-cols-2 gap-2 pt-0.5">
-              <div>
-                <div class="text-[7.5px] font-bold text-cyan-400 uppercase mb-0.5" style="letter-spacing: normal !important;">NISN</div>
-                <span id="idCardNisn" class="inline-block w-full bg-[#061833] text-cyan-300 font-mono font-bold text-[11px] px-2 py-1 rounded-xl border border-cyan-500/50 text-center truncate shadow-2xs" style="letter-spacing: normal !important;">
-                  0000000000
-                </span>
-              </div>
-              <div>
-                <div class="text-[7.5px] font-bold text-cyan-400 uppercase mb-0.5" style="letter-spacing: normal !important;">NO. KAMAR</div>
-                <span id="idCardKamar" class="inline-block w-full bg-[#061833] text-cyan-300 font-mono font-bold text-[11px] px-2 py-1 rounded-xl border border-cyan-500/50 text-center truncate shadow-2xs" style="letter-spacing: normal !important;">
-                  A.Pa-K3.9
-                </span>
-              </div>
-            </div>
+            <p class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1">
+              SCAN VERIFIKASI ABSENSI
+            </p>
           </div>
 
-          <!-- 4. Footer Bar ID Card Prestisius -->
-          <div class="w-full flex items-center justify-between text-[7px] font-bold text-cyan-400/80 uppercase px-1 pt-1 border-t border-cyan-500/20" style="letter-spacing: normal !important;">
-            <span>KTA Santri Resmi</span>
-            <span class="text-cyan-300 font-bold">e-SIWALI SRT SIDRAP</span>
+          <!-- 5. Footer Bar ID Card (Tulisan KTA Santri Resmi Telah Dihapus Sesuai Permintaan) -->
+          <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
+            <span></span>
+            <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
           </div>
-
-          <!-- Elemen Kompatibilitas Script JS -->
-          <span id="idCardJk" class="hidden"></span>
         </div>
       </div>
 
@@ -4190,6 +4164,10 @@
       });
       // Ambil data wali untuk pipeline dashboard & dropdown surat izin
       fetchWaliData(forceRefresh);
+      // Sinkronisasi data siswa, izin, dan sakit di latar belakang agar metrik selalu tepat & sinkron
+      if (!appState.cache.siswa) fetchSiswaData(null, forceRefresh);
+      if (!appState.cache.izin) fetchIzinData(forceRefresh);
+      if (!appState.cache.sakit) fetchSakitData(forceRefresh);
     }
 
     /**
@@ -5978,11 +5956,114 @@
         if (res && res.success) {
           setLocalCache('siswa', res.data);
           appState.cache.siswa = res.data;
+          syncSiswaStatusAndMetrics();
           renderSiswaTable(res.data);
           populateSiswaDropdowns(res.data);
           if (callback && !hasCallbackRun) callback();
         }
       });
+    }
+
+    /**
+     * Sinkronisasi Otomatis Status Siswa di Menu Siswa, Presensi QR, dan Kartu Metrik Dashboard
+     * Menghubungkan secara waktu nyata antara:
+     * 1. Data Izin Aktif (dari Menu Surat Izin)
+     * 2. Data Sakit Aktif (dari Menu Penanganan Siswa Sakit)
+     * 3. Status Siswa di Menu Siswa & Dropdown Formulir
+     * 4. Status Checklist & QR Absensi 11 Sesi
+     * 5. Angka Dashboard Realtime (Izin Darurat/Sakit, Sakit di Asrama, Hadir di Asrama)
+     */
+    function syncSiswaStatusAndMetrics() {
+      if (!appState.cache.siswa || appState.cache.siswa.length === 0) return;
+
+      // 1. Peta Izin Aktif dari appState.cache.izin
+      const activeIzinMap = {};
+      if (appState.cache.izin && appState.cache.izin.length > 0) {
+        appState.cache.izin.forEach(function (i) {
+          const isAktif = (i.status || '').toLowerCase().indexOf('aktif') !== -1;
+          if (isAktif && i.nisn) {
+            activeIzinMap[String(i.nisn).trim()] = i.jenisIzin || 'Izin Keluar';
+          }
+        });
+      }
+
+      // 2. Peta Siswa Sakit Aktif dari appState.cache.sakit
+      const activeSakitMap = {};
+      if (appState.cache.sakit && appState.cache.sakit.length > 0) {
+        appState.cache.sakit.forEach(function (s) {
+          const isSakit = (s.status || '').toLowerCase().indexOf('sakit') !== -1 &&
+                          (s.status || '').toLowerCase().indexOf('sembuh') === -1 &&
+                          (s.status || '').toLowerCase().indexOf('sehat') === -1;
+          if (isSakit && s.nisn) {
+            activeSakitMap[String(s.nisn).trim()] = true;
+          }
+        });
+      }
+
+      // 3. Mutasi status siswa di cache siswa
+      let hasChanges = false;
+      appState.cache.siswa.forEach(function (s) {
+        const cleanNisn = String(s.nisn || '').trim();
+        let targetStatus = 'Hadir di Asrama';
+        if (activeIzinMap[cleanNisn]) {
+          targetStatus = activeIzinMap[cleanNisn];
+        } else if (activeSakitMap[cleanNisn]) {
+          targetStatus = 'Sakit di Asrama';
+        }
+
+        if (s.statusAsrama !== targetStatus) {
+          s.statusAsrama = targetStatus;
+          hasChanges = true;
+        }
+      });
+
+      // 4. Hitung Ulang Metrik Dashboard secara Otomatis & Presisi
+      const metrics = {
+        waliAsuh: (appState.metrics && appState.metrics.waliAsuh) || { L: 0, P: 0, total: 0 },
+        waliAsrama: (appState.metrics && appState.metrics.waliAsrama) || { L: 0, P: 0, total: 0 },
+        totalSiswa: { L: 0, P: 0, total: 0 },
+        hadirAsrama: { L: 0, P: 0, total: 0 },
+        izinRutin: { L: 0, P: 0, total: 0 },
+        izinDarurat: { L: 0, P: 0, total: 0 },
+        izinKeluar: { L: 0, P: 0, total: 0 },
+        sakitAsrama: { L: 0, P: 0, total: 0 }
+      };
+
+      appState.cache.siswa.forEach(function (s) {
+        const isL = (s.jenisKelamin || '').toLowerCase().indexOf('laki') !== -1;
+        if (isL) metrics.totalSiswa.L++; else metrics.totalSiswa.P++;
+        metrics.totalSiswa.total++;
+
+        const st = (s.statusAsrama || 'Hadir di Asrama').toLowerCase();
+        if (st.indexOf('rutin') !== -1) {
+          if (isL) metrics.izinRutin.L++; else metrics.izinRutin.P++;
+          metrics.izinRutin.total++;
+        } else if (st.indexOf('darurat') !== -1 || (st.indexOf('sakit') !== -1 && st.indexOf('izin') !== -1)) {
+          if (isL) metrics.izinDarurat.L++; else metrics.izinDarurat.P++;
+          metrics.izinDarurat.total++;
+        } else if (st.indexOf('keluar') !== -1) {
+          if (isL) metrics.izinKeluar.L++; else metrics.izinKeluar.P++;
+          metrics.izinKeluar.total++;
+        }
+
+        // HANYA hitung Sakit di Asrama jika berstatus Sakit di Asrama murni
+        if (st.indexOf('sakit di asrama') !== -1 || (st.indexOf('sakit') !== -1 && st.indexOf('izin') === -1)) {
+          if (isL) metrics.sakitAsrama.L++; else metrics.sakitAsrama.P++;
+          metrics.sakitAsrama.total++;
+        }
+      });
+
+      metrics.hadirAsrama.L = Math.max(0, metrics.totalSiswa.L - (metrics.izinRutin.L + metrics.izinDarurat.L + metrics.izinKeluar.L));
+      metrics.hadirAsrama.P = Math.max(0, metrics.totalSiswa.P - (metrics.izinRutin.P + metrics.izinDarurat.P + metrics.izinKeluar.P));
+      metrics.hadirAsrama.total = Math.max(0, metrics.totalSiswa.total - (metrics.izinRutin.total + metrics.izinDarurat.total + metrics.izinKeluar.total));
+
+      appState.metrics = metrics;
+      renderMetrics(metrics);
+
+      // Simpan perubahan ke local cache siswa agar persisten
+      if (hasChanges) {
+        setLocalCache('siswa', appState.cache.siswa);
+      }
     }
 
     function renderSiswaTable(list) {
@@ -6021,10 +6102,24 @@
           ? DEFAULT_AVATAR_FEMALE
           : DEFAULT_AVATAR_MALE;
         const foto = formatImageUrl(s.fotoUrl, defaultAvatar);
-        const isHadir = (s.statusAsrama || '').toLowerCase().indexOf('hadir') !== -1;
-        const statusBadge = isHadir
-          ? '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Hadir di Asrama</span>'
-          : '<span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-amber-200">' + s.statusAsrama + '</span>';
+        
+        // Render Lencana Status Asrama Spesifik & Responsif
+        const st = (s.statusAsrama || 'Hadir di Asrama').trim();
+        const stLower = st.toLowerCase();
+        let statusBadge = '';
+        if (stLower.indexOf('hadir') !== -1) {
+          statusBadge = '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Hadir di Asrama</span>';
+        } else if (stLower.indexOf('rutin') !== -1) {
+          statusBadge = '<span class="bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-amber-200 animate-pulse">Izin Pulang Rutin</span>';
+        } else if (stLower.indexOf('darurat') !== -1 || (stLower.indexOf('sakit') !== -1 && stLower.indexOf('izin') !== -1)) {
+          statusBadge = '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-rose-200 animate-pulse">Izin Darurat / Sakit</span>';
+        } else if (stLower.indexOf('keluar') !== -1) {
+          statusBadge = '<span class="bg-cyan-50 text-cyan-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-cyan-200 animate-pulse">Izin Keluar Ringkas</span>';
+        } else if (stLower.indexOf('sakit') !== -1) {
+          statusBadge = '<span class="bg-pink-50 text-pink-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-pink-200 animate-pulse">Sakit di Asrama</span>';
+        } else {
+          statusBadge = '<span class="bg-slate-50 text-slate-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-slate-200">' + st + '</span>';
+        }
 
         // Kolom Aksi / Dokumen hanya di-render untuk petugas login
         let aksiTd = '';
@@ -6208,7 +6303,7 @@
 
       const instansiEl = document.getElementById('idCardInstansiName');
       if (instansiEl) {
-        instansiEl.innerText = 'Sekolah Rakyat Kabupaten Sidenreng Rappang';
+        instansiEl.innerText = (appState.settings && appState.settings.NAMA_INSTANSI) ? appState.settings.NAMA_INSTANSI : 'SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG';
       }
 
       const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
@@ -6249,7 +6344,7 @@
 
     /**
      * Mengunduh Tampilan ID Card sebagai Gambar PNG Berkualitas Tinggi Presisi 8.56 x 5.4 cm
-     * Tema Biru Navy Neon & Dual Pre-Conversion Base64 (Foto + Logo) Bebas CORS & Anti-Teks Terpotong
+     * Tema Navy-Maroon Klasik Prestisius & Dual Pre-Conversion Base64 (Foto + Logo) Bebas CORS & Anti-Glitch
      */
     function downloadIdCard() {
       const card = document.getElementById('idCardContainer');
@@ -6274,7 +6369,7 @@
             scale: 3,
             useCORS: true,
             allowTaint: false,
-            backgroundColor: '#030B17',
+            backgroundColor: '#0B1E33',
             logging: false,
             onclone: function (clonedDoc) {
               const clonedCard = clonedDoc.getElementById('idCardContainer');
@@ -6297,7 +6392,7 @@
                 if (kamarEl) {
                   kamarEl.style.fontWeight = '700';
                   kamarEl.style.overflow = 'visible';
-                  kamarEl.style.color = '#67e8f9';
+                  kamarEl.style.color = '#e2e8f0';
                 }
               }
             }
@@ -6420,12 +6515,31 @@
       }
 
       appState.cache.siswa.forEach(function (s) {
-        const curStatus = mapExisting[s.nisn] || 'Hadir';
+        // Otomatis tentukan status default berdasarkan status asrama siswa realtime
+        let defaultStatus = 'Hadir';
+        let badgeHtml = '';
+        if (s.statusAsrama) {
+          const stLower = s.statusAsrama.toLowerCase();
+          if (stLower.indexOf('darurat') !== -1 || (stLower.indexOf('sakit') !== -1 && stLower.indexOf('izin') !== -1)) {
+            defaultStatus = 'Izin';
+            badgeHtml = ' <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200 ml-1">Izin Darurat/Sakit</span>';
+          } else if (stLower.indexOf('rutin') !== -1) {
+            defaultStatus = 'Izin';
+            badgeHtml = ' <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 ml-1">Izin Rutin</span>';
+          } else if (stLower.indexOf('keluar') !== -1) {
+            defaultStatus = 'Izin';
+            badgeHtml = ' <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-100 text-cyan-700 border border-cyan-200 ml-1">Izin Keluar</span>';
+          } else if (stLower.indexOf('sakit') !== -1) {
+            defaultStatus = 'Sakit';
+            badgeHtml = ' <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200 ml-1">Sakit Asrama</span>';
+          }
+        }
+        const curStatus = mapExisting[s.nisn] || defaultStatus;
 
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50 transition';
         tr.innerHTML =
-          '<td class="py-2 px-3 font-semibold text-slate-800">' + s.nama + '</td>' +
+          '<td class="py-2 px-3 font-semibold text-slate-800">' + s.nama + badgeHtml + '</td>' +
           '<td class="py-2 px-2 font-mono text-slate-500">' + s.nisn + '</td>' +
           '<td class="py-2 px-2 text-navy">' + (s.noKamar || '-') + '</td>' +
           '<td class="py-2 px-3 text-center">' +
@@ -7208,6 +7322,7 @@
           setLocalCache('izin', res.data);
           appState.cache.izin = res.data;
           renderIzinTable(res.data);
+          syncSiswaStatusAndMetrics();
         }
       });
     }
@@ -7988,6 +8103,7 @@
           setLocalCache('sakit', res.data);
           appState.cache.sakit = res.data;
           renderSakitTable(res.data);
+          syncSiswaStatusAndMetrics();
         }
       });
     }
