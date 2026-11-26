@@ -2566,13 +2566,13 @@
           <!-- 1. Header: Logo Lingkaran Putih & Kop Lembaga Resmi -->
           <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
             <!-- Logo Instansi dalam Lingkaran Putih -->
-            <div class="w-12 h-12 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
               <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
             </div>
 
-            <!-- Teks Instansi Warna Emas Amber & Putih -->
+            <!-- Teks Instansi Warna Emas Amber & Putih (Enter pada KABUPATEN SIDENRENG RAPPANG Sesuai Permintaan) -->
             <h4 id="idCardInstansiName" class="text-[10px] sm:text-[10.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
-              SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG
+              SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG
             </h4>
             <p class="text-[9px] font-bold text-white uppercase tracking-wider text-center mt-0.5">
               JENJANG SRMA
@@ -2582,49 +2582,60 @@
             <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
           </div>
 
-          <!-- 2. Area Tengah: Pasfoto Siswa Berbingkai Emas dengan Badge SISWA AKTIF & Pill KARTU TANDA SISWA -->
-          <div class="w-full flex flex-col items-center justify-center relative z-10 py-0.5">
-            <!-- Wadah Pasfoto Siswa dengan Border Emas Amber & Badge SISWA AKTIF -->
-            <div class="relative w-[115px] h-[155px] rounded-2xl p-0.5 border-2 border-amber-400 bg-white shadow-md mx-auto flex items-center justify-center overflow-visible flex-shrink-0">
+          <!-- 2. Area Tengah: Pasfoto Siswa & Barcode Bersebelahan (Side-by-Side Sesuai Permintaan) -->
+          <div class="w-full flex items-center justify-center gap-3.5 relative z-10 py-1">
+            <!-- Sisi Kiri: Pasfoto Siswa Berbingkai Emas dengan Badge SISWA AKTIF -->
+            <div class="relative w-[110px] h-[146px] rounded-2xl p-0.5 border-2 border-amber-400 bg-white shadow-md flex items-center justify-center overflow-visible flex-shrink-0">
               <div class="w-full h-full rounded-[14px] overflow-hidden bg-slate-100 flex items-center justify-center">
                 <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top" style="object-fit: cover !important; object-position: top !important;">
               </div>
               <!-- Badge SISWA AKTIF -->
-              <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-black text-[9px] px-3.5 py-0.5 rounded-full shadow-md uppercase tracking-wider whitespace-nowrap">
+              <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-black text-[8px] px-2.5 py-0.5 rounded-full shadow-md uppercase tracking-wider whitespace-nowrap">
                 SISWA AKTIF
               </div>
             </div>
 
-            <!-- Pill Lencana: KARTU TANDA SISWA -->
-            <div class="inline-flex items-center justify-center px-4 py-0.5 rounded-full bg-[#182C40] border border-slate-600/60 text-amber-400 font-extrabold text-[9.5px] tracking-wider shadow-inner uppercase mt-3.5 mx-auto">
-              KARTU TANDA SISWA
+            <!-- Sisi Kanan: Barcode / QR Code Presisi & Pill Lencana -->
+            <div class="flex flex-col items-center justify-center flex-shrink-0">
+              <!-- Pill Lencana: KARTU TANDA SISWA -->
+              <div class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-[#182C40] border border-slate-600/60 text-amber-400 font-extrabold text-[8px] tracking-wider uppercase mb-1.5 shadow-inner">
+                KARTU TANDA SISWA
+              </div>
+              <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
+                <div id="idCardQrContainer" class="flex items-center justify-center w-[80px] h-[80px]"></div>
+              </div>
+              <p class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1.5">
+                SCAN VERIFIKASI
+              </p>
             </div>
           </div>
 
-          <!-- 3. Area Identitas Siswa: Nama Bersih Anti-Glitch, NISN & Kamar -->
-          <div class="w-full text-center relative z-10 px-1 py-0.5 space-y-0.5">
-            <h3 id="idCardNama" class="text-sm sm:text-[15px] font-bold text-white leading-snug uppercase tracking-wide break-words overflow-visible" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
-              NAMA LENGKAP SISWA
-            </h3>
-            <p class="text-xs text-center text-slate-300 font-medium">
-              NISN: <span id="idCardNisn" class="font-bold text-amber-400 font-mono">0000000000</span>
-            </p>
-            <p class="text-xs text-center text-slate-300 font-medium">
-              <span id="idCardJk">Laki-laki</span> &bull; <span id="idCardKamar" class="text-slate-200 font-bold">A.Pa-K3.9</span>
-            </p>
-          </div>
-
-          <!-- 4. Area QR Code Presisi -->
-          <div class="w-full flex flex-col items-center justify-center relative z-10 py-0.5">
-            <div class="bg-white p-2 rounded-2xl shadow-lg inline-block mx-auto border border-slate-200">
-              <div id="idCardQrContainer" class="flex items-center justify-center w-[84px] h-[84px]"></div>
+          <!-- 3. Area Identitas Siswa di Bawah: Nama, NISN, Jenis Kelamin & No. Kamar (Sesuai Permintaan) -->
+          <div class="w-full text-center relative z-10 px-2 py-1 flex flex-col items-center">
+            <!-- Label & Nama Lengkap Siswa -->
+            <div class="w-full">
+              <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">NAMA LENGKAP</span>
+              <h3 id="idCardNama" class="text-base sm:text-lg font-bold text-white leading-tight uppercase tracking-wide break-words overflow-visible" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
+                NAMA LENGKAP SISWA
+              </h3>
             </div>
-            <p class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1">
-              SCAN VERIFIKASI ABSENSI
-            </p>
+
+            <!-- Kartu Badges: NISN, Jenis Kelamin & No. Kamar -->
+            <div class="w-full flex flex-wrap items-center justify-center gap-1.5 mt-2">
+              <div class="px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 shadow-inner flex items-center space-x-1">
+                <span class="text-[9px] text-slate-400 font-semibold">NISN:</span>
+                <span id="idCardNisn" class="font-bold text-amber-400 font-mono text-[11px]">0000000000</span>
+              </div>
+              <div class="px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700/80 shadow-inner flex items-center space-x-1">
+                <span id="idCardJk" class="text-[10px] text-slate-300 font-medium">Laki-laki</span>
+                <span class="text-slate-500 text-[10px]">&bull;</span>
+                <span class="text-[9px] text-slate-400 font-semibold">Kamar:</span>
+                <span id="idCardKamar" class="text-[10px] text-amber-300 font-bold">A.Pa-K3.9</span>
+              </div>
+            </div>
           </div>
 
-          <!-- 5. Footer Bar ID Card (Tulisan KTA Santri Resmi Telah Dihapus Sesuai Permintaan) -->
+          <!-- 4. Footer Bar ID Card (Tulisan KTA Santri Resmi Telah Dihapus) -->
           <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
             <span></span>
             <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
@@ -6423,8 +6434,17 @@
           .replace(/SRT\s*Sidenreng\s*Rappang/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang')
           .replace(/SEKOLAH\s*RAKYAT\s*TERINTEGRASI\s*SIDENRENG\s*RAPPANG/gi, 'SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG')
           .replace(/\s*\(?JENJANG\s*SRMA\)?/gi, '')
-          .trim();
-        instansiEl.innerText = cardInstansi.toUpperCase();
+          .trim()
+          .toUpperCase();
+        
+        // Enter pada KABUPATEN SIDENRENG RAPPANG agar tata letak proporsional dan elegan
+        if (cardInstansi.includes('SEKOLAH RAKYAT') && cardInstansi.includes('KABUPATEN SIDENRENG RAPPANG')) {
+          instansiEl.innerHTML = 'SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG';
+        } else if (cardInstansi.includes('KABUPATEN')) {
+          instansiEl.innerHTML = cardInstansi.replace('KABUPATEN', '<br>KABUPATEN');
+        } else {
+          instansiEl.innerText = cardInstansi;
+        }
       }
 
       const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
@@ -6449,8 +6469,8 @@
 
         new QRCode(qrBox, {
           text: qrContent,
-          width: 84,
-          height: 84,
+          width: 80,
+          height: 80,
           colorDark: '#0f172a',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
@@ -6514,7 +6534,7 @@
                 if (kamarEl) {
                   kamarEl.style.fontWeight = '700';
                   kamarEl.style.overflow = 'visible';
-                  kamarEl.style.color = '#e2e8f0';
+                  kamarEl.style.color = '#fde047';
                 }
                 const instansiCloneEl = clonedCard.querySelector('#idCardInstansiName');
                 if (instansiCloneEl) {
@@ -6522,6 +6542,7 @@
                   instansiCloneEl.style.whiteSpace = 'normal';
                   instansiCloneEl.style.fontWeight = '800';
                   instansiCloneEl.style.color = '#fbbf24';
+                  instansiCloneEl.style.lineHeight = '1.25';
                 }
               }
             }
