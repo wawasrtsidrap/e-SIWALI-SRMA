@@ -2402,6 +2402,10 @@
         <button onclick="closeModalSiswa()" class="text-slate-400 hover:text-slate-600">&times;</button>
       </div>
       <form id="formSiswa" onsubmit="event.preventDefault(); submitSiswa();" class="space-y-3 text-xs">
+        <input type="hidden" id="sisOriginalNisn" value="">
+        <input type="hidden" id="sisOriginalNama" value="">
+        <input type="hidden" id="sisRowIndex" value="">
+        <input type="hidden" id="sisIsEdit" value="0">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Siswa(i) *</label>
@@ -2409,8 +2413,8 @@
               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-navy">
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">NISN *</label>
-            <input type="text" id="sisNisn" required placeholder="007..."
+            <label class="block font-semibold text-slate-700 mb-1">NISN</label>
+            <input type="text" id="sisNisn" placeholder="007... (Opsional jika belum ada)"
               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-1 focus:ring-navy">
           </div>
         </div>
@@ -4020,19 +4024,68 @@
         '</div>';
     }
 
-    // Helper Kunci Unik Siswa (Aman Terhadap Pagination & Indexing)
+    // Helper Normalisasi Data Siswa (ID Unik Stabil, Indeks Baris, & Anti-Blank)
+    function prepareSiswaData(list) {
+      if (!Array.isArray(list)) return [];
+      return list.map(function (s, idx) {
+        if (!s) return s;
+        s._idx = idx;
+        s._rowIndex = s._rowIndex || (idx + 2);
+        const cleanNisn = (s.nisn && String(s.nisn).trim()) ? String(s.nisn).trim() : '';
+        s._id = cleanNisn ? cleanNisn : ('sis_idx_' + idx);
+        return s;
+      });
+    }
+
+    // Helper Kunci Unik Siswa (Aman Terhadap Pagination, Indeks Tanpa NISN, & Pencarian Kunci Kosong)
     function getSiswaByIdOrIndex(key) {
-      if (!appState.cache.siswa) return null;
+      if (!appState.cache.siswa || key === undefined || key === null || key === '') return null;
       if (typeof key === 'number') {
         return appState.cache.siswa[key] || null;
       }
       const sKey = String(key).trim();
-      const found = appState.cache.siswa.find(function (s) {
-        return String(s.nisn).trim() === sKey || String(s.nik || '').trim() === sKey;
+      if (!sKey) return null; // Kunci kosong tidak boleh mencocokkan siswa manapun!
+
+      // 1. Cocokkan _id unik stabil
+      const byId = appState.cache.siswa.find(function (s) {
+        return s._id === sKey;
       });
-      if (found) return found;
-      const num = parseInt(key);
-      if (!isNaN(num) && appState.cache.siswa[num]) return appState.cache.siswa[num];
+      if (byId) return byId;
+
+      // 2. Cocokkan format prefix "sis_idx_" atau "idx_"
+      if (sKey.indexOf('sis_idx_') === 0) {
+        const numIdx = parseInt(sKey.replace('sis_idx_', ''), 10);
+        if (!isNaN(numIdx) && appState.cache.siswa[numIdx]) return appState.cache.siswa[numIdx];
+      }
+      if (sKey.indexOf('idx_') === 0) {
+        const numIdx = parseInt(sKey.replace('idx_', ''), 10);
+        if (!isNaN(numIdx) && appState.cache.siswa[numIdx]) return appState.cache.siswa[numIdx];
+      }
+
+      // 3. Cocokkan NISN jika ada dan tidak kosong
+      const byNisn = appState.cache.siswa.find(function (s) {
+        return s.nisn && String(s.nisn).trim() === sKey;
+      });
+      if (byNisn) return byNisn;
+
+      // 4. Cocokkan NIK jika ada dan tidak kosong
+      const byNik = appState.cache.siswa.find(function (s) {
+        return s.nik && String(s.nik).trim() === sKey;
+      });
+      if (byNik) return byNik;
+
+      // 5. Cocokkan Nama Lengkap (case-insensitive) jika ada dan tidak kosong
+      const byNama = appState.cache.siswa.find(function (s) {
+        return s.nama && String(s.nama).trim().toLowerCase() === sKey.toLowerCase();
+      });
+      if (byNama) return byNama;
+
+      // 6. Indeks numerik string
+      const num = parseInt(sKey, 10);
+      if (!isNaN(num) && String(num) === sKey && appState.cache.siswa[num]) {
+        return appState.cache.siswa[num];
+      }
+
       return null;
     }
 
@@ -4882,7 +4935,7 @@
       toggleBtn('btnTambahWali', isAdmin);
       toggleBtn('btnTambahShift', isAdmin);
       toggleBtn('btnTambahSiswa', isAdmin || isAsuh);
-      toggleBtn('btnTambahIzin', isAdmin || isAsrama);
+      toggleBtn('btnTambahIzin', isAdmin || isAsrama || isAsuh);
       toggleBtn('btnCatatSakit', isAdmin || isAsuh || isAsrama);
       toggleBtn('btnCatatAsesmen', isAdmin || isAsuh);
       toggleBtn('btnTambahKebutuhan', isAdmin || isAsrama);
@@ -5941,9 +5994,9 @@
       const cached = getLocalCache('siswa');
       let hasCallbackRun = false;
       if (cached && cached.data) {
-        appState.cache.siswa = cached.data;
-        renderSiswaTable(cached.data);
-        populateSiswaDropdowns(cached.data);
+        appState.cache.siswa = prepareSiswaData(cached.data);
+        renderSiswaTable(appState.cache.siswa);
+        populateSiswaDropdowns(appState.cache.siswa);
         if (callback) {
           callback();
           hasCallbackRun = true;
@@ -5954,11 +6007,11 @@
       }
       callBackend('apiGetSiswaList', undefined, function (res) {
         if (res && res.success) {
-          setLocalCache('siswa', res.data);
-          appState.cache.siswa = res.data;
+          appState.cache.siswa = prepareSiswaData(res.data);
+          setLocalCache('siswa', appState.cache.siswa);
           syncSiswaStatusAndMetrics();
-          renderSiswaTable(res.data);
-          populateSiswaDropdowns(res.data);
+          renderSiswaTable(appState.cache.siswa);
+          populateSiswaDropdowns(appState.cache.siswa);
           if (callback && !hasCallbackRun) callback();
         }
       });
@@ -5975,14 +6028,20 @@
      */
     function syncSiswaStatusAndMetrics() {
       if (!appState.cache.siswa || appState.cache.siswa.length === 0) return;
+      prepareSiswaData(appState.cache.siswa);
 
       // 1. Peta Izin Aktif dari appState.cache.izin
       const activeIzinMap = {};
       if (appState.cache.izin && appState.cache.izin.length > 0) {
         appState.cache.izin.forEach(function (i) {
           const isAktif = (i.status || '').toLowerCase().indexOf('aktif') !== -1;
-          if (isAktif && i.nisn) {
-            activeIzinMap[String(i.nisn).trim()] = i.jenisIzin || 'Izin Keluar';
+          if (isAktif) {
+            if (i.nisn && String(i.nisn).trim()) {
+              activeIzinMap[String(i.nisn).trim()] = i.jenisIzin || 'Izin Keluar';
+            }
+            if (i.nama && String(i.nama).trim()) {
+              activeIzinMap['name_' + String(i.nama).trim().toLowerCase()] = i.jenisIzin || 'Izin Keluar';
+            }
           }
         });
       }
@@ -5994,8 +6053,13 @@
           const isSakit = (s.status || '').toLowerCase().indexOf('sakit') !== -1 &&
                           (s.status || '').toLowerCase().indexOf('sembuh') === -1 &&
                           (s.status || '').toLowerCase().indexOf('sehat') === -1;
-          if (isSakit && s.nisn) {
-            activeSakitMap[String(s.nisn).trim()] = true;
+          if (isSakit) {
+            if (s.nisn && String(s.nisn).trim()) {
+              activeSakitMap[String(s.nisn).trim()] = true;
+            }
+            if (s.nama && String(s.nama).trim()) {
+              activeSakitMap['name_' + String(s.nama).trim().toLowerCase()] = true;
+            }
           }
         });
       }
@@ -6004,10 +6068,11 @@
       let hasChanges = false;
       appState.cache.siswa.forEach(function (s) {
         const cleanNisn = String(s.nisn || '').trim();
+        const cleanNamaKey = 'name_' + String(s.nama || '').trim().toLowerCase();
         let targetStatus = 'Hadir di Asrama';
-        if (activeIzinMap[cleanNisn]) {
-          targetStatus = activeIzinMap[cleanNisn];
-        } else if (activeSakitMap[cleanNisn]) {
+        if (activeIzinMap[cleanNisn] || activeIzinMap[cleanNamaKey]) {
+          targetStatus = activeIzinMap[cleanNisn] || activeIzinMap[cleanNamaKey];
+        } else if (activeSakitMap[cleanNisn] || activeSakitMap[cleanNamaKey]) {
           targetStatus = 'Sakit di Asrama';
         }
 
@@ -6121,20 +6186,24 @@
           statusBadge = '<span class="bg-slate-50 text-slate-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-slate-200">' + st + '</span>';
         }
 
+        // Buat kunci unik siswa yang tahan terhadap NISN kosong & karakter khusus
+        const sKey = (s._id || (s.nisn && String(s.nisn).trim()) || ('sis_idx_' + (s._idx !== undefined ? s._idx : ''))).replace(/'/g, "\\'");
+        const displayNisn = (s.nisn && String(s.nisn).trim()) ? s.nisn : '-';
+
         // Kolom Aksi / Dokumen hanya di-render untuk petugas login
         let aksiTd = '';
         if (isLogged) {
           let editBtn = '';
           if (isAdminOrAsuh) {
-            editBtn = '<button onclick="editSiswaByIndex(\'' + s.nisn + '\')" title="Edit Siswa" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">' +
+            editBtn = '<button onclick="editSiswaByIndex(\'' + sKey + '\')" title="Edit Siswa" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">' +
               '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>' +
               '</button>';
           }
           aksiTd = '<td class="py-2.5 px-4 text-center space-x-1.5">' +
-            '<button onclick="previewIdCardByIndex(\'' + s.nisn + '\')" title="Cetak ID Card" class="p-1.5 bg-navy hover:bg-navy-700 text-white rounded-lg shadow-sm">' +
+            '<button onclick="previewIdCardByIndex(\'' + sKey + '\')" title="Cetak ID Card" class="p-1.5 bg-navy hover:bg-navy-700 text-white rounded-lg shadow-sm">' +
             '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2H9.17A3.001 3.001 0 0112 14z"></path></svg>' +
             '</button>' +
-            '<button onclick="previewPortofolioByIndex(\'' + s.nisn + '\')" title="Portofolio Lengkap" class="p-1.5 bg-maroon hover:bg-maroon-700 text-white rounded-lg shadow-sm">' +
+            '<button onclick="previewPortofolioByIndex(\'' + sKey + '\')" title="Portofolio Lengkap" class="p-1.5 bg-maroon hover:bg-maroon-700 text-white rounded-lg shadow-sm">' +
             '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>' +
             '</button>' +
             editBtn +
@@ -6148,7 +6217,7 @@
           '<img src="' + foto + '" loading="lazy" decoding="async" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="handleAvatarFallback(this, \'' + (s.jenisKelamin || '') + '\')">' +
           '<div><span class="font-bold text-slate-800">' + s.nama + '</span></div>' +
           '</td>' +
-          '<td class="py-2.5 px-3 font-mono font-medium text-slate-600">' + s.nisn + '</td>' +
+          '<td class="py-2.5 px-3 font-mono font-medium text-slate-600">' + displayNisn + '</td>' +
           '<td class="py-2.5 px-3 text-slate-600">' + (s.jenisKelamin === 'Laki-laki' ? 'L' : 'P') + '</td>' +
           '<td class="py-2.5 px-3 font-medium text-navy">' + (s.noKamar || '-') + '</td>' +
           '<td class="py-2.5 px-3 text-slate-600">' + (s.namaWaliAsuh || '-') + '</td>' +
@@ -6180,6 +6249,10 @@
 
     function openModalSiswa() {
       document.getElementById('formSiswa').reset();
+      document.getElementById('sisOriginalNisn').value = '';
+      document.getElementById('sisOriginalNama').value = '';
+      document.getElementById('sisRowIndex').value = '';
+      document.getElementById('sisIsEdit').value = '0';
       document.getElementById('modalSiswaTitle').innerText = 'Tambah Data Siswa(i) Baru';
       document.getElementById('modalSiswa').classList.remove('hidden');
     }
@@ -6190,10 +6263,18 @@
 
     function editSiswaByIndex(idx) {
       const s = getSiswaByIdOrIndex(idx);
-      if (!s) return;
-      document.getElementById('sisNama').value = s.nama;
-      document.getElementById('sisNisn').value = s.nisn;
-      document.getElementById('sisJk').value = s.jenisKelamin;
+      if (!s) {
+        showToast('Data siswa tidak ditemukan.', 'error');
+        return;
+      }
+      document.getElementById('sisOriginalNisn').value = s.nisn || '';
+      document.getElementById('sisOriginalNama').value = s.nama || '';
+      document.getElementById('sisRowIndex').value = (s._rowIndex !== undefined) ? s._rowIndex : ((s._idx !== undefined) ? (s._idx + 2) : '');
+      document.getElementById('sisIsEdit').value = '1';
+
+      document.getElementById('sisNama').value = s.nama || '';
+      document.getElementById('sisNisn').value = s.nisn || '';
+      document.getElementById('sisJk').value = s.jenisKelamin || 'Laki-laki';
       document.getElementById('sisTempatLahir').value = s.tempatLahir || '';
       document.getElementById('sisTanggalLahir').value = s.tanggalLahir || '';
       document.getElementById('sisNik').value = s.nik || '';
@@ -6221,9 +6302,18 @@
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
+      const isEdit = document.getElementById('sisIsEdit').value === '1';
+      const originalNisn = document.getElementById('sisOriginalNisn').value;
+      const originalNama = document.getElementById('sisOriginalNama').value;
+      const rowIndex = document.getElementById('sisRowIndex').value;
+
       const data = {
-        nama: document.getElementById('sisNama').value,
-        nisn: document.getElementById('sisNisn').value,
+        isEdit: isEdit,
+        originalNisn: originalNisn,
+        originalNama: originalNama,
+        rowIndex: rowIndex,
+        nama: document.getElementById('sisNama').value.trim(),
+        nisn: document.getElementById('sisNisn').value.trim(),
         jenisKelamin: document.getElementById('sisJk').value,
         tempatLahir: document.getElementById('sisTempatLahir').value,
         tanggalLahir: document.getElementById('sisTanggalLahir').value,
@@ -6243,6 +6333,13 @@
         fotoUrl: document.getElementById('sisFotoUrl').value,
         fotoBase64: ''
       };
+
+      if (!data.nama) {
+        showToast('Nama Lengkap Siswa(i) wajib diisi.', 'error');
+        btn.disabled = false;
+        btn.innerText = 'Simpan Data Siswa';
+        return;
+      }
 
       if (fileInput && fileInput.files && fileInput.files[0]) {
         btn.innerText = 'Mengompres Foto...';
@@ -6285,13 +6382,15 @@
         return;
       }
       const s = getSiswaByIdOrIndex(idx);
-      if (!s) return;
+      if (!s) {
+        showToast('Data siswa tidak ditemukan.', 'error');
+        return;
+      }
 
-      document.getElementById('idCardNama').innerText = s.nama;
-      document.getElementById('idCardNisn').innerText = s.nisn;
-      if (document.getElementById('idCardJk')) document.getElementById('idCardJk').innerText = s.jenisKelamin;
+      document.getElementById('idCardNama').innerText = s.nama || '-';
+      document.getElementById('idCardNisn').innerText = (s.nisn && String(s.nisn).trim()) ? s.nisn : '-';
+      if (document.getElementById('idCardJk')) document.getElementById('idCardJk').innerText = s.jenisKelamin || '-';
       
-      // Ambil No. Kamar dengan proteksi data aman anti-blank
       // Ambil No. Kamar dengan proteksi data aman anti-blank dari berbagai kemungkinan field database
       const kamarVal = (s.noKamar && String(s.noKamar).trim()) ? String(s.noKamar).trim() :
                        (s.kamar && String(s.kamar).trim()) ? String(s.kamar).trim() :
@@ -6322,8 +6421,9 @@
       const qrBox = document.getElementById('idCardQrContainer');
       qrBox.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
-        // HANYA gunakan NISN bersih agar matriks QR berukuran Version 1 (modul besar, tajam, & instan di-scan)
-        const qrContent = 'NISN: ' + String(s.nisn || '').trim();
+        const qrContent = (s.nisn && String(s.nisn).trim())
+          ? ('NISN: ' + String(s.nisn).trim())
+          : ('SISWA: ' + String(s.nama || '').trim());
 
         new QRCode(qrBox, {
           text: qrContent,
@@ -6450,7 +6550,10 @@
         return;
       }
       const s = getSiswaByIdOrIndex(idx);
-      if (!s) return;
+      if (!s) {
+        showToast('Data portofolio siswa tidak ditemukan.', 'error');
+        return;
+      }
 
       const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
       const portoFotoEl = document.getElementById('portoFoto');
@@ -6458,7 +6561,7 @@
         safeSetImageWithDataUri(portoFotoEl, s.fotoUrl, defaultSiswaAvatar);
       }
       document.getElementById('portoNama').innerText = s.nama;
-      document.getElementById('portoNisnNik').innerText = s.nisn + ' / ' + (s.nik || '-');
+      document.getElementById('portoNisnNik').innerText = (s.nisn || '-') + ' / ' + (s.nik || '-');
       document.getElementById('portoTtl').innerText = (s.tempatLahir || '-') + ', ' + (s.tanggalLahir || '-');
       document.getElementById('portoJk').innerText = s.jenisKelamin;
       document.getElementById('portoKamar').innerText = s.noKamar || '-';
@@ -7370,7 +7473,7 @@
       const pag = paginateList(filtered, appState.pagination.izin.page, appState.pagination.izin.limit);
       appState.pagination.izin.page = pag.page;
 
-      const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
+      const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1 || appState.currentUser.role.toLowerCase().indexOf('asuh') !== -1);
 
       pag.items.forEach(function (item) {
         const isAktif = (item.status || '').toLowerCase().indexOf('aktif') !== -1;
@@ -7416,31 +7519,37 @@
       if (dropIzin) {
         dropIzin.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
         sortedList.forEach(function (s) {
-          dropIzin.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ' - ' + (s.noKamar || '') + ')</option>';
+          const val = (s._id || (s.nisn && String(s.nisn).trim()) || ('sis_idx_' + s._idx));
+          const nisnDisplay = (s.nisn && String(s.nisn).trim()) ? s.nisn : 'Tanpa NISN';
+          dropIzin.innerHTML += '<option value="' + val + '">' + s.nama + ' (' + nisnDisplay + ' - ' + (s.noKamar || '-') + ')</option>';
         });
       }
       if (dropSakit) {
         dropSakit.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
         sortedList.forEach(function (s) {
-          dropSakit.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ')</option>';
+          const val = (s._id || (s.nisn && String(s.nisn).trim()) || ('sis_idx_' + s._idx));
+          const nisnDisplay = (s.nisn && String(s.nisn).trim()) ? s.nisn : 'Tanpa NISN';
+          dropSakit.innerHTML += '<option value="' + val + '">' + s.nama + ' (' + nisnDisplay + ')</option>';
         });
       }
       if (dropAsesmen) {
         dropAsesmen.innerHTML = '<option value="">-- Pilih Nama Siswa(i) --</option>';
         sortedList.forEach(function (s) {
-          dropAsesmen.innerHTML += '<option value="' + s.nisn + '">' + s.nama + ' (' + s.nisn + ')</option>';
+          const val = (s._id || (s.nisn && String(s.nisn).trim()) || ('sis_idx_' + s._idx));
+          const nisnDisplay = (s.nisn && String(s.nisn).trim()) ? s.nisn : 'Tanpa NISN';
+          dropAsesmen.innerHTML += '<option value="' + val + '">' + s.nama + ' (' + nisnDisplay + ')</option>';
         });
       }
     }
 
     function autoFillSiswaIzin() {
-      const nisn = document.getElementById('izinSiswaSelect').value;
+      const val = document.getElementById('izinSiswaSelect').value;
       if (!appState.cache.siswa) return;
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
+      const s = getSiswaByIdOrIndex(val);
 
       if (s) {
-        document.getElementById('izinAutoNisn').innerText = s.nisn;
-        document.getElementById('izinAutoJk').innerText = s.jenisKelamin;
+        document.getElementById('izinAutoNisn').innerText = (s.nisn && String(s.nisn).trim()) ? s.nisn : '-';
+        document.getElementById('izinAutoJk').innerText = s.jenisKelamin || '-';
         document.getElementById('izinAutoKamar').innerText = s.noKamar || '-';
       } else {
         document.getElementById('izinAutoNisn').innerText = '-';
@@ -7840,13 +7949,16 @@
     }
 
     function submitTambahIzin() {
-      const nisn = document.getElementById('izinSiswaSelect').value;
-      if (!nisn) {
+      const key = document.getElementById('izinSiswaSelect').value;
+      if (!key) {
         showToast('Pilih siswa terlebih dahulu.', 'error');
         return;
       }
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
-      if (!s) return;
+      const s = getSiswaByIdOrIndex(key);
+      if (!s) {
+        showToast('Data siswa tidak ditemukan.', 'error');
+        return;
+      }
 
       const batasWaktuRaw = document.getElementById('izinBatasWaktu') ? document.getElementById('izinBatasWaktu').value : '';
       if (!batasWaktuRaw) {
@@ -7883,7 +7995,7 @@
 
       const payload = {
         jenisIzin: jenis,
-        nisn: s.nisn,
+        nisn: s.nisn || '',
         nama: s.nama,
         jenisKelamin: s.jenisKelamin,
         noKamar: s.noKamar || '-',
@@ -7895,7 +8007,7 @@
         waliAsramaPiket: document.getElementById('izinWaliAsramaPiket') ? document.getElementById('izinWaliAsramaPiket').value : '-',
         fotoBukti1Base64: foto1Data,
         fotoBukti2Base64: foto2Data,
-        petugas: appState.currentUser ? appState.currentUser.namaLengkap : 'Wali Asrama'
+        petugas: appState.currentUser ? appState.currentUser.namaLengkap : 'Petugas Piket'
       };
 
       const processFoto2 = function () {
@@ -8156,12 +8268,13 @@
     }
 
     function autoFillSiswaSakit() {
-      const nisn = document.getElementById('sakitSiswaSelect').value;
+      const val = document.getElementById('sakitSiswaSelect').value;
       if (!appState.cache.siswa) return;
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
+      const s = getSiswaByIdOrIndex(val);
 
       if (s) {
-        document.getElementById('sakitAutoNisnKamar').innerText = s.nisn + ' / ' + (s.noKamar || '-');
+        const nisnDisplay = (s.nisn && String(s.nisn).trim()) ? s.nisn : '-';
+        document.getElementById('sakitAutoNisnKamar').innerText = nisnDisplay + ' / ' + (s.noKamar || '-');
         if (document.getElementById('sakitAutoJk')) document.getElementById('sakitAutoJk').innerText = s.jenisKelamin || '-';
         document.getElementById('sakitAutoBpjsFaskes').innerText = (s.noBpjs || '-') + ' (' + (s.faskes || '-') + ')';
       } else {
@@ -8185,20 +8298,23 @@
     }
 
     function submitCatatSakit() {
-      const nisn = document.getElementById('sakitSiswaSelect').value;
-      if (!nisn) {
+      const val = document.getElementById('sakitSiswaSelect').value;
+      if (!val) {
         showToast('Pilih siswa terlebih dahulu.', 'error');
         return;
       }
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
-      if (!s) return;
+      const s = getSiswaByIdOrIndex(val);
+      if (!s) {
+        showToast('Data siswa tidak ditemukan.', 'error');
+        return;
+      }
 
       const btn = document.getElementById('btnSaveSakit');
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
       const data = {
-        nisn: s.nisn,
+        nisn: s.nisn || '',
         nama: s.nama,
         jenisKelamin: s.jenisKelamin,
         noKamar: s.noKamar || '-',
@@ -8343,12 +8459,12 @@
     }
 
     function autoFillSiswaAsesmen() {
-      const nisn = document.getElementById('asesmenSiswaSelect').value;
+      const val = document.getElementById('asesmenSiswaSelect').value;
       if (!appState.cache.siswa) return;
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
+      const s = getSiswaByIdOrIndex(val);
 
       if (s) {
-        if (document.getElementById('asesmenAutoNisn')) document.getElementById('asesmenAutoNisn').innerText = s.nisn;
+        if (document.getElementById('asesmenAutoNisn')) document.getElementById('asesmenAutoNisn').innerText = (s.nisn && String(s.nisn).trim()) ? s.nisn : '-';
         if (document.getElementById('asesmenAutoJk')) document.getElementById('asesmenAutoJk').innerText = s.jenisKelamin || '-';
         if (document.getElementById('asesmenAutoKamar')) document.getElementById('asesmenAutoKamar').innerText = s.noKamar || '-';
       } else {
@@ -8369,20 +8485,23 @@
     }
 
     function submitCatatAsesmen() {
-      const nisn = document.getElementById('asesmenSiswaSelect').value;
-      if (!nisn) {
+      const val = document.getElementById('asesmenSiswaSelect').value;
+      if (!val) {
         showToast('Pilih siswa terlebih dahulu.', 'error');
         return;
       }
-      const s = appState.cache.siswa.find(function (item) { return item.nisn === nisn; });
-      if (!s) return;
+      const s = getSiswaByIdOrIndex(val);
+      if (!s) {
+        showToast('Data siswa tidak ditemukan.', 'error');
+        return;
+      }
 
       const btn = document.getElementById('btnSaveAsesmen');
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
       const data = {
-        nisn: s.nisn,
+        nisn: s.nisn || '',
         nama: s.nama,
         jenisKelamin: s.jenisKelamin,
         noKamar: s.noKamar || '-',
