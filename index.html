@@ -310,7 +310,7 @@
             class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm ring-1 ring-cyan-300/40">SRMA</span>
         </div>
         <p id="sidebarInstansiName" class="text-[10px] text-slate-300 font-semibold leading-tight line-clamp-2 mt-0.5">
-          SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG (JENJANG SRMA)
+          Sekolah Rakyat Kabupaten Sidenreng Rappang Jenjang SRMA
         </p>
       </div>
     </div>
@@ -2572,7 +2572,7 @@
 
             <!-- Teks Instansi Warna Emas Amber & Putih -->
             <h4 id="idCardInstansiName" class="text-[10px] sm:text-[10.5px] font-extrabold text-amber-400 uppercase tracking-wide leading-tight mt-1 text-center font-bold" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;">
-              SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG
+              SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG
             </h4>
             <p class="text-[9px] font-bold text-white uppercase tracking-wider text-center mt-0.5">
               JENJANG SRMA
@@ -4179,6 +4179,11 @@
       if (cached && cached.data) {
         const res = cached.data;
         if (res.settings) {
+          if (res.settings.NAMA_INSTANSI) {
+            res.settings.NAMA_INSTANSI = res.settings.NAMA_INSTANSI
+              .replace(/SRT\s*Sidenreng\s*Rappang/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang')
+              .replace(/SEKOLAH\s*RAKYAT\s*TERINTEGRASI\s*SIDENRENG\s*RAPPANG/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang');
+          }
           appState.settings = Object.assign(appState.settings, res.settings);
           syncSettingsToUI();
         }
@@ -4200,6 +4205,11 @@
       // 2. Ambil data paling segar dari Google Apps Script jika cache kosong, kedaluwarsa, atau dipaksa refresh
       callBackend('apiGetInitialData', undefined, function (res) {
         if (res && res.success) {
+          if (res.settings && res.settings.NAMA_INSTANSI) {
+            res.settings.NAMA_INSTANSI = res.settings.NAMA_INSTANSI
+              .replace(/SRT\s*Sidenreng\s*Rappang/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang')
+              .replace(/SEKOLAH\s*RAKYAT\s*TERINTEGRASI\s*SIDENRENG\s*RAPPANG/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang');
+          }
           setLocalCache('initialData', res);
           if (res.settings) {
             appState.settings = Object.assign(appState.settings, res.settings);
@@ -4358,7 +4368,13 @@
 
       const rawLogo = appState.settings.LOGO_URL;
       const logoUrl = (!rawLogo || rawLogo.indexOf('flaticon.com') !== -1) ? DEFAULT_SRMA_LOGO : formatImageUrl(rawLogo, DEFAULT_SRMA_LOGO);
-      const instansi = appState.settings.NAMA_INSTANSI || 'Sekolah Rakyat Kabupaten Sidenreng Rappang';
+      
+      // Standarisasi Nama Instansi resmi sesuai instruksi (Sekolah Rakyat Kabupaten Sidenreng Rappang)
+      let instansi = appState.settings.NAMA_INSTANSI || 'Sekolah Rakyat Kabupaten Sidenreng Rappang Jenjang SRMA';
+      instansi = instansi
+        .replace(/SRT\s*Sidenreng\s*Rappang/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang')
+        .replace(/SEKOLAH\s*RAKYAT\s*TERINTEGRASI\s*SIDENRENG\s*RAPPANG/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang');
+      appState.settings.NAMA_INSTANSI = instansi;
 
       if (logoEl) { logoEl.removeAttribute('crossorigin'); logoEl.src = logoUrl; }
       if (instansiEl) instansiEl.innerText = instansi;
@@ -6402,7 +6418,13 @@
 
       const instansiEl = document.getElementById('idCardInstansiName');
       if (instansiEl) {
-        instansiEl.innerText = (appState.settings && appState.settings.NAMA_INSTANSI) ? appState.settings.NAMA_INSTANSI : 'SEKOLAH RAKYAT TERINTEGRASI SIDENRENG RAPPANG';
+        let cardInstansi = (appState.settings && appState.settings.NAMA_INSTANSI) ? appState.settings.NAMA_INSTANSI : 'SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG';
+        cardInstansi = cardInstansi
+          .replace(/SRT\s*Sidenreng\s*Rappang/gi, 'Sekolah Rakyat Kabupaten Sidenreng Rappang')
+          .replace(/SEKOLAH\s*RAKYAT\s*TERINTEGRASI\s*SIDENRENG\s*RAPPANG/gi, 'SEKOLAH RAKYAT KABUPATEN SIDENRENG RAPPANG')
+          .replace(/\s*\(?JENJANG\s*SRMA\)?/gi, '')
+          .trim();
+        instansiEl.innerText = cardInstansi.toUpperCase();
       }
 
       const defaultSiswaAvatar = s.jenisKelamin === 'Perempuan' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
@@ -6493,6 +6515,13 @@
                   kamarEl.style.fontWeight = '700';
                   kamarEl.style.overflow = 'visible';
                   kamarEl.style.color = '#e2e8f0';
+                }
+                const instansiCloneEl = clonedCard.querySelector('#idCardInstansiName');
+                if (instansiCloneEl) {
+                  instansiCloneEl.style.overflow = 'visible';
+                  instansiCloneEl.style.whiteSpace = 'normal';
+                  instansiCloneEl.style.fontWeight = '800';
+                  instansiCloneEl.style.color = '#fbbf24';
                 }
               }
             }
