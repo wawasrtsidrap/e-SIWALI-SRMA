@@ -289,12 +289,13 @@
         padding: 4mm !important;
       }
 
-      /* FORMAT CETAK DOKUMEN REKAPITULASI (A4 / F4) */
+      /* FORMAT CETAK DOKUMEN REKAPITULASI (A4 LANDSCAPE / HORIZONTAL) */
       .print-report-sheet {
         width: 100% !important;
+        max-width: 100% !important;
         background: #ffffff !important;
         color: #0f172a !important;
-        padding: 6mm !important;
+        padding: 5mm 8mm !important;
         box-sizing: border-box !important;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
       }
@@ -302,13 +303,14 @@
       .print-report-sheet table {
         width: 100% !important;
         border-collapse: collapse !important;
+        table-layout: auto !important;
       }
 
       .print-report-sheet th,
       .print-report-sheet td {
         border: 1px solid #94a3b8 !important;
         padding: 4px 6px !important;
-        font-size: 8.5pt !important;
+        font-size: 8pt !important;
         color: #0f172a !important;
       }
 
@@ -1223,32 +1225,96 @@
             </div>
           </div>
 
-          <!-- Info Singkat Sistem Keasramaan -->
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <!-- Diagram Persentase Siswa Sakit di Asrama Berdasarkan Gender -->
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-4">
             <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-3">Status Sinkronisasi Sistem</h3>
-              <div class="space-y-3 text-xs text-slate-600">
-                <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
-                  <span>Penyimpanan Basis Data:</span>
-                  <span class="font-bold text-emerald-600">Google Spreadsheet</span>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900 flex items-center space-x-1.5">
+                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                    <span>Persentase Siswa Sakit di Asrama</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-500">Distribusi gender siswa sakit terhadap total siswa</p>
                 </div>
-                <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
-                  <span>Berkas Media Foto:</span>
-                  <span class="font-bold text-navy">Google Drive</span>
+                <span class="inline-flex items-center text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1 animate-pulse"></span>
+                  <span>Sakit Aktif</span>
+                </span>
+              </div>
+
+              <!-- Visual Kanvas Donat Proporsi Sakit vs Sehat -->
+              <div class="flex items-center justify-center relative my-3">
+                <div class="relative w-36 h-36">
+                  <canvas id="chartSakitGender"></canvas>
+                  <!-- Center Cutout Text -->
+                  <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                    <span id="chartSakitCenterTotal" class="text-2xl font-black text-rose-600 leading-none">0</span>
+                    <span class="text-[8px] text-slate-400 font-extrabold uppercase tracking-wider mt-0.5">Siswa Sakit</span>
+                    <span id="chartSakitCenterPct" class="text-[10px] font-bold text-slate-700 mt-0.5">0%</span>
+                  </div>
                 </div>
-                <div class="flex items-center justify-between py-1.5 border-b border-slate-100">
-                  <span>Waktu Server:</span>
-                  <span id="dashboardServerTime" class="font-mono text-slate-700">-</span>
+              </div>
+
+              <!-- Rincian Distribusi Angka & Persentase Baris Per Gender -->
+              <div class="space-y-2 text-xs">
+                <!-- 1. Total Keseluruhan Siswa -->
+                <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                  <div class="flex items-center space-x-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span class="font-bold text-slate-700">Total Keseluruhan Siswa:</span>
+                  </div>
+                  <div class="text-right">
+                    <span id="distTotalSiswaText" class="font-black text-slate-900">0 Siswa</span>
+                    <span class="text-[10px] text-slate-500 font-bold ml-1">(100%)</span>
+                  </div>
                 </div>
-                <div class="flex items-center justify-between py-1.5">
-                  <span>Status Kunci Data:</span>
-                  <span class="font-medium text-emerald-600">LockService Aktif</span>
+
+                <!-- 2. Siswa Laki-Laki Sakit -->
+                <div class="p-2 rounded-xl bg-blue-50/60 border border-blue-200 flex flex-col space-y-1">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-blue-600 ring-2 ring-blue-300"></span>
+                      <span class="font-bold text-slate-800">Siswa Laki-laki Sakit (L):</span>
+                    </div>
+                    <div class="text-right">
+                      <span id="distSakitLText" class="font-black text-blue-700 text-sm">0 Siswa</span>
+                      <span id="distSakitLPct" class="text-[10px] font-extrabold text-blue-600 ml-1">(0%)</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-blue-200/50 rounded-full h-1.5 overflow-hidden">
+                    <div id="distSakitLBar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <!-- 3. Siswa Perempuan Sakit -->
+                <div class="p-2 rounded-xl bg-rose-50/60 border border-rose-200 flex flex-col space-y-1">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-rose-600 ring-2 ring-rose-300"></span>
+                      <span class="font-bold text-slate-800">Siswa Perempuan Sakit (P):</span>
+                    </div>
+                    <div class="text-right">
+                      <span id="distSakitPText" class="font-black text-rose-700 text-sm">0 Siswa</span>
+                      <span id="distSakitPPct" class="text-[10px] font-extrabold text-rose-600 ml-1">(0%)</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-rose-200/50 rounded-full h-1.5 overflow-hidden">
+                    <div id="distSakitPBar" class="bg-rose-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200 text-[11px] text-slate-500">
-              Seluruh data mutasi izin, absensi, dan kondisi kesehatan otomatis mengubah angka metrik di atas secara
-              seketika.
+
+            <!-- Footer Card Ringkasan Sehat vs Sakit -->
+            <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+              <span class="text-slate-500 flex items-center space-x-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                <span>Siswa Sehat di Asrama:</span>
+              </span>
+              <span id="distSiswaSehatText" class="font-extrabold text-emerald-700">0 Siswa (0%)</span>
             </div>
           </div>
         </div>
@@ -1903,14 +1969,14 @@
               verifikasi kedatangan</p>
           </div>
           <div class="flex items-center space-x-2">
-            <button onclick="switchIzinSubTab('rekap')"
+            <button id="btnToggleRekapIzin" onclick="toggleIzinRekapView()"
               class="bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
-              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg id="iconToggleRekapIzin" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                 </path>
               </svg>
-              <span>Rekap & Cetak Laporan Izin</span>
+              <span id="btnToggleRekapIzinText">Rekap & Cetak Laporan Izin</span>
             </button>
             <button id="btnTambahIzin" onclick="openModalTambahIzin()"
               class="hidden bg-maroon hover:bg-maroon-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all items-center space-x-1.5">
@@ -1922,21 +1988,12 @@
           </div>
         </div>
 
-        <!-- Tab Sub-Menu: Izin Aktif, Riwayat, & Rekap Cetak -->
+        <!-- Tab Sub-Menu: Izin Aktif & Riwayat -->
         <div class="flex border-b border-slate-200 space-x-4">
           <button onclick="switchIzinSubTab('aktif')" id="tabIzinAktif"
             class="pb-2 text-sm font-bold text-maroon border-b-2 border-maroon">1. Izin Aktif di Luar Asrama</button>
           <button onclick="switchIzinSubTab('riwayat')" id="tabIzinRiwayat"
             class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800">2. Riwayat Izin Siswa(i)</button>
-          <button onclick="switchIzinSubTab('rekap')" id="tabIzinRekap"
-            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
-            <svg class="w-4 h-4 text-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-              </path>
-            </svg>
-            <span>3. Rekap & Cetak Laporan Izin</span>
-          </button>
         </div>
 
         <!-- Panel Daftar Tabel Izin (Aktif & Riwayat) -->
@@ -2154,7 +2211,7 @@
                 <p id="rekapIzinTglCetakText">Sidenreng Rappang, 26 November 2026</p>
                 <p class="font-bold">Petugas Piket / Wali Asrama</p>
                 <div class="h-16"></div>
-                <p id="rekapIzinNamaPetugas" class="font-bold underline">( Petugas Jaga Asrama )</p>
+                <p id="rekapIzinNamaPetugas" class="font-bold underline">( .................................................... )</p>
                 <p class="text-[10px] text-slate-500">e-SIWALI SRT Sidrap</p>
               </div>
             </div>
@@ -2171,14 +2228,14 @@
               perilaku</p>
           </div>
           <div class="flex items-center space-x-2">
-            <button onclick="switchPenangananSubTab('rekapSakit')"
+            <button id="btnToggleRekapSakit" onclick="togglePenangananRekapView()"
               class="bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
-              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg id="iconToggleRekapSakit" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                 </path>
               </svg>
-              <span>Rekap & Cetak Siswa Sakit</span>
+              <span id="btnToggleRekapSakitText">Rekap & Cetak Siswa Sakit</span>
             </button>
           </div>
         </div>
@@ -2189,15 +2246,6 @@
             class="pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700">1. Siswa(i) Sakit di Asrama</button>
           <button onclick="switchPenangananSubTab('asesmen')" id="tabAsesmen"
             class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800">2. Pelanggaran & Asesmen Anak</button>
-          <button onclick="switchPenangananSubTab('rekapSakit')" id="tabRekapSakit"
-            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
-            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-              </path>
-            </svg>
-            <span>3. Rekap & Cetak Siswa Sakit</span>
-          </button>
         </div>
 
         <!-- Panel 1: Siswa Sakit -->
@@ -2443,7 +2491,7 @@
                 <p id="rekapSakitTglCetakText">Sidenreng Rappang, 26 November 2026</p>
                 <p class="font-bold">Petugas Kesehatan / Wali Asrama</p>
                 <div class="h-16"></div>
-                <p id="rekapSakitNamaPetugas" class="font-bold underline">( Petugas Kesehatan Asrama )</p>
+                <p id="rekapSakitNamaPetugas" class="font-bold underline">( .................................................... )</p>
                 <p class="text-[10px] text-slate-500">e-SIWALI SRT Sidrap</p>
               </div>
             </div>
@@ -5098,8 +5146,9 @@
       setEl('cardSakitL', m.sakitAsrama.L);
       setEl('cardSakitP', m.sakitAsrama.P);
 
-      // Jalankan Rendering Widget Chart.js Doughnut 2-Kolom
+      // Jalankan Rendering Widget Chart.js Doughnut 2-Kolom & Diagram Persentase Siswa Sakit
       renderDoughnutChart(m);
+      renderSakitGenderChart(m);
       initCard3DTilt();
     }
 
@@ -5200,6 +5249,109 @@
             animateScale: true,
             animateRotate: true
           }
+        }
+      });
+    }
+
+    /**
+     * Inisialisasi & Pembaharuan Diagram Persentase Siswa Sakit di Asrama Berdasarkan Gender
+     */
+    function renderSakitGenderChart(m) {
+      if (!m) return;
+      const canvas = document.getElementById('chartSakitGender');
+      if (!canvas) return;
+
+      const total = (m.totalSiswa && m.totalSiswa.total) || 0;
+      const totalL = (m.totalSiswa && m.totalSiswa.L) || 0;
+      const totalP = (m.totalSiswa && m.totalSiswa.P) || 0;
+
+      const sakitTotal = (m.sakitAsrama && m.sakitAsrama.total) || 0;
+      const sakitL = (m.sakitAsrama && m.sakitAsrama.L) || 0;
+      const sakitP = (m.sakitAsrama && m.sakitAsrama.P) || 0;
+      const sehat = Math.max(0, total - sakitTotal);
+
+      const pctSakit = total > 0 ? ((sakitTotal / total) * 100).toFixed(1) : '0';
+      const pctL = total > 0 ? ((sakitL / total) * 100).toFixed(1) : '0';
+      const pctP = total > 0 ? ((sakitP / total) * 100).toFixed(1) : '0';
+      const pctSehat = total > 0 ? ((sehat / total) * 100).toFixed(1) : '0';
+
+      // Update Center Teks Donat
+      setEl('chartSakitCenterTotal', sakitTotal);
+      setEl('chartSakitCenterPct', pctSakit + '% Sakit');
+
+      // Update Teks Breakdown
+      setEl('distTotalSiswaText', total + ' Siswa');
+      setEl('distSakitLText', sakitL + ' Siswa');
+      setEl('distSakitLPct', '(' + pctL + '%)');
+      const barL = document.getElementById('distSakitLBar');
+      if (barL) {
+        const barLPct = totalL > 0 ? Math.min(100, Math.round((sakitL / totalL) * 100)) : 0;
+        barL.style.width = barLPct + '%';
+      }
+
+      setEl('distSakitPText', sakitP + ' Siswa');
+      setEl('distSakitPPct', '(' + pctP + '%)');
+      const barP = document.getElementById('distSakitPBar');
+      if (barP) {
+        const barPPct = totalP > 0 ? Math.min(100, Math.round((sakitP / totalP) * 100)) : 0;
+        barP.style.width = barPPct + '%';
+      }
+
+      setEl('distSiswaSehatText', sehat + ' Siswa (' + pctSehat + '%)');
+
+      // Safe Check: Tunggu Chart.js jika script CDN masih proses memuat
+      if (typeof Chart === 'undefined') {
+        setTimeout(function () { renderSakitGenderChart(m); }, 350);
+        return;
+      }
+
+      // Hancurkan instance lama jika ada
+      if (appState.chartSakitInstance) {
+        appState.chartSakitInstance.destroy();
+        appState.chartSakitInstance = null;
+      }
+
+      const rawValues = [sakitL, sakitP, sehat];
+      const isAllZero = (sakitL === 0 && sakitP === 0 && sehat === 0);
+      const chartValues = isAllZero ? [0, 0, 1] : rawValues;
+      const chartColors = isAllZero ? ['#E2E8F0', '#E2E8F0', '#E2E8F0'] : ['#2563eb', '#e11d48', '#10b981'];
+
+      const ctx = canvas.getContext('2d');
+      appState.chartSakitInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Laki-laki Sakit', 'Perempuan Sakit', 'Siswa Sehat'],
+          datasets: [{
+            data: chartValues,
+            backgroundColor: chartColors,
+            borderColor: '#FFFFFF',
+            borderWidth: 2,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: !isAllZero,
+              backgroundColor: '#0F2537',
+              titleFont: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+              bodyFont: { family: 'Plus Jakarta Sans', size: 10 },
+              padding: 8,
+              cornerRadius: 6,
+              callbacks: {
+                label: function (context) {
+                  const val = rawValues[context.dataIndex] || 0;
+                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                  return ' ' + context.label + ': ' + val + ' Siswa (' + pct + '%)';
+                }
+              }
+            }
+          },
+          animation: { animateScale: true, animateRotate: true, duration: 600 }
         }
       });
     }
@@ -8257,34 +8409,47 @@
       appState.pagination.izin.page = 1;
       const tAktif = document.getElementById('tabIzinAktif');
       const tRiwayat = document.getElementById('tabIzinRiwayat');
-      const tRekap = document.getElementById('tabIzinRekap');
       const pDaftar = document.getElementById('panelIzinDaftar');
       const pRekap = document.getElementById('panelIzinRekap');
+      const btnToggle = document.getElementById('btnToggleRekapIzin');
+      const btnToggleText = document.getElementById('btnToggleRekapIzinText');
 
       const inactiveClass = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1';
       if (tAktif) tAktif.className = inactiveClass;
       if (tRiwayat) tRiwayat.className = inactiveClass;
-      if (tRekap) tRekap.className = inactiveClass;
 
       if (tab === 'aktif') {
         if (tAktif) tAktif.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon flex items-center space-x-1';
         if (pDaftar) pDaftar.classList.remove('hidden');
         if (pRekap) pRekap.classList.add('hidden');
+        if (btnToggleText) btnToggleText.innerText = 'Rekap & Cetak Laporan Izin';
+        if (btnToggle) btnToggle.className = 'bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (appState.cache.izin) renderIzinTable(appState.cache.izin);
       } else if (tab === 'riwayat') {
         if (tRiwayat) tRiwayat.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon flex items-center space-x-1';
         if (pDaftar) pDaftar.classList.remove('hidden');
         if (pRekap) pRekap.classList.add('hidden');
+        if (btnToggleText) btnToggleText.innerText = 'Rekap & Cetak Laporan Izin';
+        if (btnToggle) btnToggle.className = 'bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (appState.cache.izin) renderIzinTable(appState.cache.izin);
       } else if (tab === 'rekap') {
-        if (tRekap) tRekap.className = 'pb-2 text-sm font-bold text-navy border-b-2 border-navy flex items-center space-x-1';
         if (pDaftar) pDaftar.classList.add('hidden');
         if (pRekap) pRekap.classList.remove('hidden');
+        if (btnToggleText) btnToggleText.innerText = '← Kembali ke Daftar Izin';
+        if (btnToggle) btnToggle.className = 'bg-slate-700 hover:bg-slate-800 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (!appState.cache.izin) {
           fetchIzinData(false);
         } else {
           filterRekapIzin();
         }
+      }
+    }
+
+    function toggleIzinRekapView() {
+      if (appState.izinSubTab === 'rekap') {
+        switchIzinSubTab('aktif');
+      } else {
+        switchIzinSubTab('rekap');
       }
     }
 
@@ -8460,8 +8625,7 @@
       }
       const petugasEl = document.getElementById('rekapIzinNamaPetugas');
       if (petugasEl) {
-        const namaUser = appState.currentUser && appState.currentUser.nama ? appState.currentUser.nama : 'Petugas Jaga Asrama';
-        petugasEl.innerText = '( ' + namaUser + ' )';
+        petugasEl.innerText = '( .................................................... )';
       }
 
       // 4. Render Baris Tabel Rekapitulasi Izin
@@ -9184,15 +9348,15 @@
       appState.penangananSubTab = tab;
       const tSakit = document.getElementById('tabSakit');
       const tAsesmen = document.getElementById('tabAsesmen');
-      const tRekapSakit = document.getElementById('tabRekapSakit');
       const pSakit = document.getElementById('subtab-sakit');
       const pAsesmen = document.getElementById('subtab-asesmen');
       const pRekapSakit = document.getElementById('subtab-rekap-sakit');
+      const btnToggle = document.getElementById('btnToggleRekapSakit');
+      const btnToggleText = document.getElementById('btnToggleRekapSakitText');
 
       const inactiveClass = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1';
       if (tSakit) tSakit.className = inactiveClass;
       if (tAsesmen) tAsesmen.className = inactiveClass;
-      if (tRekapSakit) tRekapSakit.className = inactiveClass;
 
       if (pSakit) pSakit.classList.add('hidden');
       if (pAsesmen) pAsesmen.classList.add('hidden');
@@ -9201,21 +9365,34 @@
       if (tab === 'sakit') {
         if (tSakit) tSakit.className = 'pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700 flex items-center space-x-1';
         if (pSakit) pSakit.classList.remove('hidden');
+        if (btnToggleText) btnToggleText.innerText = 'Rekap & Cetak Siswa Sakit';
+        if (btnToggle) btnToggle.className = 'bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (appState.cache.sakit) renderSakitTable(appState.cache.sakit);
       } else if (tab === 'asesmen') {
         if (tAsesmen) tAsesmen.className = 'pb-2 text-sm font-bold text-slate-800 border-b-2 border-slate-800 flex items-center space-x-1';
         if (pAsesmen) pAsesmen.classList.remove('hidden');
+        if (btnToggleText) btnToggleText.innerText = 'Rekap & Cetak Siswa Sakit';
+        if (btnToggle) btnToggle.className = 'bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (appState.cache.pelanggaran && typeof renderPelanggaranTable === 'function') {
           renderPelanggaranTable(appState.cache.pelanggaran);
         }
       } else if (tab === 'rekapSakit') {
-        if (tRekapSakit) tRekapSakit.className = 'pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700 flex items-center space-x-1';
         if (pRekapSakit) pRekapSakit.classList.remove('hidden');
+        if (btnToggleText) btnToggleText.innerText = '← Kembali ke Tabel Sakit';
+        if (btnToggle) btnToggle.className = 'bg-slate-700 hover:bg-slate-800 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5';
         if (!appState.cache.sakit) {
           fetchSakitData(false);
         } else {
           filterRekapSakit();
         }
+      }
+    }
+
+    function togglePenangananRekapView() {
+      if (appState.penangananSubTab === 'rekapSakit') {
+        switchPenangananSubTab('sakit');
+      } else {
+        switchPenangananSubTab('rekapSakit');
       }
     }
 
@@ -9382,8 +9559,7 @@
       }
       const petugasEl = document.getElementById('rekapSakitNamaPetugas');
       if (petugasEl) {
-        const namaUser = appState.currentUser && appState.currentUser.nama ? appState.currentUser.nama : 'Petugas Kesehatan Asrama';
-        petugasEl.innerText = '( ' + namaUser + ' )';
+        petugasEl.innerText = '( .................................................... )';
       }
 
       // 4. Render Baris Tabel Rekapitulasi Sakit
@@ -9673,19 +9849,18 @@
         petugas: appState.currentUser ? appState.currentUser.namaLengkap : 'Wali Asuh'
       };
 
-      callBackend('apiSavePelanggaran', data, function (res) {
+      callBackend('apiSavePelanggaran', data, function(res) {
         btn.disabled = false;
         btn.innerText = 'Simpan Catatan';
         if (res && res.success) {
           closeModalCatatAsesmen();
           showToast(res.message, 'success');
-          invalidateLocalCache('pelanggaran');
           appState.cache.pelanggaran = null;
           fetchPelanggaranData();
         } else {
           showToast(res ? res.message : 'Gagal.', 'error');
         }
-      }, function () {
+      }, function() {
         btn.disabled = false;
         btn.innerText = 'Simpan Catatan';
       });
@@ -9715,17 +9890,9 @@
       }
     }
 
-    function fetchKebutuhanInventarisData(forceRefresh) {
-      const cached = getLocalCache('kebutuhan_inv');
-      if (cached && cached.data) {
-        appState.cache.kebutuhan = cached.data.kebutuhan;
-        appState.cache.inventaris = cached.data.inventaris;
-        renderKebutuhanDanInventarisTables();
-        if (!cached.isExpired && !forceRefresh) return;
-      }
-      callBackend('apiGetKebutuhanDanInventaris', undefined, function (res) {
+    function fetchKebutuhanInventarisData() {
+      callBackend('apiGetKebutuhanDanInventaris', undefined, function(res) {
         if (res && res.success) {
-          setLocalCache('kebutuhan_inv', res);
           appState.cache.kebutuhan = res.kebutuhan;
           appState.cache.inventaris = res.inventaris;
           renderKebutuhanDanInventarisTables();
@@ -9741,13 +9908,10 @@
         const listK = appState.cache.kebutuhan;
         if (!listK || listK.length === 0) {
           tbodyK.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada usulan kebutuhan asrama.</td></tr>';
-          renderPaginationControls('paginationKebutuhan', null);
         } else {
           const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
-          const pagK = paginateList(listK, appState.pagination.kebutuhan.page, appState.pagination.kebutuhan.limit);
-          appState.pagination.kebutuhan.page = pagK.page;
 
-          pagK.items.forEach(function (item) {
+          listK.forEach(function(item) {
             const isDiterima = (item.status || '').toLowerCase().indexOf('diterima') !== -1;
             const statusBadge = isDiterima
               ? '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Sudah Diterima</span>'
@@ -9758,23 +9922,18 @@
               btnTerima = '<button onclick="openTerimaKebutuhanModal(\'' + item.id + '\', \'' + item.namaBarang + '\', ' + item.jumlah + ')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm transition">Tandai Diterima & Masuk Aset</button>';
             }
 
-            const waktuUsulStr = item.tanggal
-              ? (item.tanggal.indexOf('WITA') !== -1 ? item.tanggal : item.tanggal + ' WITA')
-              : '-';
-
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition';
-            tr.innerHTML =
+            tr.innerHTML = 
               '<td class="py-2.5 px-4 font-bold text-slate-800">' + item.namaBarang + '</td>' +
               '<td class="py-2.5 px-3 font-semibold text-slate-900">' + item.jumlah + ' Unit</td>' +
               '<td class="py-2.5 px-3 font-mono text-slate-600">Rp ' + Number(item.estimasiHarga || 0).toLocaleString('id-ID') + '</td>' +
-              '<td class="py-2.5 px-3 font-mono text-xs text-slate-600 whitespace-nowrap">' + waktuUsulStr + '</td>' +
+              '<td class="py-2.5 px-3 text-slate-500">' + item.tanggal + '</td>' +
               '<td class="py-2.5 px-3 text-slate-600">' + item.pemohon + '</td>' +
               '<td class="py-2.5 px-3">' + statusBadge + '</td>' +
               '<td class="py-2.5 px-4 text-center">' + btnTerima + '</td>';
             tbodyK.appendChild(tr);
           });
-          renderPaginationControls('paginationKebutuhan', pagK, 'changeKebutuhanPage', 'changeKebutuhanLimit');
         }
       }
 
@@ -9785,27 +9944,23 @@
         const listInv = appState.cache.inventaris;
         if (!listInv || listInv.length === 0) {
           tbodyInv.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada barang inventaris terdaftar.</td></tr>';
-          renderPaginationControls('paginationInventaris', null);
         } else {
           const isAsramaOrAdmin = appState.currentUser && (appState.currentUser.role.toLowerCase() === 'admin' || appState.currentUser.role.toLowerCase().indexOf('asrama') !== -1);
-          const pagInv = paginateList(listInv, appState.pagination.inventaris.page, appState.pagination.inventaris.limit);
-          appState.pagination.inventaris.page = pagInv.page;
 
-          pagInv.items.forEach(function (item) {
-            const defItemFoto = 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300';
-            const foto = formatImageUrl(item.fotoBarang, defItemFoto);
+          listInv.forEach(function(item, idx) {
+            const foto = item.fotoBarang || 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=300';
             let editBtn = '';
             if (isAsramaOrAdmin) {
-              editBtn = '<button onclick="openEditInventarisByIndex(\'' + (item.noBarang || item.id) + '\')" class="px-2.5 py-1 bg-navy hover:bg-navy-700 text-white rounded text-xs font-medium">Edit Jumlah/Kondisi</button>';
+              editBtn = '<button onclick="openEditInventarisByIndex(' + idx + ')" class="px-2.5 py-1 bg-navy hover:bg-navy-700 text-white rounded text-xs font-medium">Edit Jumlah/Kondisi</button>';
             }
 
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition';
-            tr.innerHTML =
+            tr.innerHTML = 
               '<td class="py-2.5 px-3 font-mono font-bold text-navy">' + item.noBarang + '</td>' +
               '<td class="py-2.5 px-4 flex items-center space-x-3">' +
-              '<img src="' + foto + '" loading="lazy" decoding="async" class="w-10 h-10 object-cover rounded border border-slate-200" onerror="this.src=\'' + defItemFoto + '\'">' +
-              '<div><span class="font-bold text-slate-900">' + item.namaBarang + '</span></div>' +
+                '<img src="' + foto + '" class="w-10 h-10 object-cover rounded border border-slate-200">' +
+                '<div><span class="font-bold text-slate-900">' + item.namaBarang + '</span></div>' +
               '</td>' +
               '<td class="py-2.5 px-2 font-bold text-slate-800">' + item.jumlah + ' Unit</td>' +
               '<td class="py-2.5 px-3 font-semibold text-emerald-700">' + item.kondisi + '</td>' +
@@ -9814,16 +9969,12 @@
               '<td class="py-2.5 px-3 text-center">' + editBtn + '</td>';
             tbodyInv.appendChild(tr);
           });
-          renderPaginationControls('paginationInventaris', pagInv, 'changeInventarisPage', 'changeInventarisLimit');
         }
       }
     }
 
     function openModalTambahKebutuhan() {
       document.getElementById('formTambahKebutuhan').reset();
-      if (document.getElementById('kebutuhanWaktuRealtimeLabel')) {
-        document.getElementById('kebutuhanWaktuRealtimeLabel').innerText = getFormattedCurrentTime();
-      }
       document.getElementById('modalTambahKebutuhan').classList.remove('hidden');
     }
 
@@ -9843,19 +9994,18 @@
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
-      callBackend('apiSaveKebutuhan', data, function (res) {
+      callBackend('apiSaveKebutuhan', data, function(res) {
         btn.disabled = false;
         btn.innerText = 'Ajukan Usulan';
         if (res && res.success) {
           closeModalTambahKebutuhan();
           showToast(res.message, 'success');
-          invalidateLocalCache('kebutuhan_inv');
           appState.cache.kebutuhan = null;
           fetchKebutuhanInventarisData();
         } else {
           showToast(res ? res.message : 'Gagal.', 'error');
         }
-      }, function () {
+      }, function() {
         btn.disabled = false;
         btn.innerText = 'Ajukan Usulan';
       });
@@ -9881,54 +10031,41 @@
 
       const btn = document.getElementById('btnSaveTerima');
       btn.disabled = true;
-      btn.innerText = 'Mengompres Foto...';
+      btn.innerText = 'Menyimpan...';
 
-      compressImageFile(fileInput.files[0], 1000, 1000, 0.78, function (fotoBase64) {
-        btn.innerText = 'Menyimpan...';
+      const reader = new FileReader();
+      reader.onload = function(e) {
         const payload = {
           idKebutuhan: document.getElementById('terimaIdKebutuhan').value,
           jumlahDiterima: document.getElementById('terimaJumlah').value,
           kondisi: document.getElementById('terimaKondisi').value,
           lokasiKamar: document.getElementById('terimaLokasi').value,
-          fotoBase64: fotoBase64,
+          fotoBase64: e.target.result,
           petugas: appState.currentUser ? appState.currentUser.namaLengkap : 'Wali Asrama'
         };
 
-        callBackend('apiTerimaKebutuhanKeInventaris', payload, function (res) {
+        callBackend('apiTerimaKebutuhanKeInventaris', payload, function(res) {
           btn.disabled = false;
           btn.innerText = 'Terima & Registrasi Aset';
           if (res && res.success) {
             closeModalTerimaKebutuhan();
             showToast(res.message, 'success');
-            invalidateLocalCache('kebutuhan_inv');
             appState.cache.kebutuhan = null;
             appState.cache.inventaris = null;
             fetchKebutuhanInventarisData();
           } else {
             showToast(res ? res.message : 'Gagal registrasi barang.', 'error');
           }
-        }, function () {
+        }, function() {
           btn.disabled = false;
           btn.innerText = 'Terima & Registrasi Aset';
         });
-      });
+      };
+      reader.readAsDataURL(fileInput.files[0]);
     }
 
-    function openEditInventarisByIndex(idxOrId) {
-      let item = null;
-      if (appState.cache.inventaris) {
-        if (typeof idxOrId === 'number') {
-          item = appState.cache.inventaris[idxOrId];
-        } else {
-          item = appState.cache.inventaris.find(function (it) {
-            return String(it.noBarang) === String(idxOrId) || String(it.id) === String(idxOrId);
-          });
-          if (!item) {
-            const num = parseInt(idxOrId);
-            if (!isNaN(num)) item = appState.cache.inventaris[num];
-          }
-        }
-      }
+    function openEditInventarisByIndex(idx) {
+      const item = appState.cache.inventaris[idx];
       if (!item) return;
 
       document.getElementById('editInvNoBarang').value = item.noBarang;
@@ -9956,19 +10093,18 @@
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
-      callBackend('apiUpdateInventaris', data, function (res) {
+      callBackend('apiUpdateInventaris', data, function(res) {
         btn.disabled = false;
         btn.innerText = 'Simpan Perubahan';
         if (res && res.success) {
           closeModalEditInventaris();
           showToast(res.message, 'success');
-          invalidateLocalCache('kebutuhan_inv');
           appState.cache.inventaris = null;
           fetchKebutuhanInventarisData();
         } else {
           showToast(res ? res.message : 'Gagal.', 'error');
         }
-      }, function () {
+      }, function() {
         btn.disabled = false;
         btn.innerText = 'Simpan Perubahan';
       });
@@ -9978,50 +10114,12 @@
     // PENGATURAN LOGO & INSTANSI (ADMIN ONLY)
     // =====================================================================
 
-    function previewLogoFile(input) {
-      if (input.files && input.files[0]) {
-        compressImageFile(input.files[0], 800, 800, 0.85, function (base64) {
-          const prev = document.getElementById('previewLogoSettings');
-          if (prev) prev.src = base64;
-        });
-      }
-    }
-
-    function previewBannerFile(input) {
-      if (input && input.files && input.files[0]) {
-        compressImageFile(input.files[0], 1200, 600, 0.85, function (base64) {
-          const prev = document.getElementById('previewBannerSettings');
-          if (prev) prev.src = base64;
-        });
-      }
-    }
-
     function openModalSettings() {
       document.getElementById('setNamaInstansi').value = appState.settings.NAMA_INSTANSI || '';
-      document.getElementById('setLogoUrl').value = appState.settings.LOGO_URL && appState.settings.LOGO_URL !== DEFAULT_SRMA_LOGO ? appState.settings.LOGO_URL : '';
-      document.getElementById('setBannerUrl').value = appState.settings.BANNER_BERANDA_URL && appState.settings.BANNER_BERANDA_URL !== DEFAULT_BANNER_HERO ? appState.settings.BANNER_BERANDA_URL : '';
+      document.getElementById('setLogoUrl').value = appState.settings.LOGO_URL || '';
       document.getElementById('setAlamat').value = appState.settings.ALAMAT || '';
       document.getElementById('setKontak').value = appState.settings.KONTAK || '';
-      const prev = document.getElementById('previewLogoSettings');
-      if (prev) prev.src = formatImageUrl(appState.settings.LOGO_URL, DEFAULT_SRMA_LOGO);
-      const prevBanner = document.getElementById('previewBannerSettings');
-      if (prevBanner) prevBanner.src = formatImageUrl(appState.settings.BANNER_BERANDA_URL, DEFAULT_BANNER_HERO);
-      const fileInput = document.getElementById('setLogoFile');
-      if (fileInput) fileInput.value = '';
-      const bannerFileInput = document.getElementById('setBannerFile');
-      if (bannerFileInput) bannerFileInput.value = '';
       document.getElementById('modalSettings').classList.remove('hidden');
-    }
-
-    function openModalSettingsToBanner() {
-      openModalSettings();
-      setTimeout(function () {
-        const el = document.getElementById('setBannerUrl');
-        if (el) {
-          el.focus();
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 150);
     }
 
     function closeModalSettings() {
@@ -10031,8 +10129,7 @@
     function submitSettings() {
       const data = {
         NAMA_INSTANSI: document.getElementById('setNamaInstansi').value,
-        LOGO_URL: document.getElementById('setLogoUrl').value || appState.settings.LOGO_URL || DEFAULT_SRMA_LOGO,
-        BANNER_BERANDA_URL: document.getElementById('setBannerUrl').value || appState.settings.BANNER_BERANDA_URL || DEFAULT_BANNER_HERO,
+        LOGO_URL: document.getElementById('setLogoUrl').value,
         ALAMAT: document.getElementById('setAlamat').value,
         KONTAK: document.getElementById('setKontak').value
       };
@@ -10041,53 +10138,18 @@
       btn.disabled = true;
       btn.innerText = 'Menyimpan...';
 
-      const fileInput = document.getElementById('setLogoFile');
-      const bannerFileInput = document.getElementById('setBannerFile');
-
-      const processBannerAndSend = function () {
-        if (bannerFileInput && bannerFileInput.files && bannerFileInput.files[0]) {
-          btn.innerText = 'Mengompres Banner...';
-          compressImageFile(bannerFileInput.files[0], 1200, 600, 0.85, function (bannerB64) {
-            data.bannerBase64 = bannerB64;
-            btn.innerText = 'Menyimpan...';
-            sendSettingsData(data, btn);
-          });
-        } else {
-          sendSettingsData(data, btn);
-        }
-      };
-
-      if (fileInput && fileInput.files && fileInput.files[0]) {
-        btn.innerText = 'Mengompres Logo...';
-        compressImageFile(fileInput.files[0], 800, 800, 0.85, function (base64) {
-          data.logoBase64 = base64;
-          processBannerAndSend();
-        });
-      } else {
-        processBannerAndSend();
-      }
-    }
-
-    function sendSettingsData(data, btn) {
-      callBackend('apiUpdateSettings', data, function (res) {
+      callBackend('apiUpdateSettings', data, function(res) {
         btn.disabled = false;
         btn.innerText = 'Simpan & Sinkronkan';
         if (res && res.success) {
-          if (res.logoUrl) {
-            data.LOGO_URL = res.logoUrl;
-          }
-          if (res.bannerUrl) {
-            data.BANNER_BERANDA_URL = res.bannerUrl;
-          }
           appState.settings = Object.assign(appState.settings, data);
-          setLocalCache('initialData', { settings: appState.settings, metrics: appState.metrics });
           syncSettingsToUI();
           closeModalSettings();
           showToast(res.message, 'success');
         } else {
           showToast(res ? res.message : 'Gagal.', 'error');
         }
-      }, function () {
+      }, function() {
         btn.disabled = false;
         btn.innerText = 'Simpan & Sinkronkan';
       });
@@ -10098,129 +10160,25 @@
     // =====================================================================
 
     function printElement(elId) {
-      const targetEl = document.getElementById(elId);
-      if (!targetEl) return;
-
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const printContents = el.innerHTML;
       const printArea = document.createElement('div');
       printArea.id = 'printArea';
-
-      const clone = targetEl.cloneNode(true);
-      if (elId === 'idCardContainer') {
-        clone.classList.add('idcard-print-target');
-      }
-
-      // Pastikan semua gambar dalam clone dimuat secara eager dan sinkron (anti-blank cetak)
-      const cloneImgs = clone.querySelectorAll('img');
-      const origImgs = targetEl.querySelectorAll('img');
-      for (let i = 0; i < cloneImgs.length; i++) {
-        cloneImgs[i].removeAttribute('loading');
-        cloneImgs[i].setAttribute('loading', 'eager');
-        cloneImgs[i].setAttribute('decoding', 'sync');
-        cloneImgs[i].removeAttribute('crossorigin');
-        if (origImgs[i] && (origImgs[i].currentSrc || origImgs[i].src)) {
-          cloneImgs[i].src = origImgs[i].currentSrc || origImgs[i].src;
-        }
-      }
-
-      // Salin data piksel canvas (misal QR code) ke elemen clone agar tidak blank saat cetak
-      const origCanvases = targetEl.querySelectorAll('canvas');
-      const cloneCanvases = clone.querySelectorAll('canvas');
-      for (let i = 0; i < origCanvases.length; i++) {
-        if (cloneCanvases[i]) {
-          cloneCanvases[i].width = origCanvases[i].width;
-          cloneCanvases[i].height = origCanvases[i].height;
-          const destCtx = cloneCanvases[i].getContext('2d');
-          if (destCtx) destCtx.drawImage(origCanvases[i], 0, 0);
-        }
-      }
-
-      printArea.appendChild(clone);
+      const styleEl = document.createElement('style');
+      styleEl.innerHTML = '@page { size: A4 landscape !important; margin: 8mm 10mm !important; } @media print { body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }';
+      printArea.appendChild(styleEl);
+      const contentHolder = document.createElement('div');
+      contentHolder.innerHTML = printContents;
+      printArea.appendChild(contentHolder);
       document.body.appendChild(printArea);
-
-      // Berikan jeda render singkat agar DOM clone sepenuhnya tertata sebelum dialog cetak terbuka
-      setTimeout(function () {
-        window.print();
-      }, 150);
-
-      // Bersihkan printArea HANYA setelah dialog cetak ditutup
-      const cleanup = function () {
-        if (printArea.parentNode) {
-          printArea.parentNode.removeChild(printArea);
-        }
-        window.removeEventListener('afterprint', cleanup);
-      };
-      window.addEventListener('afterprint', cleanup);
-      // Timeout pengaman jika peramban tidak memicu event afterprint
-      setTimeout(cleanup, 25000);
-    }
-
-    let successModalTimer = null;
-    let successModalCallback = null;
-
-    /**
-     * Menampilkan Modal Dialog Berhasil Simpan Data (Sesuai Referensi Visual Pengguna)
-     */
-    function showSuccessModal(message, title, callback) {
-      const modal = document.getElementById('modalSuccessDialog');
-      const titleEl = document.getElementById('modalSuccessTitle');
-      const msgEl = document.getElementById('modalSuccessMessage');
-
-      if (typeof title === 'function') {
-        callback = title;
-        title = 'Berhasil';
-      }
-
-      if (typeof callback === 'function') {
-        successModalCallback = callback;
-      } else {
-        successModalCallback = null;
-      }
-
-      if (!modal) {
-        if (message) showToast(message, 'info');
-        if (typeof successModalCallback === 'function') {
-          const cb = successModalCallback;
-          successModalCallback = null;
-          cb();
-        }
-        return;
-      }
-
-      if (titleEl) titleEl.innerText = title || 'Berhasil';
-      if (msgEl) msgEl.innerText = message || 'Data Anda telah berhasil disimpan';
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-
-      if (successModalTimer) clearTimeout(successModalTimer);
-      successModalTimer = setTimeout(function () {
-        closeModalSuccess();
-      }, 2600);
-    }
-
-    function closeModalSuccess() {
-      if (successModalTimer) {
-        clearTimeout(successModalTimer);
-        successModalTimer = null;
-      }
-      const modal = document.getElementById('modalSuccessDialog');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-      if (typeof successModalCallback === 'function') {
-        const cb = successModalCallback;
-        successModalCallback = null;
-        cb();
-      }
+      window.print();
+      setTimeout(function() {
+        if (printArea.parentNode) printArea.parentNode.removeChild(printArea);
+      }, 500);
     }
 
     function showToast(message, type) {
-      if (type === 'success') {
-        showSuccessModal(message);
-        return;
-      }
-
       const container = document.getElementById('toastContainer');
       if (!container) return;
 
@@ -10234,9 +10192,9 @@
       toast.innerHTML = '<span>' + message + '</span>';
 
       container.appendChild(toast);
-      setTimeout(function () {
+      setTimeout(function() {
         toast.style.opacity = '0';
-        setTimeout(function () {
+        setTimeout(function() {
           if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, 300);
       }, 3500);
@@ -10247,20 +10205,20 @@
      * Aktif otomatis jika file HTML dibuka di luar iframe Google Apps Script
      */
     function simulateBackendLocally(fn, args, cb) {
-      setTimeout(function () {
+      setTimeout(function() {
         if (fn === 'apiGetInitialData') {
           cb({
             success: true,
             settings: appState.settings,
             metrics: {
-              waliAsuh: { L: 2, P: 2, total: 4 },
-              waliAsrama: { L: 2, P: 2, total: 4 },
-              totalSiswa: { L: 20, P: 20, total: 40 },
-              hadirAsrama: { L: 14, P: 14, total: 28 },
-              izinRutin: { L: 3, P: 2, total: 5 },
-              izinDarurat: { L: 2, P: 1, total: 3 },
-              izinKeluar: { L: 1, P: 3, total: 4 },
-              sakitAsrama: { L: 1, P: 1, total: 2 }
+              waliAsuh: { L: 2, P: 1, total: 3 },
+              waliAsrama: { L: 2, P: 1, total: 3 },
+              totalSiswa: { L: 2, P: 2, total: 4 },
+              hadirAsrama: { L: 2, P: 2, total: 4 },
+              izinRutin: { L: 0, P: 0, total: 0 },
+              izinDarurat: { L: 0, P: 0, total: 0 },
+              izinKeluar: { L: 0, P: 0, total: 0 },
+              sakitAsrama: { L: 0, P: 0, total: 0 }
             },
             serverTime: '20/11/2026 08:00:00'
           });
@@ -10279,40 +10237,6 @@
               { id: 'WAL-003', nip: '199003152016031002', nama: 'Ust. Fathurrahman, S.Ag.', jabatan: 'Wali Asrama Putra', jenisKelamin: 'Laki-laki', tmtSk: '01/08/2022', noWhatsApp: '081234567892', fotoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300' }
             ]
           });
-        } else if (fn === 'apiGetJadwalShiftList') {
-          const dNow = new Date();
-          const dDays = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-          const curDay = dDays[dNow.getDay()];
-          const curIso = dNow.getFullYear() + '-' + String(dNow.getMonth() + 1).padStart(2, '0') + '-' + String(dNow.getDate()).padStart(2, '0');
-          const curH = dNow.getHours();
-
-          let activeShiftName = 'Shift Pagi (07:00 - 15:00)';
-          let pastShiftName = 'Shift Malam (23:00 - 07:00)';
-          let nextShiftName = 'Shift Siang / Sore (15:00 - 23:00)';
-
-          if (curH >= 15 && curH < 23) {
-            activeShiftName = 'Shift Siang / Sore (15:00 - 23:00)';
-            pastShiftName = 'Shift Pagi (07:00 - 15:00)';
-            nextShiftName = 'Shift Malam (23:00 - 07:00)';
-          } else if (curH >= 23 || curH < 7) {
-            activeShiftName = 'Shift Malam (23:00 - 07:00)';
-            pastShiftName = 'Shift Siang / Sore (15:00 - 23:00)';
-            nextShiftName = 'Shift Pagi (07:00 - 15:00)';
-          }
-
-          const shiftDemo = [
-            { id: 'SHF-001', hari: curDay, tanggal: curIso, shift: activeShiftName, kategori: 'Wali Asuh', namaPetugas: 'Ust. Abdullah, S.Pd.I', areaAsrama: 'Asrama Putra', keterangan: 'Pengawalan Ibadah & Pendampingan Siswa', status: 'Aktif' },
-            { id: 'SHF-002', hari: curDay, tanggal: curIso, shift: pastShiftName, kategori: 'Wali Asuh', namaPetugas: 'Ustzh. Maryam, S.Pd.', areaAsrama: 'Asrama Putri', keterangan: 'Piket Harian Siswi', status: 'Aktif' },
-            { id: 'SHF-003', hari: curDay, tanggal: curIso, shift: 'Off Shift (Libur / Bebas Tugas)', kategori: 'Wali Asuh', namaPetugas: 'Ust. Ahmad Fauzan, S.Pd.', areaAsrama: 'Seluruh Lingkungan Asrama', keterangan: 'Bebas Tugas / Libur Shift', status: 'Aktif' },
-            { id: 'SHF-004', hari: curDay, tanggal: curIso, shift: nextShiftName, kategori: 'Wali Asrama', namaPetugas: 'Ust. Fathurrahman, S.Ag.', areaAsrama: 'Asrama Putra', keterangan: 'Kontrol Keamanan & Ketertiban', status: 'Aktif' },
-            { id: 'SHF-005', hari: 'Senin', tanggal: '2026-11-23', shift: 'Shift Pagi (07:00 - 15:00)', kategori: 'Wali Asuh', namaPetugas: 'Ust. Abdullah, S.Pd.I', areaAsrama: 'Asrama Putra', keterangan: 'Piket Ibadah Subuh & Pengawalan Sekolah', status: 'Aktif' },
-            { id: 'SHF-006', hari: 'Senin', tanggal: '2026-11-23', shift: 'Off Shift (Libur / Bebas Tugas)', kategori: 'Wali Asrama', namaPetugas: 'Ustzh. Nur Aisyah, S.Pd.', areaAsrama: 'Asrama Putri', keterangan: 'Bebas Tugas', status: 'Aktif' }
-          ];
-          cb({ success: true, data: shiftDemo });
-        } else if (fn === 'apiSaveJadwalShift') {
-          cb({ success: true, message: 'Jadwal shift berhasil disimpan.' });
-        } else if (fn === 'apiDeleteJadwalShift') {
-          cb({ success: true, message: 'Jadwal shift berhasil dihapus.' });
         } else if (fn === 'apiGetSiswaList') {
           cb({
             success: true,
@@ -10321,17 +10245,6 @@
               { nisn: '0071234562', nama: 'Nurul Annisa', jenisKelamin: 'Perempuan', tempatLahir: 'Sidenreng Rappang', tanggalLahir: '10/02/2009', nik: '7314011002090003', noKamar: 'Kamar Fatimah 01', hobi: 'Menulis Cerpen', citaCita: 'Dokter Spesialis', ekskul: 'PMR & Panahan', prestasi: 'Juara 2 Debat Bahasa Arab', ortuAyah: 'Drs. H. Arifin', ortuIbu: 'Hj. Rosdiana', noHpOrtu: '085299887768', namaWaliAsuh: 'Ustzh. Maryam, S.Pd.', alamat: 'Jl. Poros Rappang Km 3', noBpjs: '000123987458', faskes: 'Klinik SRT Pratama', fotoUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', statusAsrama: 'Hadir di Asrama' }
             ]
           });
-        } else if (fn === 'apiGetAbsensiData') {
-          const mockRiwayat = [
-            { id: 'ABS-001', tanggal: '21/11/2026', sesi: 'Salat Subuh', nisn: '0071234561', nama: 'Ahmad Fauzan', noKamar: 'Kamar Al-Ghazali 01', status: 'Hadir', waktuCatat: '21/11/2026 04:55:12', petugas: 'Ust. Abdullah, S.Pd.I' },
-            { id: 'ABS-002', tanggal: '21/11/2026', sesi: 'Salat Subuh', nisn: '0071234562', nama: 'Nurul Annisa', noKamar: 'Kamar Fatimah 01', status: 'Hadir', waktuCatat: '21/11/2026 04:58:30', petugas: 'Ustzh. Maryam, S.Pd.' },
-            { id: 'ABS-003', tanggal: '20/11/2026', sesi: 'Apel Malam', nisn: '0071234561', nama: 'Ahmad Fauzan', noKamar: 'Kamar Al-Ghazali 01', status: 'Hadir', waktuCatat: '20/11/2026 21:05:44', petugas: 'Ust. Abdullah, S.Pd.I' },
-            { id: 'ABS-004', tanggal: '20/11/2026', sesi: 'Apel Malam', nisn: '0071234562', nama: 'Nurul Annisa', noKamar: 'Kamar Fatimah 01', status: 'Sakit', waktuCatat: '20/11/2026 21:07:11', petugas: 'Ustzh. Maryam, S.Pd.' },
-            { id: 'ABS-005', tanggal: '20/11/2026', sesi: 'Makan Malam', nisn: '0071234561', nama: 'Ahmad Fauzan', noKamar: 'Kamar Al-Ghazali 01', status: 'Hadir', waktuCatat: '20/11/2026 19:15:20', petugas: 'Ust. Fathurrahman, S.Ag.' }
-          ];
-          cb({ success: true, data: mockRiwayat });
-        } else if (fn === 'apiUpdateAbsensiRecord') {
-          cb({ success: true, message: 'Data absensi kegiatan berhasil diperbarui!' });
         } else {
           cb({ success: true, message: 'Operasi demo berhasil disimulasikan.' });
         }
@@ -10340,5 +10253,4 @@
   </script>
 
 </body>
-
 </html>
