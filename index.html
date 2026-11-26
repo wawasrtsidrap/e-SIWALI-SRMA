@@ -288,6 +288,35 @@
         margin: 0 auto !important;
         padding: 4mm !important;
       }
+
+      /* FORMAT CETAK DOKUMEN REKAPITULASI (A4 / F4) */
+      .print-report-sheet {
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        padding: 6mm !important;
+        box-sizing: border-box !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      }
+
+      .print-report-sheet table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+
+      .print-report-sheet th,
+      .print-report-sheet td {
+        border: 1px solid #94a3b8 !important;
+        padding: 4px 6px !important;
+        font-size: 8.5pt !important;
+        color: #0f172a !important;
+      }
+
+      .print-report-sheet thead th {
+        background-color: #f1f5f9 !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+      }
     }
   </style>
 </head>
@@ -1874,6 +1903,15 @@
               verifikasi kedatangan</p>
           </div>
           <div class="flex items-center space-x-2">
+            <button onclick="switchIzinSubTab('rekap')"
+              class="bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
+              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              <span>Rekap & Cetak Laporan Izin</span>
+            </button>
             <button id="btnTambahIzin" onclick="openModalTambahIzin()"
               class="hidden bg-maroon hover:bg-maroon-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all items-center space-x-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1884,37 +1922,243 @@
           </div>
         </div>
 
-        <!-- Tab Sub-Menu: Izin Aktif vs Riwayat -->
+        <!-- Tab Sub-Menu: Izin Aktif, Riwayat, & Rekap Cetak -->
         <div class="flex border-b border-slate-200 space-x-4">
           <button onclick="switchIzinSubTab('aktif')" id="tabIzinAktif"
-            class="pb-2 text-sm font-bold text-maroon border-b-2 border-maroon">Izin Aktif di Luar Asrama</button>
+            class="pb-2 text-sm font-bold text-maroon border-b-2 border-maroon">1. Izin Aktif di Luar Asrama</button>
           <button onclick="switchIzinSubTab('riwayat')" id="tabIzinRiwayat"
-            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800">Riwayat Izin Siswa(i)</button>
+            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800">2. Riwayat Izin Siswa(i)</button>
+          <button onclick="switchIzinSubTab('rekap')" id="tabIzinRekap"
+            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
+            <svg class="w-4 h-4 text-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+              </path>
+            </svg>
+            <span>3. Rekap & Cetak Laporan Izin</span>
+          </button>
         </div>
 
-        <!-- Tabel Izin -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs sm:text-sm">
-              <thead
-                class="bg-gradient-to-r from-[#071524] via-[#0B2138] to-[#071524] text-white font-semibold border-b-2 border-maroon-700/60">
-                <tr>
-                  <th class="py-3 px-3">No. Surat</th>
-                  <th class="py-3 px-3">Jenis Izin</th>
-                  <th class="py-3 px-3">Nama Siswa(i)</th>
-                  <th class="py-3 px-3">Waktu Keluar</th>
-                  <th class="py-3 px-3">Batas Kembali</th>
-                  <th class="py-3 px-3">Penjemput</th>
-                  <th class="py-3 px-3">Status</th>
-                  <th class="py-3 px-4 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyIzin" class="divide-y divide-slate-100">
-                <!-- Render Otomatis via JS -->
-              </tbody>
-            </table>
+        <!-- Panel Daftar Tabel Izin (Aktif & Riwayat) -->
+        <div id="panelIzinDaftar" class="space-y-4">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead
+                  class="bg-gradient-to-r from-[#071524] via-[#0B2138] to-[#071524] text-white font-semibold border-b-2 border-maroon-700/60">
+                  <tr>
+                    <th class="py-3 px-3">No. Surat</th>
+                    <th class="py-3 px-3">Jenis Izin</th>
+                    <th class="py-3 px-3">Nama Siswa(i)</th>
+                    <th class="py-3 px-3">Waktu Keluar</th>
+                    <th class="py-3 px-3">Batas Kembali</th>
+                    <th class="py-3 px-3">Penjemput</th>
+                    <th class="py-3 px-3">Status</th>
+                    <th class="py-3 px-4 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyIzin" class="divide-y divide-slate-100">
+                  <!-- Render Otomatis via JS -->
+                </tbody>
+              </table>
+            </div>
+            <div id="paginationIzin"></div>
           </div>
-          <div id="paginationIzin"></div>
+        </div>
+
+        <!-- Panel 3: Rekapitulasi & Cetak Surat Izin (Filter Bulan & Tahun) -->
+        <div id="panelIzinRekap" class="hidden space-y-5">
+          <!-- Filter Bar Rekap Izin -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 no-print">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+              <h3 class="font-extrabold text-sm text-slate-900 flex items-center space-x-2">
+                <svg class="w-4 h-4 text-maroon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                  </path>
+                </svg>
+                <span>Filter Rekapitulasi Surat Izin Siswa(i)</span>
+              </h3>
+              <div class="flex items-center space-x-2">
+                <button onclick="resetFilterRekapIzin()"
+                  class="text-xs text-slate-500 hover:text-slate-800 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition">Reset
+                  Filter</button>
+                <button onclick="printRekapIzin()"
+                  class="bg-navy hover:bg-navy-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                  <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                  </svg>
+                  <span>Cetak Laporan Rekap (Print / PDF)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Kontrol Filter: Bulan, Tahun, Kategori, Status -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Filter Bulan *</label>
+                <select id="filterRekapIzinBulan" onchange="filterRekapIzin()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Bulan (Januari - Desember)</option>
+                  <option value="1">Januari</option>
+                  <option value="2">Februari</option>
+                  <option value="3">Maret</option>
+                  <option value="4">April</option>
+                  <option value="5">Mei</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">Agustus</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Filter Tahun *</label>
+                <select id="filterRekapIzinTahun" onchange="filterRekapIzin()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Tahun</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Jenis / Kategori Izin</label>
+                <select id="filterRekapIzinJenis" onchange="filterRekapIzin()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Jenis Izin</option>
+                  <option value="Izin Pulang Rutin">Izin Pulang Rutin</option>
+                  <option value="Darurat">Izin Pulang Darurat/Sakit</option>
+                  <option value="Ringkas">Izin Keluar Ringkas</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Status Izin</label>
+                <select id="filterRekapIzinStatus" onchange="filterRekapIzin()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Status</option>
+                  <option value="aktif">Aktif di Luar Asrama</option>
+                  <option value="kembali">Sudah Kembali ke Asrama</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards Mini Stats Rekap Izin -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 no-print">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Surat Izin</p>
+                <h4 id="statRekapIzinTotal" class="text-lg font-black text-slate-900">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
+                📋</div>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-2xl border border-amber-200 shadow-sm flex items-center justify-between bg-amber-50/20">
+              <div>
+                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Pulang Rutin</p>
+                <h4 id="statRekapIzinRutin" class="text-lg font-black text-amber-700">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
+                🏠</div>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-2xl border border-rose-200 shadow-sm flex items-center justify-between bg-rose-50/20">
+              <div>
+                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Darurat / Sakit</p>
+                <h4 id="statRekapIzinDarurat" class="text-lg font-black text-rose-700">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">
+                ⚠️</div>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-2xl border border-cyan-200 shadow-sm flex items-center justify-between bg-cyan-50/20">
+              <div>
+                <p class="text-[10px] font-bold text-cyan-600 uppercase tracking-wider">Keluar Ringkas</p>
+                <h4 id="statRekapIzinRingkas" class="text-lg font-black text-cyan-700">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xs">
+                ⏱️</div>
+            </div>
+          </div>
+
+          <!-- Lembar Laporan Siap Cetak & Tabel Rekapitulasi Izin -->
+          <div id="printAreaRekapIzin"
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden print-report-sheet p-4 sm:p-6">
+            <!-- Kop Laporan Resmi -->
+            <div class="border-b-2 border-slate-900 pb-3 mb-4 text-center">
+              <div class="flex items-center justify-center space-x-3 mb-1">
+                <img id="rekapIzinKopLogo" src="" alt="Logo" class="w-12 h-12 object-contain flex-shrink-0">
+                <div class="text-left">
+                  <h2 class="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-wide">SEKOLAH RAKYAT
+                    KABUPATEN SIDENRENG RAPPANG</h2>
+                  <p class="text-xs font-bold text-slate-700 uppercase">JENJANG SRMA &bull; SISTEM INFORMASI DIGITAL
+                    e-SIWALI</p>
+                  <p class="text-[10px] text-slate-500">Alamat: Kabupaten Sidenreng Rappang, Sulawesi Selatan</p>
+                </div>
+              </div>
+              <div class="w-full h-[1.5px] bg-slate-900 mt-2 mb-0.5"></div>
+              <div class="w-full h-[0.5px] bg-slate-900 mb-2"></div>
+              <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">LAPORAN REKAPITULASI SURAT IZIN
+                SISWA(I)</h3>
+              <p id="rekapIzinPeriodeText" class="text-xs font-semibold text-slate-600">Periode: Semua Bulan Tahun 2026
+              </p>
+            </div>
+
+            <!-- Tabel Rekapitulasi Izin -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-900 font-bold border-b-2 border-slate-300">
+                    <th class="py-2.5 px-2 text-center w-8 border border-slate-300">No</th>
+                    <th class="py-2.5 px-2 border border-slate-300 font-mono">No. Surat</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Tanggal/Waktu Izin</th>
+                    <th class="py-2.5 px-2.5 border border-slate-300">Nama Siswa(i)</th>
+                    <th class="py-2.5 px-2 border border-slate-300 text-center">Kamar</th>
+                    <th class="py-2.5 px-2.5 border border-slate-300">Jenis Izin</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Batas Waktu</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Penjemput / Hubungan</th>
+                    <th class="py-2.5 px-2 border border-slate-300 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyRekapIzin" class="divide-y divide-slate-200">
+                  <!-- Render via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Lembar Tanda Tangan Pengesahan (Muncul Saat Cetak) -->
+            <div class="mt-8 pt-4 flex justify-between items-start text-xs text-slate-800">
+              <div class="text-center w-56">
+                <p>Mengetahui,</p>
+                <p class="font-bold">Koordinator Pengasuhan & Keasramaan</p>
+                <div class="h-16"></div>
+                <p class="font-bold underline">( .................................................... )</p>
+                <p class="text-[10px] text-slate-500">NIP/SK: Pengasuhan Asrama</p>
+              </div>
+              <div class="text-center w-56">
+                <p id="rekapIzinTglCetakText">Sidenreng Rappang, 26 November 2026</p>
+                <p class="font-bold">Petugas Piket / Wali Asrama</p>
+                <div class="h-16"></div>
+                <p id="rekapIzinNamaPetugas" class="font-bold underline">( Petugas Jaga Asrama )</p>
+                <p class="text-[10px] text-slate-500">e-SIWALI SRT Sidrap</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1926,6 +2170,17 @@
             <p class="text-xs sm:text-sm text-slate-500">Pencatatan siswa(i) sakit di asrama dan asesmen pembinaan
               perilaku</p>
           </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="switchPenangananSubTab('rekapSakit')"
+              class="bg-navy hover:bg-navy-700 text-white font-medium text-xs px-3.5 py-2 rounded-lg shadow-sm transition-all flex items-center space-x-1.5">
+              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              <span>Rekap & Cetak Siswa Sakit</span>
+            </button>
+          </div>
         </div>
 
         <!-- Nav Sub-Tab Penanganan -->
@@ -1934,6 +2189,15 @@
             class="pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700">1. Siswa(i) Sakit di Asrama</button>
           <button onclick="switchPenangananSubTab('asesmen')" id="tabAsesmen"
             class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800">2. Pelanggaran & Asesmen Anak</button>
+          <button onclick="switchPenangananSubTab('rekapSakit')" id="tabRekapSakit"
+            class="pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
+            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+              </path>
+            </svg>
+            <span>3. Rekap & Cetak Siswa Sakit</span>
+          </button>
         </div>
 
         <!-- Panel 1: Siswa Sakit -->
@@ -2009,6 +2273,180 @@
               </table>
             </div>
             <div id="paginationAsesmen"></div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Rekapitulasi & Cetak Siswa Sakit di Asrama (Filter Bulan & Tahun) -->
+        <div id="subtab-rekap-sakit" class="hidden space-y-5">
+          <!-- Filter Bar Rekap Sakit -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 no-print">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+              <h3 class="font-extrabold text-sm text-slate-900 flex items-center space-x-2">
+                <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                  </path>
+                </svg>
+                <span>Filter Rekapitulasi Siswa(i) Sakit di Asrama</span>
+              </h3>
+              <div class="flex items-center space-x-2">
+                <button onclick="resetFilterRekapSakit()"
+                  class="text-xs text-slate-500 hover:text-slate-800 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition">Reset
+                  Filter</button>
+                <button onclick="printRekapSakit()"
+                  class="bg-navy hover:bg-navy-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                  <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                  </svg>
+                  <span>Cetak Laporan Rekap (Print / PDF)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Kontrol Filter: Bulan, Tahun, Status -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Filter Bulan *</label>
+                <select id="filterRekapSakitBulan" onchange="filterRekapSakit()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Bulan (Januari - Desember)</option>
+                  <option value="1">Januari</option>
+                  <option value="2">Februari</option>
+                  <option value="3">Maret</option>
+                  <option value="4">April</option>
+                  <option value="5">Mei</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">Agustus</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Filter Tahun *</label>
+                <select id="filterRekapSakitTahun" onchange="filterRekapSakit()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Tahun</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Status Kesehatan</label>
+                <select id="filterRekapSakitStatus" onchange="filterRekapSakit()"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-navy focus:outline-none">
+                  <option value="">Semua Status</option>
+                  <option value="sakit">Sedang Sakit di Asrama</option>
+                  <option value="sembuh">Sudah Sembuh / Sehat</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards Mini Stats Rekap Sakit -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Kasus Sakit</p>
+                <h4 id="statRekapSakitTotal" class="text-lg font-black text-slate-900">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
+                🩺</div>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-2xl border border-rose-200 shadow-sm flex items-center justify-between bg-rose-50/20">
+              <div>
+                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Sakit di Asrama (Aktif)</p>
+                <h4 id="statRekapSakitAktif" class="text-lg font-black text-rose-700">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">
+                🛏️</div>
+            </div>
+            <div
+              class="bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm flex items-center justify-between bg-emerald-50/20">
+              <div>
+                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Sudah Sembuh / Sehat</p>
+                <h4 id="statRekapSakitSembuh" class="text-lg font-black text-emerald-700">0</h4>
+              </div>
+              <div
+                class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                ✓</div>
+            </div>
+          </div>
+
+          <!-- Lembar Laporan Siap Cetak & Tabel Rekapitulasi Sakit -->
+          <div id="printAreaRekapSakit"
+            class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden print-report-sheet p-4 sm:p-6">
+            <!-- Kop Laporan Resmi -->
+            <div class="border-b-2 border-slate-900 pb-3 mb-4 text-center">
+              <div class="flex items-center justify-center space-x-3 mb-1">
+                <img id="rekapSakitKopLogo" src="" alt="Logo" class="w-12 h-12 object-contain flex-shrink-0">
+                <div class="text-left">
+                  <h2 class="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-wide">SEKOLAH RAKYAT
+                    KABUPATEN SIDENRENG RAPPANG</h2>
+                  <p class="text-xs font-bold text-slate-700 uppercase">JENJANG SRMA &bull; SISTEM INFORMASI DIGITAL
+                    e-SIWALI</p>
+                  <p class="text-[10px] text-slate-500">Alamat: Kabupaten Sidenreng Rappang, Sulawesi Selatan</p>
+                </div>
+              </div>
+              <div class="w-full h-[1.5px] bg-slate-900 mt-2 mb-0.5"></div>
+              <div class="w-full h-[0.5px] bg-slate-900 mb-2"></div>
+              <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">LAPORAN REKAPITULASI PENANGANAN
+                SISWA(I) SAKIT DI ASRAMA</h3>
+              <p id="rekapSakitPeriodeText" class="text-xs font-semibold text-slate-600">Periode: Semua Bulan Tahun 2026
+              </p>
+            </div>
+
+            <!-- Tabel Rekapitulasi Sakit -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-900 font-bold border-b-2 border-slate-300">
+                    <th class="py-2.5 px-2 text-center w-8 border border-slate-300">No</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Waktu Catat</th>
+                    <th class="py-2.5 px-2.5 border border-slate-300">Nama Siswa(i)</th>
+                    <th class="py-2.5 px-2 border border-slate-300 text-center">Kamar</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Tanda Vital</th>
+                    <th class="py-2.5 px-3 border border-slate-300">Keluhan & Lama Sakit</th>
+                    <th class="py-2.5 px-2 border border-slate-300">Faskes / BPJS</th>
+                    <th class="py-2.5 px-3 border border-slate-300">Obat & RTL</th>
+                    <th class="py-2.5 px-2 border border-slate-300 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyRekapSakit" class="divide-y divide-slate-200">
+                  <!-- Render via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Lembar Tanda Tangan Pengesahan (Muncul Saat Cetak) -->
+            <div class="mt-8 pt-4 flex justify-between items-start text-xs text-slate-800">
+              <div class="text-center w-56">
+                <p>Mengetahui,</p>
+                <p class="font-bold">Koordinator Pengasuhan & Keasramaan</p>
+                <div class="h-16"></div>
+                <p class="font-bold underline">( .................................................... )</p>
+                <p class="text-[10px] text-slate-500">NIP/SK: Pengasuhan Asrama</p>
+              </div>
+              <div class="text-center w-56">
+                <p id="rekapSakitTglCetakText">Sidenreng Rappang, 26 November 2026</p>
+                <p class="font-bold">Petugas Kesehatan / Wali Asrama</p>
+                <div class="h-16"></div>
+                <p id="rekapSakitNamaPetugas" class="font-bold underline">( Petugas Kesehatan Asrama )</p>
+                <p class="text-[10px] text-slate-500">e-SIWALI SRT Sidrap</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2280,7 +2718,7 @@
         </div>
         <!-- Pengaturan Foto Hero Banner Beranda -->
         <div class="pt-2 border-t border-slate-100">
-          <label class="block font-semibold text-slate-700 mb-1">Foto Banner Beranda (Kegiatan Santri / Asrama)</label>
+          <label class="block font-semibold text-slate-700 mb-1">Foto Banner Beranda (Kegiatan Siswa / Asrama)</label>
           <input type="file" id="setBannerFile" accept="image/*" onchange="previewBannerFile(this)"
             class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-navy-50 file:text-navy hover:file:bg-navy-100">
         </div>
@@ -2577,30 +3015,37 @@
       class="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-5 shadow-2xl space-y-3.5 max-h-[94vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100 no-print">
         <div>
-          <h3 class="font-extrabold text-sm sm:text-base text-navy">Kartu Tanda Siswa Digital (Tampak Depan & Belakang)</h3>
+          <h3 class="font-extrabold text-sm sm:text-base text-navy">Kartu Tanda Siswa Digital (Tampak Depan & Belakang)
+          </h3>
           <p class="text-[11px] text-slate-500">Cetak & Download Format Gambar PNG Presisi Standar ISO 8.56 x 5.4 cm</p>
         </div>
-        <button onclick="closeModalIdCard()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        <button onclick="closeModalIdCard()"
+          class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
       </div>
 
       <!-- Area Fisik Kartu ID Card: Depan & Belakang Berdampingan -->
       <div id="idCardPrintWrapper" class="flex flex-col lg:flex-row items-center justify-center gap-6 py-2">
-        
+
         <!-- 1. TAMPAK DEPAN KARTU -->
         <div class="flex flex-col items-center space-y-1.5 flex-shrink-0">
-          <span class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak Depan</span>
+          <span
+            class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak
+            Depan</span>
           <div id="idCardContainer"
             class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
             style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
 
             <!-- Ornamen Ambience Bulatan Gelap Elegan -->
-            <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none"></div>
-            <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none"></div>
+            <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none">
+            </div>
+            <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none">
+            </div>
 
             <!-- 1. Header: Logo Lingkaran Putih & Kop Lembaga Resmi -->
             <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
               <!-- Logo Instansi dalam Lingkaran Putih -->
-              <div class="w-11 h-11 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+              <div
+                class="w-11 h-11 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
                 <img id="idCardLogo" src="" alt="Logo Instansi" class="w-full h-full object-contain">
               </div>
 
@@ -2623,24 +3068,29 @@
               <!-- 2. Area Pasfoto Siswa & Barcode Bersebelahan -->
               <div class="w-full flex items-center justify-center gap-3">
                 <!-- Sisi Kiri: Pasfoto Siswa Sedikit Lebih Besar, Pas, dengan Background Abu-abu Samar -->
-                <div class="relative w-[126px] h-[166px] rounded-2xl bg-slate-200/25 shadow-inner flex items-end justify-center flex-shrink-0 overflow-hidden border border-white/10">
+                <div
+                  class="relative w-[126px] h-[166px] rounded-2xl bg-slate-200/25 shadow-inner flex items-end justify-center flex-shrink-0 overflow-hidden border border-white/10">
                   <img id="idCardFoto" src="" alt="Foto Siswa" class="w-full h-full object-cover object-top"
                     style="object-fit: cover !important; object-position: top !important; -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);">
                   <!-- Overlay gradien halus untuk memastikan efek blur/fadeout bawah konsisten di semua browser & hasil unduh -->
-                  <div class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#0E243A] via-[#0E243A]/60 to-transparent pointer-events-none"></div>
+                  <div
+                    class="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-[#0E243A] via-[#0E243A]/60 to-transparent pointer-events-none">
+                  </div>
                 </div>
 
                 <!-- Sisi Kanan: Barcode / QR Code Presisi & Pill Lencana SRMA Sesuai Referensi -->
                 <div class="flex flex-col items-center justify-center flex-shrink-0">
                   <!-- Pill Lencana: SRMA Sesuai Referensi -->
-                  <div class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-extrabold text-[8.5px] tracking-wider uppercase mb-1.5 shadow-sm">
+                  <div
+                    class="inline-flex items-center justify-center px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-extrabold text-[8.5px] tracking-wider uppercase mb-1.5 shadow-sm">
                     SRMA
                   </div>
                   <div class="bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
                     <div id="idCardQrContainer" class="flex items-center justify-center w-[80px] h-[80px]"></div>
                   </div>
                   <!-- Teks Panduan 2 Baris Monospace Sesuai Referensi -->
-                  <div class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1.5 leading-tight">
+                  <div
+                    class="text-[7.5px] font-mono font-bold text-slate-300 uppercase tracking-widest text-center mt-1.5 leading-tight">
                     <div>SCAN QR</div>
                     <div>VERIFIKASI DATA</div>
                   </div>
@@ -2648,10 +3098,12 @@
               </div>
 
               <!-- 3. Area Identitas Siswa di Bawah: Rata Kiri dengan Kolom NISN & No. Kamar Sesuai Referensi -->
-              <div class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg text-left">
+              <div
+                class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg text-left">
                 <!-- Label & Nama Lengkap Siswa -->
                 <div class="w-full">
-                  <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">NAMA LENGKAP</span>
+                  <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">NAMA
+                    LENGKAP</span>
                   <h3 id="idCardNama"
                     class="text-base sm:text-[17px] font-bold text-white leading-tight uppercase tracking-wide break-words overflow-visible"
                     style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; font-weight: 700 !important; overflow: visible !important; white-space: normal !important;">
@@ -2664,19 +3116,24 @@
                   <!-- Kolom Kiri: NISN -->
                   <div>
                     <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NISN</span>
-                    <div class="w-full py-1.5 px-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-inner flex items-center justify-center">
-                      <span id="idCardNisn" class="font-bold text-slate-200 font-mono text-[11px] sm:text-xs tracking-wider">0000000000</span>
+                    <div
+                      class="w-full py-1.5 px-2 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-inner flex items-center justify-center">
+                      <span id="idCardNisn"
+                        class="font-bold text-slate-200 font-mono text-[11px] sm:text-xs tracking-wider">0000000000</span>
                     </div>
                   </div>
 
                   <!-- Kolom Kanan: NO. KAMAR -->
                   <div>
-                    <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NO. KAMAR</span>
-                    <div class="w-full py-1.5 px-2 rounded-xl bg-emerald-950/40 border border-emerald-500/50 shadow-inner flex items-center justify-center space-x-1.5">
+                    <span class="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">NO.
+                      KAMAR</span>
+                    <div
+                      class="w-full py-1.5 px-2 rounded-xl bg-emerald-950/40 border border-emerald-500/50 shadow-inner flex items-center justify-center space-x-1.5">
                       <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
                       </svg>
-                      <span id="idCardKamar" class="text-[11px] sm:text-xs text-emerald-300 font-bold tracking-wide">A.Pa-K3.9</span>
+                      <span id="idCardKamar"
+                        class="text-[11px] sm:text-xs text-emerald-300 font-bold tracking-wide">A.Pa-K3.9</span>
                     </div>
                   </div>
                 </div>
@@ -2687,7 +3144,8 @@
             </div>
 
             <!-- 4. Footer Bar ID Card Depan -->
-            <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
+            <div
+              class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
               <span></span>
               <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
             </div>
@@ -2696,18 +3154,24 @@
 
         <!-- 2. TAMPAK BELAKANG KARTU -->
         <div class="flex flex-col items-center space-y-1.5 flex-shrink-0">
-          <span class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak Belakang</span>
+          <span
+            class="text-[11px] font-bold text-slate-600 no-print uppercase tracking-wider bg-slate-100 px-3 py-0.5 rounded-full border border-slate-200 shadow-xs">Tampak
+            Belakang</span>
           <div id="idCardContainerBack"
             class="w-[316px] h-[501px] aspect-[54/85.6] bg-gradient-to-b from-[#0B1E33] via-[#0E243A] to-[#380E17] text-white rounded-[28px] p-4 shadow-2xl relative overflow-hidden border border-slate-700/80 flex flex-col justify-between select-none"
             style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;">
 
             <!-- Ornamen Ambience Bulatan Gelap Elegan -->
-            <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none"></div>
-            <div class="absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none"></div>
+            <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-slate-700/20 blur-xl pointer-events-none">
+            </div>
+            <div
+              class="absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-rose-950/40 blur-xl pointer-events-none">
+            </div>
 
             <!-- 1. Header Belakang: Logo & Identitas Lembaga -->
             <div class="w-full flex flex-col items-center justify-center pt-0.5 relative z-10 text-center">
-              <div class="w-10 h-10 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
+              <div
+                class="w-10 h-10 rounded-full bg-white p-1 shadow-md mx-auto flex items-center justify-center border border-slate-200 flex-shrink-0">
                 <img id="idCardLogoBack" src="" alt="Logo Instansi" class="w-full h-full object-contain">
               </div>
               <h4 id="idCardInstansiNameBack"
@@ -2716,35 +3180,44 @@
                 SEKOLAH RAKYAT<br>KABUPATEN SIDENRENG RAPPANG
               </h4>
               <p class="text-[8px] font-bold text-slate-300 uppercase tracking-wider text-center mt-0.5">
-                KARTU IDENTITAS SANTRI & ASRAMA
+                KARTU IDENTITAS SISWA
               </p>
               <div class="w-full h-[1px] bg-slate-600/60 my-1"></div>
             </div>
 
             <!-- 2. Konten Utama Belakang: Tata Tertib & Ketentuan Kartu -->
-            <div class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg relative z-10 text-left my-auto space-y-2">
+            <div
+              class="w-full bg-[#071626]/85 backdrop-blur-sm rounded-2xl p-3 border border-slate-700/70 shadow-lg relative z-10 text-left my-auto space-y-2">
               <div class="flex items-center space-x-1.5 pb-1 border-b border-slate-700/50">
-                <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
-                <span class="text-[8.5px] font-extrabold text-amber-400 uppercase tracking-wider">TATA TERTIB & KETENTUAN KARTU</span>
+                <span class="text-[8.5px] font-extrabold text-amber-400 uppercase tracking-wider">TATA TERTIB &
+                  KETENTUAN KARTU</span>
               </div>
               <ol class="text-[7.5px] text-slate-300 space-y-1.5 list-decimal pl-3.5 leading-relaxed font-medium">
-                <li>Kartu ini adalah identitas resmi santri Sekolah Rakyat Kabupaten Sidenreng Rappang Jenjang SRMA.</li>
+                <li>Kartu ini adalah identitas resmi Siswa(i) Sekolah Rakyat Kabupaten Sidenreng Rappang Jenjang SRMA.
+                </li>
                 <li>Wajib dibawa pada saat presensi harian (11 sesi), perizinan keluar/pulang, dan kegiatan asrama.</li>
-                <li>Dilarang memindahtangankan, merusak, mencoret, atau menyalahgunakan kartu ini kepada pihak lain.</li>
+                <li>Dilarang memindahtangankan, merusak, mencoret, atau menyalahgunakan kartu ini kepada pihak lain.
+                </li>
                 <li>Apabila kartu hilang atau rusak, segera melapor ke bagian Pengasuhan / Wali Asrama.</li>
-                <li>Barangsiapa menemukan kartu ini dimohon mengembalikan ke Sekretariat Pengasuhan Asrama SRT Sidrap.</li>
+                <li>Barangsiapa menemukan kartu ini dimohon mengembalikan ke Sekretariat Pengasuhan Asrama SRT Sidrap.
+                </li>
               </ol>
             </div>
 
             <!-- 3. Area Pengesahan Lembaga & Barcode QR Validasi -->
-            <div class="w-full flex items-center justify-between px-2.5 py-1.5 bg-slate-900/70 rounded-xl border border-slate-700/60 relative z-10 mb-1">
+            <div
+              class="w-full flex items-center justify-between px-2.5 py-1.5 bg-slate-900/70 rounded-xl border border-slate-700/60 relative z-10 mb-1">
               <div class="text-left text-[7.5px] leading-tight">
-                <p class="text-slate-400">Diterbitkan di: <span class="text-white font-semibold">Sidenreng Rappang</span></p>
-                <p class="text-slate-400 mt-0.5">Status: <span class="text-emerald-400 font-bold uppercase">Resmi & Terverifikasi</span></p>
-                <p class="text-amber-300 font-bold text-[7px] mt-1 tracking-wider">PENGASUHAN SANTRI SRMA</p>
+                <p class="text-slate-400">Diterbitkan di: <span class="text-white font-semibold">Sidenreng
+                    Rappang</span></p>
+                <p class="text-slate-400 mt-0.5">Status: <span class="text-emerald-400 font-bold uppercase">Resmi &
+                    Terverifikasi</span></p>
+                <p class="text-amber-300 font-bold text-[7px] mt-1 tracking-wider">PENGASUHAN SISWA SRMA</p>
               </div>
               <div class="flex flex-col items-center">
                 <div class="bg-white p-1 rounded-xl shadow border border-slate-200">
@@ -2755,7 +3228,8 @@
             </div>
 
             <!-- 4. Footer Bar ID Card Belakang -->
-            <div class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
+            <div
+              class="w-full pt-1 border-t border-slate-700/60 flex items-center justify-between text-[8px] font-bold px-1 relative z-10 mt-auto">
               <span class="text-slate-400">BAGIAN BELAKANG</span>
               <span class="text-amber-400 font-bold tracking-wider">SISTEM e-SIWALI</span>
             </div>
@@ -2787,7 +3261,8 @@
           class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow transition flex items-center space-x-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2">
+            </path>
           </svg>
           <span>Unduh Keduanya (PNG)</span>
         </button>
@@ -4537,6 +5012,16 @@
       if (suratLogo) {
         suratLogo.removeAttribute('crossorigin');
         suratLogo.src = logoUrl;
+      }
+      const kopIzinLogo = document.getElementById('rekapIzinKopLogo');
+      if (kopIzinLogo) {
+        kopIzinLogo.removeAttribute('crossorigin');
+        kopIzinLogo.src = logoUrl;
+      }
+      const kopSakitLogo = document.getElementById('rekapSakitKopLogo');
+      if (kopSakitLogo) {
+        kopSakitLogo.removeAttribute('crossorigin');
+        kopSakitLogo.src = logoUrl;
       }
       const sideLogo = document.getElementById('sidebarLogoImg');
       const sideInstansi = document.getElementById('sidebarInstansiName');
@@ -6789,7 +7274,7 @@
       cloneBack.classList.add('idcard-print-target');
 
       // Pastikan semua gambar dan kanvas tercetak tajam
-      [ { orig: front, clone: cloneFront }, { orig: back, clone: cloneBack } ].forEach(function (pair) {
+      [{ orig: front, clone: cloneFront }, { orig: back, clone: cloneBack }].forEach(function (pair) {
         const cloneImgs = pair.clone.querySelectorAll('img');
         const origImgs = pair.orig.querySelectorAll('img');
         for (let i = 0; i < cloneImgs.length; i++) {
@@ -7699,6 +8184,52 @@
     }
 
     // =====================================================================
+    // HELPER TANGGAL & BULAN INDONESIA (REKAPITULASI)
+    // =====================================================================
+
+    const NAMA_BULAN_INDONESIA = [
+      '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    function parseMonthYear(dateStr) {
+      if (!dateStr) return { month: null, year: null };
+      const s = String(dateStr).trim();
+      // Format: DD/MM/YYYY atau DD-MM-YYYY (contoh: "26/11/2026 14:30 WITA")
+      const dmyMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (dmyMatch) {
+        return {
+          month: parseInt(dmyMatch[2], 10),
+          year: parseInt(dmyMatch[3], 10)
+        };
+      }
+      // Format: YYYY-MM-DD atau YYYY/MM/DD
+      const ymdMatch = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (ymdMatch) {
+        return {
+          month: parseInt(ymdMatch[2], 10),
+          year: parseInt(ymdMatch[1], 10)
+        };
+      }
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        return {
+          month: d.getMonth() + 1,
+          year: d.getFullYear()
+        };
+      }
+      return { month: null, year: null };
+    }
+
+    function getSiswaKamarByName(nama) {
+      if (!nama || !appState.cache.siswa) return '';
+      const s = appState.cache.siswa.find(function (x) {
+        return (x.nama || '').trim().toLowerCase() === nama.trim().toLowerCase();
+      });
+      return s ? (s.noKamar || '') : '';
+    }
+
+    // =====================================================================
     // MODUL SURAT IZIN PULANG DAN KELUAR
     // =====================================================================
 
@@ -7707,6 +8238,7 @@
       if (cached && cached.data) {
         appState.cache.izin = cached.data;
         renderIzinTable(cached.data);
+        if (appState.izinSubTab === 'rekap') filterRekapIzin();
         if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetIzinList', undefined, function (res) {
@@ -7714,6 +8246,7 @@
           setLocalCache('izin', res.data);
           appState.cache.izin = res.data;
           renderIzinTable(res.data);
+          if (appState.izinSubTab === 'rekap') filterRekapIzin();
           syncSiswaStatusAndMetrics();
         }
       });
@@ -7724,16 +8257,35 @@
       appState.pagination.izin.page = 1;
       const tAktif = document.getElementById('tabIzinAktif');
       const tRiwayat = document.getElementById('tabIzinRiwayat');
+      const tRekap = document.getElementById('tabIzinRekap');
+      const pDaftar = document.getElementById('panelIzinDaftar');
+      const pRekap = document.getElementById('panelIzinRekap');
+
+      const inactiveClass = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1';
+      if (tAktif) tAktif.className = inactiveClass;
+      if (tRiwayat) tRiwayat.className = inactiveClass;
+      if (tRekap) tRekap.className = inactiveClass;
 
       if (tab === 'aktif') {
-        tAktif.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon';
-        tRiwayat.className = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800';
-      } else {
-        tRiwayat.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon';
-        tAktif.className = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800';
+        if (tAktif) tAktif.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon flex items-center space-x-1';
+        if (pDaftar) pDaftar.classList.remove('hidden');
+        if (pRekap) pRekap.classList.add('hidden');
+        if (appState.cache.izin) renderIzinTable(appState.cache.izin);
+      } else if (tab === 'riwayat') {
+        if (tRiwayat) tRiwayat.className = 'pb-2 text-sm font-bold text-maroon border-b-2 border-maroon flex items-center space-x-1';
+        if (pDaftar) pDaftar.classList.remove('hidden');
+        if (pRekap) pRekap.classList.add('hidden');
+        if (appState.cache.izin) renderIzinTable(appState.cache.izin);
+      } else if (tab === 'rekap') {
+        if (tRekap) tRekap.className = 'pb-2 text-sm font-bold text-navy border-b-2 border-navy flex items-center space-x-1';
+        if (pDaftar) pDaftar.classList.add('hidden');
+        if (pRekap) pRekap.classList.remove('hidden');
+        if (!appState.cache.izin) {
+          fetchIzinData(false);
+        } else {
+          filterRekapIzin();
+        }
       }
-
-      if (appState.cache.izin) renderIzinTable(appState.cache.izin);
     }
 
     function renderIzinTable(list) {
@@ -7793,6 +8345,162 @@
       });
 
       renderPaginationControls('paginationIzin', pag, 'changeIzinPage', 'changeIzinLimit');
+    }
+
+    // =====================================================================
+    // FITUR REKAPITULASI SURAT IZIN SISWA(I)
+    // =====================================================================
+
+    function filterRekapIzin() {
+      const bulanEl = document.getElementById('filterRekapIzinBulan');
+      const tahunEl = document.getElementById('filterRekapIzinTahun');
+      const jenisEl = document.getElementById('filterRekapIzinJenis');
+      const statusEl = document.getElementById('filterRekapIzinStatus');
+
+      const bulanVal = bulanEl ? bulanEl.value : '';
+      const tahunVal = tahunEl ? tahunEl.value : '';
+      const jenisVal = (jenisEl ? jenisEl.value : '').toLowerCase().trim();
+      const statusVal = (statusEl ? statusEl.value : '').toLowerCase().trim();
+
+      const list = appState.cache.izin || [];
+
+      const filtered = list.filter(function (item) {
+        const waktuStr = item.waktuIzin || '';
+        const my = parseMonthYear(waktuStr);
+
+        // Filter Bulan
+        if (bulanVal) {
+          if (my.month !== parseInt(bulanVal, 10)) return false;
+        }
+
+        // Filter Tahun
+        if (tahunVal) {
+          if (my.year !== parseInt(tahunVal, 10)) return false;
+        }
+
+        // Filter Jenis
+        if (jenisVal) {
+          const itemJenis = (item.jenisIzin || '').toLowerCase();
+          if (jenisVal === 'izin pulang rutin' && itemJenis.indexOf('rutin') === -1) return false;
+          if (jenisVal === 'darurat' && itemJenis.indexOf('darurat') === -1 && itemJenis.indexOf('sakit') === -1) return false;
+          if (jenisVal === 'ringkas' && itemJenis.indexOf('ringkas') === -1) return false;
+        }
+
+        // Filter Status
+        if (statusVal) {
+          const itemStatus = (item.status || '').toLowerCase();
+          if (statusVal === 'aktif' && itemStatus.indexOf('aktif') === -1) return false;
+          if (statusVal === 'kembali' && itemStatus.indexOf('kembali') === -1) return false;
+        }
+
+        return true;
+      });
+
+      renderRekapIzin(filtered, bulanVal, tahunVal);
+    }
+
+    function resetFilterRekapIzin() {
+      const bulanEl = document.getElementById('filterRekapIzinBulan');
+      const tahunEl = document.getElementById('filterRekapIzinTahun');
+      const jenisEl = document.getElementById('filterRekapIzinJenis');
+      const statusEl = document.getElementById('filterRekapIzinStatus');
+
+      if (bulanEl) bulanEl.value = '';
+      if (tahunEl) tahunEl.value = '2026';
+      if (jenisEl) jenisEl.value = '';
+      if (statusEl) statusEl.value = '';
+
+      filterRekapIzin();
+    }
+
+    function renderRekapIzin(filtered, bulanVal, tahunVal) {
+      // 1. Hitung Statistik Rekapitulasi
+      const total = filtered.length;
+      let rutin = 0;
+      let darurat = 0;
+      let ringkas = 0;
+
+      filtered.forEach(function (i) {
+        const j = (i.jenisIzin || '').toLowerCase();
+        if (j.indexOf('rutin') !== -1) rutin++;
+        else if (j.indexOf('darurat') !== -1 || j.indexOf('sakit') !== -1) darurat++;
+        else if (j.indexOf('ringkas') !== -1) ringkas++;
+      });
+
+      const statTotal = document.getElementById('statRekapIzinTotal');
+      const statRutin = document.getElementById('statRekapIzinRutin');
+      const statDarurat = document.getElementById('statRekapIzinDarurat');
+      const statRingkas = document.getElementById('statRekapIzinRingkas');
+
+      if (statTotal) statTotal.innerText = total;
+      if (statRutin) statRutin.innerText = rutin;
+      if (statDarurat) statDarurat.innerText = darurat;
+      if (statRingkas) statRingkas.innerText = ringkas;
+
+      // 2. Perbarui Header Kop & Periode Laporan
+      const periodeEl = document.getElementById('rekapIzinPeriodeText');
+      if (periodeEl) {
+        const bText = bulanVal ? NAMA_BULAN_INDONESIA[parseInt(bulanVal, 10)] : 'Semua Bulan';
+        const tText = tahunVal ? tahunVal : 'Semua Tahun';
+        periodeEl.innerText = 'Periode: ' + bText + ' Tahun ' + tText;
+      }
+
+      const logoSrc = (document.getElementById('sidebarLogoImg') && document.getElementById('sidebarLogoImg').src) || (appState.config && appState.config.logoUrl) || '';
+      const kopLogo = document.getElementById('rekapIzinKopLogo');
+      if (kopLogo && logoSrc) {
+        kopLogo.removeAttribute('crossorigin');
+        kopLogo.src = logoSrc;
+      }
+
+      // 3. Perbarui Lembar Tanda Tangan Cetak
+      const tglCetakEl = document.getElementById('rekapIzinTglCetakText');
+      if (tglCetakEl) {
+        const now = new Date();
+        tglCetakEl.innerText = 'Sidenreng Rappang, ' + now.getDate() + ' ' + (NAMA_BULAN_INDONESIA[now.getMonth() + 1] || '') + ' ' + now.getFullYear();
+      }
+      const petugasEl = document.getElementById('rekapIzinNamaPetugas');
+      if (petugasEl) {
+        const namaUser = appState.currentUser && appState.currentUser.nama ? appState.currentUser.nama : 'Petugas Jaga Asrama';
+        petugasEl.innerText = '( ' + namaUser + ' )';
+      }
+
+      // 4. Render Baris Tabel Rekapitulasi Izin
+      const tbody = document.getElementById('tbodyRekapIzin');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400">Tidak ada data catatan surat izin pada filter bulan & tahun yang dipilih.</td></tr>';
+        return;
+      }
+
+      filtered.forEach(function (item, idx) {
+        const isAktif = (item.status || '').toLowerCase().indexOf('aktif') !== -1;
+        const statusBadge = isAktif
+          ? '<span class="bg-amber-100 text-amber-800 font-semibold px-2 py-0.5 rounded text-[10px] border border-amber-300">Aktif di Luar</span>'
+          : '<span class="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px] border border-emerald-300">Sudah Kembali</span>';
+
+        const kamar = item.noKamar || getSiswaKamarByName(item.nama) || '-';
+        const penjemput = (item.namaPenjemput || '-') + (item.hubungan ? ' (' + item.hubungan + ')' : '');
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML =
+          '<td class="py-2 px-2 text-center font-bold text-slate-500 border border-slate-300">' + (idx + 1) + '</td>' +
+          '<td class="py-2 px-2 font-mono text-xs font-bold text-navy border border-slate-300">' + (item.noSurat || '-') + '</td>' +
+          '<td class="py-2 px-2 text-xs text-slate-700 border border-slate-300 whitespace-nowrap">' + (item.waktuIzin || '-') + '</td>' +
+          '<td class="py-2 px-2.5 font-bold text-slate-900 border border-slate-300">' + (item.nama || '-') + '</td>' +
+          '<td class="py-2 px-2 text-center text-xs font-semibold text-navy border border-slate-300">' + kamar + '</td>' +
+          '<td class="py-2 px-2.5 font-medium text-slate-800 border border-slate-300">' + (item.jenisIzin || '-') + '</td>' +
+          '<td class="py-2 px-2 text-xs text-rose-700 font-medium border border-slate-300 whitespace-nowrap">' + (item.batasWaktu || '-') + '</td>' +
+          '<td class="py-2 px-2 text-xs text-slate-700 border border-slate-300">' + penjemput + '</td>' +
+          '<td class="py-2 px-2 text-center border border-slate-300">' + statusBadge + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function printRekapIzin() {
+      printElement('printAreaRekapIzin');
     }
 
     function populateSiswaDropdowns(list) {
@@ -8476,19 +9184,38 @@
       appState.penangananSubTab = tab;
       const tSakit = document.getElementById('tabSakit');
       const tAsesmen = document.getElementById('tabAsesmen');
+      const tRekapSakit = document.getElementById('tabRekapSakit');
       const pSakit = document.getElementById('subtab-sakit');
       const pAsesmen = document.getElementById('subtab-asesmen');
+      const pRekapSakit = document.getElementById('subtab-rekap-sakit');
+
+      const inactiveClass = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1';
+      if (tSakit) tSakit.className = inactiveClass;
+      if (tAsesmen) tAsesmen.className = inactiveClass;
+      if (tRekapSakit) tRekapSakit.className = inactiveClass;
+
+      if (pSakit) pSakit.classList.add('hidden');
+      if (pAsesmen) pAsesmen.classList.add('hidden');
+      if (pRekapSakit) pRekapSakit.classList.add('hidden');
 
       if (tab === 'sakit') {
-        tSakit.className = 'pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700';
-        tAsesmen.className = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800';
-        pSakit.classList.remove('hidden');
-        pAsesmen.classList.add('hidden');
-      } else {
-        tAsesmen.className = 'pb-2 text-sm font-bold text-slate-800 border-b-2 border-slate-800';
-        tSakit.className = 'pb-2 text-sm font-medium text-slate-500 hover:text-slate-800';
-        pAsesmen.classList.remove('hidden');
-        pSakit.classList.add('hidden');
+        if (tSakit) tSakit.className = 'pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700 flex items-center space-x-1';
+        if (pSakit) pSakit.classList.remove('hidden');
+        if (appState.cache.sakit) renderSakitTable(appState.cache.sakit);
+      } else if (tab === 'asesmen') {
+        if (tAsesmen) tAsesmen.className = 'pb-2 text-sm font-bold text-slate-800 border-b-2 border-slate-800 flex items-center space-x-1';
+        if (pAsesmen) pAsesmen.classList.remove('hidden');
+        if (appState.cache.pelanggaran && typeof renderPelanggaranTable === 'function') {
+          renderPelanggaranTable(appState.cache.pelanggaran);
+        }
+      } else if (tab === 'rekapSakit') {
+        if (tRekapSakit) tRekapSakit.className = 'pb-2 text-sm font-bold text-rose-700 border-b-2 border-rose-700 flex items-center space-x-1';
+        if (pRekapSakit) pRekapSakit.classList.remove('hidden');
+        if (!appState.cache.sakit) {
+          fetchSakitData(false);
+        } else {
+          filterRekapSakit();
+        }
       }
     }
 
@@ -8497,6 +9224,7 @@
       if (cached && cached.data) {
         appState.cache.sakit = cached.data;
         renderSakitTable(cached.data);
+        if (appState.penangananSubTab === 'rekapSakit') filterRekapSakit();
         if (!cached.isExpired && !forceRefresh) return;
       }
       callBackend('apiGetSakitList', undefined, function (res) {
@@ -8504,6 +9232,7 @@
           setLocalCache('sakit', res.data);
           appState.cache.sakit = res.data;
           renderSakitTable(res.data);
+          if (appState.penangananSubTab === 'rekapSakit') filterRekapSakit();
           syncSiswaStatusAndMetrics();
         }
       });
@@ -8554,6 +9283,149 @@
       });
 
       renderPaginationControls('paginationSakit', pag, 'changeSakitPage', 'changeSakitLimit');
+    }
+
+    // =====================================================================
+    // FITUR REKAPITULASI SISWA(I) SAKIT DI ASRAMA
+    // =====================================================================
+
+    function filterRekapSakit() {
+      const bulanEl = document.getElementById('filterRekapSakitBulan');
+      const tahunEl = document.getElementById('filterRekapSakitTahun');
+      const statusEl = document.getElementById('filterRekapSakitStatus');
+
+      const bulanVal = bulanEl ? bulanEl.value : '';
+      const tahunVal = tahunEl ? tahunEl.value : '';
+      const statusVal = (statusEl ? statusEl.value : '').toLowerCase().trim();
+
+      const list = appState.cache.sakit || [];
+
+      const filtered = list.filter(function (item) {
+        const waktuStr = item.tanggalCatat || item.tanggal || '';
+        const my = parseMonthYear(waktuStr);
+
+        // Filter Bulan
+        if (bulanVal) {
+          if (my.month !== parseInt(bulanVal, 10)) return false;
+        }
+
+        // Filter Tahun
+        if (tahunVal) {
+          if (my.year !== parseInt(tahunVal, 10)) return false;
+        }
+
+        // Filter Status
+        if (statusVal) {
+          const itemStatus = (item.status || '').toLowerCase();
+          if (statusVal === 'sakit' && itemStatus.indexOf('sakit') === -1) return false;
+          if (statusVal === 'sembuh' && (itemStatus.indexOf('sembuh') === -1 && itemStatus.indexOf('sehat') === -1)) return false;
+        }
+
+        return true;
+      });
+
+      renderRekapSakit(filtered, bulanVal, tahunVal);
+    }
+
+    function resetFilterRekapSakit() {
+      const bulanEl = document.getElementById('filterRekapSakitBulan');
+      const tahunEl = document.getElementById('filterRekapSakitTahun');
+      const statusEl = document.getElementById('filterRekapSakitStatus');
+
+      if (bulanEl) bulanEl.value = '';
+      if (tahunEl) tahunEl.value = '2026';
+      if (statusEl) statusEl.value = '';
+
+      filterRekapSakit();
+    }
+
+    function renderRekapSakit(filtered, bulanVal, tahunVal) {
+      // 1. Hitung Statistik Rekapitulasi
+      const total = filtered.length;
+      let aktif = 0;
+      let sembuh = 0;
+
+      filtered.forEach(function (i) {
+        const st = (i.status || '').toLowerCase();
+        if (st.indexOf('sakit') !== -1) aktif++;
+        else if (st.indexOf('sembuh') !== -1 || st.indexOf('sehat') !== -1) sembuh++;
+      });
+
+      const statTotal = document.getElementById('statRekapSakitTotal');
+      const statAktif = document.getElementById('statRekapSakitAktif');
+      const statSembuh = document.getElementById('statRekapSakitSembuh');
+
+      if (statTotal) statTotal.innerText = total;
+      if (statAktif) statAktif.innerText = aktif;
+      if (statSembuh) statSembuh.innerText = sembuh;
+
+      // 2. Perbarui Header Kop & Periode Laporan
+      const periodeEl = document.getElementById('rekapSakitPeriodeText');
+      if (periodeEl) {
+        const bText = bulanVal ? NAMA_BULAN_INDONESIA[parseInt(bulanVal, 10)] : 'Semua Bulan';
+        const tText = tahunVal ? tahunVal : 'Semua Tahun';
+        periodeEl.innerText = 'Periode: ' + bText + ' Tahun ' + tText;
+      }
+
+      const logoSrc = (document.getElementById('sidebarLogoImg') && document.getElementById('sidebarLogoImg').src) || (appState.config && appState.config.logoUrl) || '';
+      const kopLogo = document.getElementById('rekapSakitKopLogo');
+      if (kopLogo && logoSrc) {
+        kopLogo.removeAttribute('crossorigin');
+        kopLogo.src = logoSrc;
+      }
+
+      // 3. Perbarui Lembar Tanda Tangan Cetak
+      const tglCetakEl = document.getElementById('rekapSakitTglCetakText');
+      if (tglCetakEl) {
+        const now = new Date();
+        tglCetakEl.innerText = 'Sidenreng Rappang, ' + now.getDate() + ' ' + (NAMA_BULAN_INDONESIA[now.getMonth() + 1] || '') + ' ' + now.getFullYear();
+      }
+      const petugasEl = document.getElementById('rekapSakitNamaPetugas');
+      if (petugasEl) {
+        const namaUser = appState.currentUser && appState.currentUser.nama ? appState.currentUser.nama : 'Petugas Kesehatan Asrama';
+        petugasEl.innerText = '( ' + namaUser + ' )';
+      }
+
+      // 4. Render Baris Tabel Rekapitulasi Sakit
+      const tbody = document.getElementById('tbodyRekapSakit');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400">Tidak ada data penanganan siswa sakit pada filter bulan & tahun yang dipilih.</td></tr>';
+        return;
+      }
+
+      filtered.forEach(function (item, idx) {
+        const isSakit = (item.status || '').toLowerCase().indexOf('sakit') !== -1;
+        const statusBadge = isSakit
+          ? '<span class="bg-rose-100 text-rose-800 font-semibold px-2 py-0.5 rounded text-[10px] border border-rose-300">Sakit di Asrama</span>'
+          : '<span class="bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px] border border-emerald-300">Sembuh/Sehat</span>';
+
+        const kamar = item.noKamar || getSiswaKamarByName(item.nama) || '-';
+        const tandaVital = (item.suhu ? item.suhu + '°C' : '-') + (item.tensi ? ' / ' + item.tensi : '');
+        const keluhan = (item.keluhan || '-') + (item.lamaSakit ? ' (' + item.lamaSakit + ')' : '');
+        const faskesBpjs = (item.faskes || '-') + (item.noBpjs ? '<br><span class="text-slate-400 font-mono text-[10px]">BPJS: ' + item.noBpjs + '</span>' : '');
+        const obatRtl = (item.obat || '-') + (item.rtl ? '<br><span class="text-slate-500 italic text-[10px]">RTL: ' + item.rtl + '</span>' : '');
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML =
+          '<td class="py-2 px-2 text-center font-bold text-slate-500 border border-slate-300">' + (idx + 1) + '</td>' +
+          '<td class="py-2 px-2 text-xs font-mono text-slate-700 border border-slate-300 whitespace-nowrap">' + (item.tanggalCatat || item.tanggal || '-') + '</td>' +
+          '<td class="py-2 px-2.5 font-bold text-slate-900 border border-slate-300">' + (item.nama || '-') + '</td>' +
+          '<td class="py-2 px-2 text-center text-xs font-semibold text-navy border border-slate-300">' + kamar + '</td>' +
+          '<td class="py-2 px-2 font-mono text-xs font-bold text-rose-700 border border-slate-300 whitespace-nowrap">' + tandaVital + '</td>' +
+          '<td class="py-2 px-3 text-xs text-slate-800 border border-slate-300">' + keluhan + '</td>' +
+          '<td class="py-2 px-2 text-xs text-slate-600 border border-slate-300">' + faskesBpjs + '</td>' +
+          '<td class="py-2 px-3 text-xs text-slate-700 border border-slate-300">' + obatRtl + '</td>' +
+          '<td class="py-2 px-2 text-center border border-slate-300">' + statusBadge + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function printRekapSakit() {
+      printElement('printAreaRekapSakit');
     }
 
     function autoFillSiswaSakit() {
