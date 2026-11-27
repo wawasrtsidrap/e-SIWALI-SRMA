@@ -3864,6 +3864,107 @@
     </div>
   </div>
 
+  <!-- Modal Rujuk Siswa Sakit ke Faskes -->
+  <div id="modalRujukFaskes"
+    class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div
+      class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar animate-fade-in">
+      <div class="flex justify-between items-center pb-2 border-b border-rose-100">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shadow-inner">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-rose-800">Rujuk Siswa(i) ke Fasilitas Kesehatan</h3>
+            <p class="text-[11px] text-slate-500">Sinkronisasi Otomatis ke Izin Pulang Darurat/Sakit</p>
+          </div>
+        </div>
+        <button onclick="closeModalRujukFaskes()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+      </div>
+
+      <!-- Alert Notifikasi Cerdas -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start space-x-2.5 text-xs text-amber-900">
+        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="leading-relaxed">
+          <span class="font-bold">Perubahan Status Otomatis:</span> Siswa akan otomatis dikeluarkan dari <strong>Jumlah Siswa Sakit di Asrama</strong> dan didaftarkan pada <strong>Izin Pulang Darurat/Sakit</strong>.
+        </div>
+      </div>
+
+      <form id="formRujukFaskes" onsubmit="event.preventDefault(); submitRujukFaskes();" class="space-y-3.5 text-xs">
+        <input type="hidden" id="rujukIdSakit">
+        
+        <!-- Info Ringkas Siswa -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 text-[11px]">Nama Lengkap Siswa:</span>
+            <span id="rujukNamaSiswa" class="font-bold text-slate-900 text-sm">-</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-slate-500">NISN & Kamar:</span>
+            <span id="rujukNisnKamar" class="font-semibold text-slate-800">-</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-slate-500">Keluhan / Diagnosa:</span>
+            <span id="rujukKeluhan" class="font-bold text-rose-700">-</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-slate-500">BPJS & Faskes Terdaftar:</span>
+            <span id="rujukBpjsFaskes" class="font-mono text-slate-700">-</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Fasilitas Kesehatan Tujuan Rujukan *</label>
+          <input type="text" id="rujukFaskesTujuan" required placeholder="Contoh: Puskesmas Rappang / RSUD Nene Mallomo"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-rose-600">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nama Petugas Pengantar / Penjemput *</label>
+            <input type="text" id="rujukNamaPengantar" required placeholder="Nama petugas medis / keluarga"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-rose-600">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Status / Hubungan Pengantar *</label>
+            <select id="rujukHubungan" required class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="Rujukan Medis / Faskes">Rujukan Medis / Faskes</option>
+              <option value="Petugas Medis Asrama">Petugas Medis Asrama</option>
+              <option value="Wali Asrama & Tim Medis">Wali Asrama & Tim Medis</option>
+              <option value="Orang Tua / Keluarga">Orang Tua / Keluarga</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Estimasi Durasi / Batas Waktu Rujukan</label>
+          <input type="text" id="rujukBatasWaktu" placeholder="Hingga Penanganan Faskes Selesai" value="Hingga Penanganan Faskes Selesai"
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-rose-600">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Keterangan / Alasan Rujukan</label>
+          <textarea id="rujukKeterangan" rows="2" placeholder="Alasan rujukan dan catatan penanganan medis..."
+            class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-1 focus:ring-rose-600"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeModalRujukFaskes()"
+            class="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition">Batal</button>
+          <button type="submit" id="btnSubmitRujuk"
+            class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md transition flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            <span>Konfirmasi Rujuk ke Faskes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal Catat Asesmen & Pelanggaran -->
   <div id="modalCatatAsesmen"
     class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -9431,13 +9532,30 @@
 
       pag.items.forEach(function (item) {
         const isSakit = (item.status || '').toLowerCase().indexOf('sakit') !== -1;
-        const statusBadge = isSakit
-          ? '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-rose-200 animate-pulse">Sakit di Asrama</span>'
-          : '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Sembuh/Sehat</span>';
+        const isDirujuk = (item.status || '').toLowerCase().indexOf('rujuk') !== -1;
+        const isSembuh = (item.status || '').toLowerCase().indexOf('sembuh') !== -1 || (item.status || '').toLowerCase().indexOf('sehat') !== -1;
 
-        let btnSembuh = '';
-        if (isSakit) {
-          btnSembuh = '<button onclick="tandaiSembuhById(\'' + item.id + '\')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm transition">Tandai Sembuh</button>';
+        let statusBadge = '';
+        if (isDirujuk) {
+          statusBadge = '<span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-indigo-200">Dirujuk ke Faskes</span>';
+        } else if (isSakit && !isSembuh) {
+          statusBadge = '<span class="bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-rose-200 animate-pulse">Sakit di Asrama</span>';
+        } else {
+          statusBadge = '<span class="bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded text-[11px] border border-emerald-200">Sembuh/Sehat</span>';
+        }
+
+        let aksiHtml = '<span class="text-xs text-slate-400 font-medium">-</span>';
+        if (isSakit && !isSembuh && !isDirujuk) {
+          aksiHtml = 
+            '<div class="flex items-center justify-center space-x-1.5">' +
+              '<button onclick="tandaiSembuhById(\'' + item.id + '\')" title="Tandai Siswa Sudah Sembuh" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm transition">Tandai Sembuh</button>' +
+              '<button onclick="bukaModalRujukFaskes(\'' + item.id + '\')" title="Rujuk Siswa ke Fasilitas Kesehatan / RS" class="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-semibold shadow-sm transition inline-flex items-center space-x-1">' +
+                '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>' +
+                '<span>Rujuk ke Faskes</span>' +
+              '</button>' +
+            '</div>';
+        } else if (isDirujuk) {
+          aksiHtml = '<span class="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">Dalam Perawatan Faskes</span>';
         }
 
         const waktuInputStr = item.tanggalCatat
@@ -9455,7 +9573,7 @@
           '<td class="py-2.5 px-3 font-medium text-slate-800">' + item.keluhan + ' (' + item.lamaSakit + ')</td>' +
           '<td class="py-2.5 px-3 text-slate-600 text-xs">' + item.obat + '<br><span class="text-slate-400">' + item.rtl + '</span></td>' +
           '<td class="py-2.5 px-2">' + statusBadge + '</td>' +
-          '<td class="py-2.5 px-3 text-center">' + btnSembuh + '</td>';
+          '<td class="py-2.5 px-3 text-center">' + aksiHtml + '</td>';
         tbody.appendChild(tr);
       });
 
@@ -9744,6 +9862,160 @@
         } else {
           showToast(res ? res.message : 'Gagal memperbarui status sembuh.', 'error');
         }
+      });
+    }
+
+    // =====================================================================
+    // AKSI RUJUK KE FASKES & SINKRONISASI KE IZIN DARURAT
+    // =====================================================================
+
+    function bukaModalRujukFaskes(idSakit) {
+      if (!appState.cache.sakit) return;
+      const item = appState.cache.sakit.find(function(it) {
+        return String(it.id).trim() === String(idSakit).trim();
+      });
+      if (!item) {
+        showToast('Data sakit siswa tidak ditemukan.', 'error');
+        return;
+      }
+
+      document.getElementById('rujukIdSakit').value = item.id;
+      document.getElementById('rujukNamaSiswa').innerText = item.nama;
+      document.getElementById('rujukNisnKamar').innerText = (item.nisn || '-') + ' • Kamar ' + (item.noKamar || '-');
+      document.getElementById('rujukKeluhan').innerText = item.keluhan + ' (Suhu: ' + item.suhu + '°C / Tensi: ' + item.tensi + ')';
+      document.getElementById('rujukBpjsFaskes').innerText = (item.noBpjs || '-') + ' • ' + (item.faskes || '-');
+
+      // Default values
+      document.getElementById('rujukFaskesTujuan').value = (item.faskes && item.faskes !== '-') ? item.faskes : 'Puskesmas Rappang';
+      document.getElementById('rujukNamaPengantar').value = 'Petugas Medis Asrama';
+      document.getElementById('rujukHubungan').value = 'Rujukan Medis / Faskes';
+      document.getElementById('rujukBatasWaktu').value = 'Hingga Penanganan Faskes Selesai';
+      document.getElementById('rujukKeterangan').value = 'Dirujuk dari asrama ke faskes untuk penanganan intensif (Keluhan: ' + item.keluhan + ').';
+
+      document.getElementById('modalRujukFaskes').classList.remove('hidden');
+    }
+
+    function closeModalRujukFaskes() {
+      const modal = document.getElementById('modalRujukFaskes');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function submitRujukFaskes() {
+      const idSakit = document.getElementById('rujukIdSakit').value;
+      if (!idSakit) return;
+
+      const faskesTujuan = document.getElementById('rujukFaskesTujuan').value.trim();
+      if (!faskesTujuan) {
+        showToast('Fasilitas kesehatan tujuan wajib diisi.', 'error');
+        return;
+      }
+
+      const namaPengantar = document.getElementById('rujukNamaPengantar').value.trim();
+      const hubungan = document.getElementById('rujukHubungan').value;
+      const batasWaktu = document.getElementById('rujukBatasWaktu').value.trim();
+      const keterangan = document.getElementById('rujukKeterangan').value.trim();
+
+      const btn = document.getElementById('btnSubmitRujuk');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Memproses Rujukan...</span>';
+
+      const petugas = appState.currentUser ? appState.currentUser.namaLengkap : 'Piket Medis Asrama';
+
+      const payload = {
+        idSakit: idSakit,
+        faskesTujuan: faskesTujuan,
+        namaPengantar: namaPengantar,
+        hubungan: hubungan,
+        batasWaktu: batasWaktu,
+        keterangan: keterangan,
+        petugas: petugas,
+        waliAsuhPiket: '-',
+        waliAsramaPiket: petugas
+      };
+
+      callBackend('apiRujukKeFaskes', payload, function(res) {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg><span>Konfirmasi Rujuk ke Faskes</span>';
+
+        if (res && res.success) {
+          closeModalRujukFaskes();
+          showToast(res.message, 'success');
+
+          // 1. Update status pada cache sakit
+          if (appState.cache.sakit) {
+            const item = appState.cache.sakit.find(function(it) {
+              return String(it.id).trim() === String(idSakit).trim();
+            });
+            if (item) {
+              item.status = 'Dirujuk ke Faskes';
+              item.waktuSembuh = new Date().toLocaleDateString('id-ID') + ' (Dirujuk)';
+              renderSakitTable(appState.cache.sakit);
+            }
+          }
+
+          // 2. Update status siswa pada cache siswa & tabel Siswa & QR
+          if (appState.cache.siswa) {
+            const target = appState.cache.siswa.find(function(s) {
+              const matchNisn = res.nisn && String(s.nisn).trim() === String(res.nisn).trim();
+              const matchNama = res.nama && String(s.nama).trim().toLowerCase() === String(res.nama).trim().toLowerCase();
+              return matchNisn || matchNama;
+            });
+            if (target) {
+              target.statusAsrama = 'Izin Pulang Darurat/Sakit';
+              renderSiswaTable(appState.cache.siswa);
+            }
+          }
+
+          // 3. Tambahkan catatan ke cache izin secara langsung
+          if (appState.cache.izin) {
+            const sItem = (appState.cache.sakit || []).find(function(it) {
+              return String(it.id).trim() === String(idSakit).trim();
+            });
+            const newIzin = {
+              noSurat: res.noSurat || ('SIPK - 001/wawa.SRT-Sidrap/XI/2026'),
+              jenisIzin: 'Izin Pulang Darurat/Sakit',
+              nisn: res.nisn || (sItem ? sItem.nisn : ''),
+              nama: res.nama || (sItem ? sItem.nama : ''),
+              jenisKelamin: sItem ? sItem.jenisKelamin : 'Laki-laki',
+              noKamar: sItem ? sItem.noKamar : '-',
+              waktuIzin: new Date().toLocaleString('id-ID') + ' WITA',
+              batasWaktu: batasWaktu || 'Hingga Penanganan Faskes Selesai',
+              namaPenjemput: namaPengantar + ' (' + faskesTujuan + ')',
+              hubungan: hubungan,
+              fotoBukti1: '-',
+              fotoBukti2: '-',
+              status: 'Aktif Keluar',
+              waktuKembali: '-',
+              fotoKembali: '-',
+              petugas: petugas,
+              waliAsuhPiket: '-',
+              waliAsramaPiket: petugas
+            };
+            appState.cache.izin.unshift(newIzin);
+            renderIzinTable(appState.cache.izin);
+          }
+
+          // 4. Update Metrik Dashboard secara realtime
+          if (res.metrics) {
+            appState.metrics = res.metrics;
+            renderMetrics(res.metrics);
+          }
+
+          // 5. Invalidate cache lokal dan refresh sinkronisasi di latar belakang
+          invalidateLocalCache('sakit');
+          invalidateLocalCache('izin');
+          invalidateLocalCache('siswa');
+          invalidateLocalCache('initialData');
+          fetchSakitData();
+          fetchIzinData();
+          fetchSiswaData();
+          fetchInitialData();
+        } else {
+          showToast(res ? res.message : 'Gagal memproses rujukan ke faskes.', 'error');
+        }
+      }, function() {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg><span>Konfirmasi Rujuk ke Faskes</span>';
       });
     }
 
@@ -10244,6 +10516,25 @@
               { nisn: '0071234561', nama: 'Ahmad Fauzan', jenisKelamin: 'Laki-laki', tempatLahir: 'Sidenreng Rappang', tanggalLahir: '15/05/2009', nik: '7314011505090001', noKamar: 'Kamar Al-Ghazali 01', hobi: 'Membaca & Kaligrafi', citaCita: 'Diplomat / Dosen', ekskul: 'Pramuka & Robotik', prestasi: 'Juara 1 MHQ 2025', ortuAyah: 'Sulaiman', ortuIbu: 'Siti Aminah', noHpOrtu: '085299887766', namaWaliAsuh: 'Ust. Abdullah, S.Pd.I', alamat: 'Jl. Poros Sidrap No. 45', noBpjs: '000123987456', faskes: 'Puskesmas Rappang', fotoUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300', statusAsrama: 'Hadir di Asrama' },
               { nisn: '0071234562', nama: 'Nurul Annisa', jenisKelamin: 'Perempuan', tempatLahir: 'Sidenreng Rappang', tanggalLahir: '10/02/2009', nik: '7314011002090003', noKamar: 'Kamar Fatimah 01', hobi: 'Menulis Cerpen', citaCita: 'Dokter Spesialis', ekskul: 'PMR & Panahan', prestasi: 'Juara 2 Debat Bahasa Arab', ortuAyah: 'Drs. H. Arifin', ortuIbu: 'Hj. Rosdiana', noHpOrtu: '085299887768', namaWaliAsuh: 'Ustzh. Maryam, S.Pd.', alamat: 'Jl. Poros Rappang Km 3', noBpjs: '000123987458', faskes: 'Klinik SRT Pratama', fotoUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', statusAsrama: 'Hadir di Asrama' }
             ]
+          });
+        } else if (fn === 'apiRujukKeFaskes') {
+          const payload = (args && args[0]) ? args[0] : {};
+          if (appState.metrics) {
+            if (appState.metrics.sakitAsrama.total > 0) {
+              appState.metrics.sakitAsrama.total--;
+              appState.metrics.sakitAsrama.L = Math.max(0, appState.metrics.sakitAsrama.L - 1);
+            }
+            appState.metrics.izinDarurat.total++;
+            appState.metrics.izinDarurat.L++;
+            appState.metrics.hadirAsrama.total = Math.max(0, appState.metrics.hadirAsrama.total - 1);
+            appState.metrics.hadirAsrama.L = Math.max(0, appState.metrics.hadirAsrama.L - 1);
+          }
+          const noSurat = 'SIPK - ' + ('00' + Math.floor(Math.random() * 900 + 100)).slice(-3) + '/wawa.SRT-Sidrap/XI/2026';
+          cb({
+            success: true,
+            message: 'Siswa berhasil dirujuk ke faskes! Terdaftar otomatis pada Izin Pulang Darurat/Sakit (' + noSurat + ').',
+            noSurat: noSurat,
+            metrics: appState.metrics
           });
         } else {
           cb({ success: true, message: 'Operasi demo berhasil disimulasikan.' });
